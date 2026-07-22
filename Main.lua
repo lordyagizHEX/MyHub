@@ -1,27 +1,28 @@
 -- ============================================
--- 🔥 LORD HUB V2 - GELİŞMİŞ HUB
+-- 🔥 LORD HUB V3 - BROOKHAVEN EDITION
 -- ============================================
 
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:FindFirstChild("Humanoid")
 local mouse = player:GetMouse()
+local runService = game:GetService("RunService")
+local userInput = game:GetService("UserInputService")
 
 -- ============================================
--- 📱 ANA MENÜ OLUŞTUR
+-- 📱 ANA MENÜ
 -- ============================================
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = player.PlayerGui
-screenGui.Name = "LordHubV2"
+screenGui.Name = "LordHubV3"
 screenGui.ResetOnSpawn = false
 
--- Ana Panel (2 sütunlu)
 local mainFrame = Instance.new("Frame")
 mainFrame.Parent = screenGui
-mainFrame.Size = UDim2.new(0, 700, 0, 550)
-mainFrame.Position = UDim2.new(0.5, -350, 0.5, -275)
-mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+mainFrame.Size = UDim2.new(0, 500, 0, 550)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -275)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
 mainFrame.BackgroundTransparency = 0.05
 mainFrame.Active = true
 mainFrame.Draggable = true
@@ -33,20 +34,20 @@ corner.CornerRadius = UDim.new(0, 12)
 
 local stroke = Instance.new("UIStroke")
 stroke.Parent = mainFrame
-stroke.Color = Color3.fromRGB(0, 150, 255)
+stroke.Color = Color3.fromRGB(255, 50, 100)
 stroke.Thickness = 2
 
 -- Başlık
 local title = Instance.new("TextLabel")
 title.Parent = mainFrame
 title.Size = UDim2.new(1, 0, 0, 45)
-title.Text = "🔥 LORD HUB V2 🔥"
+title.Text = "🔥 LORD HUB V3 🔥"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 24
 title.Font = Enum.Font.GothamBold
 title.BackgroundTransparency = 1
 
--- Kapatma Butonu
+-- Kapatma
 local closeBtn = Instance.new("TextButton")
 closeBtn.Parent = mainFrame
 closeBtn.Size = UDim2.new(0, 40, 0, 30)
@@ -60,17 +61,17 @@ closeBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- 🔘 MENÜYÜ AÇMA BUTONU
+-- 🔘 MENÜ AÇMA BUTONU
 -- ============================================
 
 local toggleBtn = Instance.new("TextButton")
 toggleBtn.Parent = screenGui
 toggleBtn.Size = UDim2.new(0, 60, 0, 60)
-toggleBtn.Position = UDim2.new(0.9, 0, 0.85, 0)
+toggleBtn.Position = UDim2.new(0.9, 0, 0.8, 0)
 toggleBtn.Text = "🔥"
 toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 toggleBtn.TextSize = 30
-toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 100)
 toggleBtn.BackgroundTransparency = 0.1
 
 local toggleCorner = Instance.new("UICorner")
@@ -82,7 +83,7 @@ toggleBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- 📋 SOL TARAF - OYUNCU LİSTESİ
+-- 📋 OYUNCU LİSTESİ (SOL)
 -- ============================================
 
 local leftPanel = Instance.new("Frame")
@@ -96,7 +97,6 @@ local leftCorner = Instance.new("UICorner")
 leftCorner.Parent = leftPanel
 leftCorner.CornerRadius = UDim.new(0, 8)
 
--- Oyuncu Listesi Başlığı
 local listTitle = Instance.new("TextLabel")
 listTitle.Parent = leftPanel
 listTitle.Size = UDim2.new(1, 0, 0, 35)
@@ -106,10 +106,9 @@ listTitle.TextSize = 16
 listTitle.Font = Enum.Font.GothamBold
 listTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
 
--- Scrollable Liste
 local scrollFrame = Instance.new("ScrollingFrame")
 scrollFrame.Parent = leftPanel
-scrollFrame.Size = UDim2.new(1, 0, 1, -35)
+scrollFrame.Size = UDim2.new(1, 0, 1, -70)
 scrollFrame.Position = UDim2.new(0, 0, 0, 35)
 scrollFrame.BackgroundTransparency = 1
 scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -118,12 +117,25 @@ local listLayout = Instance.new("UIListLayout")
 listLayout.Parent = scrollFrame
 listLayout.Padding = UDim.new(0, 5)
 
--- Seçili oyuncu
 local selectedPlayer = nil
 local playerButtons = {}
 
+-- Yenile butonu
+local refreshBtn = Instance.new("TextButton")
+refreshBtn.Parent = leftPanel
+refreshBtn.Size = UDim2.new(1, 0, 0, 30)
+refreshBtn.Position = UDim2.new(0, 0, 0.94, 0)
+refreshBtn.Text = "🔄 Yenile"
+refreshBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+refreshBtn.TextSize = 14
+refreshBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 100)
+
+local refreshCorner = Instance.new("UICorner")
+refreshCorner.Parent = refreshBtn
+refreshCorner.CornerRadius = UDim.new(0, 6)
+
 -- ============================================
--- 📋 SAĞ TARAF - İŞLEMLER
+-- 📋 İŞLEMLER (SAĞ)
 -- ============================================
 
 local rightPanel = Instance.new("Frame")
@@ -137,7 +149,6 @@ local rightCorner = Instance.new("UICorner")
 rightCorner.Parent = rightPanel
 rightCorner.CornerRadius = UDim.new(0, 8)
 
--- Seçili oyuncu gösterimi
 local selectedDisplay = Instance.new("TextLabel")
 selectedDisplay.Parent = rightPanel
 selectedDisplay.Size = UDim2.new(1, 0, 0, 35)
@@ -148,17 +159,17 @@ selectedDisplay.Font = Enum.Font.GothamBold
 selectedDisplay.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
 
 -- ============================================
--- 🎯 BUTON OLUŞTURUCU (SAĞ TARAF)
+-- 🎯 BUTON OLUŞTURUCU
 -- ============================================
 
-local function createRightButton(text, yPos, color, callback)
+local function createButton(text, yPos, color, callback)
     local btn = Instance.new("TextButton")
     btn.Parent = rightPanel
-    btn.Size = UDim2.new(0.9, 0, 0, 40)
+    btn.Size = UDim2.new(0.9, 0, 0, 38)
     btn.Position = UDim2.new(0.05, 0, yPos, 0)
     btn.Text = text
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 15
+    btn.TextSize = 14
     btn.Font = Enum.Font.GothamSemibold
     btn.BackgroundColor3 = color or Color3.fromRGB(40, 40, 60)
     
@@ -175,15 +186,12 @@ end
 -- ============================================
 
 local function refreshPlayerList()
-    -- Eski butonları temizle
     for _, btn in pairs(playerButtons) do
         btn:Destroy()
     end
     playerButtons = {}
     
-    -- Oyuncuları listele
-    local players = game.Players:GetPlayers()
-    for _, plr in pairs(players) do
+    for _, plr in pairs(game.Players:GetPlayers()) do
         if plr ~= player then
             local btn = Instance.new("TextButton")
             btn.Parent = scrollFrame
@@ -200,11 +208,10 @@ local function refreshPlayerList()
             btn.MouseButton1Click:Connect(function()
                 selectedPlayer = plr
                 selectedDisplay.Text = "🎯 Seçili: " .. plr.Name
-                -- Buton rengini değiştir
                 for _, b in pairs(playerButtons) do
                     b.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
                 end
-                btn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+                btn.BackgroundColor3 = Color3.fromRGB(255, 50, 100)
             end)
             
             table.insert(playerButtons, btn)
@@ -214,26 +221,43 @@ local function refreshPlayerList()
     scrollFrame.CanvasSize = UDim2.new(0, 0, 0, #playerButtons * 40)
 end
 
--- Liste yenileme butonu
-local refreshBtn = Instance.new("TextButton")
-refreshBtn.Parent = leftPanel
-refreshBtn.Size = UDim2.new(1, 0, 0, 30)
-refreshBtn.Position = UDim2.new(0, 0, 0.94, 0)
-refreshBtn.Text = "🔄 Yenile"
-refreshBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-refreshBtn.TextSize = 14
-refreshBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-
-local refreshCorner = Instance.new("UICorner")
-refreshCorner.Parent = refreshBtn
-refreshCorner.CornerRadius = UDim.new(0, 6)
-
 refreshBtn.MouseButton1Click:Connect(refreshPlayerList)
 
 -- ============================================
--- 1️⃣ ESP SİSTEMİ
+-- ⚡ KENDİ ÖZELLİKLERİN (SAĞ TARAF)
 -- ============================================
 
+-- 1. UÇUŞ
+local flying = false
+local flyBodyVel = nil
+local flyConn = nil
+
+createButton("🛩️ Uçuş", 0.08, Color3.fromRGB(0, 150, 255), function()
+    flying = not flying
+    
+    if flying then
+        local char = player.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            flyBodyVel = Instance.new("BodyVelocity")
+            flyBodyVel.Parent = char.HumanoidRootPart
+            flyBodyVel.MaxForce = Vector3.new(4000, 4000, 4000)
+            flyBodyVel.Velocity = Vector3.new(0, 50, 0)
+            
+            flyConn = runService.Heartbeat:Connect(function()
+                if flying and char and char:FindFirstChild("HumanoidRootPart") then
+                    flyBodyVel.Velocity = Vector3.new(0, 50, 0)
+                end
+            end)
+        end
+        print("✅ Uçuş AÇIK")
+    else
+        if flyBodyVel then flyBodyVel:Destroy() end
+        if flyConn then flyConn:Disconnect() end
+        print("❌ Uçuş KAPALI")
+    end
+end)
+
+-- 2. ESP
 local espEnabled = false
 local espObjects = {}
 
@@ -242,12 +266,10 @@ local function createESP()
         if plr ~= player and plr.Character then
             local char = plr.Character
             local head = char:FindFirstChild("Head")
-            local humanoid = char:FindFirstChild("Humanoid")
-            
-            if head and humanoid and humanoid.Health > 0 then
+            if head then
                 local bill = Instance.new("BillboardGui")
                 bill.Parent = head
-                bill.Size = UDim2.new(0, 200, 0, 50)
+                bill.Size = UDim2.new(0, 200, 0, 40)
                 bill.StudsOffset = Vector3.new(0, 2.5, 0)
                 bill.AlwaysOnTop = true
                 bill.Name = "ESP_Billboard"
@@ -256,18 +278,18 @@ local function createESP()
                 label.Parent = bill
                 label.Size = UDim2.new(1, 0, 1, 0)
                 label.BackgroundTransparency = 1
-                label.Text = plr.Name .. " ❤️ " .. math.floor(humanoid.Health)
-                label.TextColor3 = humanoid.Health > 50 and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+                label.Text = plr.Name
+                label.TextColor3 = Color3.fromRGB(255, 255, 0)
                 label.TextSize = 16
                 label.Font = Enum.Font.GothamBold
-                label.TextStrokeTransparency = 0.5
+                label.TextStrokeTransparency = 0.3
                 label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
                 
                 local box = Instance.new("BoxHandleAdornment")
                 box.Parent = char
                 box.Adornee = char
                 box.Size = Vector3.new(4, 6, 2)
-                box.Color3 = Color3.fromRGB(0, 150, 255)
+                box.Color3 = Color3.fromRGB(255, 50, 100)
                 box.Transparency = 0.5
                 box.AlwaysOnTop = true
                 box.Name = "ESP_Box"
@@ -288,159 +310,7 @@ local function clearESP()
     espObjects = {}
 end
 
--- ============================================
--- 2️⃣ FLY SİSTEMİ
--- ============================================
-
-local flying = false
-local flyBodyVel = nil
-local flyConnection = nil
-
--- ============================================
--- 3️⃣ FLING / BOAT / KILL / BRING / TELEPORT
--- ============================================
-
-local function getTargetChar()
-    if not selectedPlayer or not selectedPlayer.Character then
-        print("❌ Geçerli bir oyuncu seç!")
-        return nil
-    end
-    return selectedPlayer.Character
-end
-
--- Teleport
-createRightButton("📦 Teleport Et", 0.10, Color3.fromRGB(0, 150, 255), function()
-    local targetChar = getTargetChar()
-    if targetChar and character and character:FindFirstChild("HumanoidRootPart") then
-        character.HumanoidRootPart.CFrame = targetChar.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
-        print("✅ " .. selectedPlayer.Name .. "'e ışınlandın!")
-    end
-end)
-
--- Bring (Oyuncuyu yanına çek)
-createRightButton("📥 Bring (Çek)", 0.20, Color3.fromRGB(255, 200, 0), function()
-    local targetChar = getTargetChar()
-    if targetChar and character and character:FindFirstChild("HumanoidRootPart") then
-        targetChar.HumanoidRootPart.CFrame = character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 3)
-        print("✅ " .. selectedPlayer.Name .. " getirildi!")
-    end
-end)
-
--- Kill
-createRightButton("💀 Kill (Öldür)", 0.30, Color3.fromRGB(255, 0, 0), function()
-    local targetChar = getTargetChar()
-    if targetChar then
-        local hum = targetChar:FindFirstChild("Humanoid")
-        if hum then
-            hum.Health = 0
-            print("💀 " .. selectedPlayer.Name .. " öldürüldü!")
-        end
-    end
-end)
-
--- Fling (Fırlat)
-createRightButton("💥 Fling (Fırlat)", 0.40, Color3.fromRGB(255, 100, 0), function()
-    local targetChar = getTargetChar()
-    if targetChar then
-        local root = targetChar:FindFirstChild("HumanoidRootPart")
-        if root then
-            local vel = Instance.new("BodyVelocity")
-            vel.Parent = root
-            vel.MaxForce = Vector3.new(400000, 400000, 400000)
-            vel.Velocity = Vector3.new(0, 200, 0) + Vector3.new(math.random(-100, 100), 0, math.random(-100, 100))
-            task.wait(0.5)
-            vel:Destroy()
-            print("💥 " .. selectedPlayer.Name .. " fırlatıldı!")
-        end
-    end
-end)
-
--- ============================================
--- 🚗 BOAT (GEMİ) SİSTEMİ
--- ============================================
-
-createRightButton("🚤 Boat (Gemi Fırlat)", 0.50, Color3.fromRGB(200, 50, 50), function()
-    local targetChar = getTargetChar()
-    if not targetChar then return end
-    
-    local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-    if not targetRoot then return end
-    
-    -- Gemi oluştur
-    local boat = Instance.new("Part")
-    boat.Parent = workspace
-    boat.Size = Vector3.new(12, 4, 6)
-    boat.Position = character.HumanoidRootPart.Position + Vector3.new(0, 20, 0)
-    boat.Material = Enum.Material.Neon
-    boat.Color = Color3.fromRGB(255, 0, 0)
-    boat.Anchored = false
-    boat.Name = "Boat_Attack"
-    
-    local boatCorner = Instance.new("SpecialMesh")
-    boatCorner.Parent = boat
-    boatCorner.MeshType = Enum.MeshType.FileMesh
-    boatCorner.MeshId = "rbxassetid://7408735455" -- Tekne görünümü
-    
-    -- Gemiye hız ver
-    local vel = Instance.new("BodyVelocity")
-    vel.Parent = boat
-    vel.MaxForce = Vector3.new(400000, 400000, 400000)
-    vel.Velocity = (targetRoot.Position - boat.Position).Unit * 250 + Vector3.new(0, 50, 0)
-    
-    -- Gemi hedefe çarpsın
-    local connection
-    connection = game:GetService("RunService").Heartbeat:Connect(function()
-        if boat and targetRoot and targetChar and targetChar:FindFirstChild("Humanoid") then
-            local dist = (boat.Position - targetRoot.Position).Magnitude
-            if dist < 15 then
-                -- Patlama efekti
-                local explosion = Instance.new("Explosion")
-                explosion.Parent = workspace
-                explosion.Position = targetRoot.Position
-                explosion.BlastRadius = 25
-                explosion.BlastPressure = 150000
-                
-                targetChar.Humanoid.Health = 0
-                boat:Destroy()
-                connection:Disconnect()
-                print("🚤 " .. selectedPlayer.Name .. " gemi ile yok edildi!")
-            end
-        end
-    end)
-    
-    -- 5 saniye sonra temizle
-    task.wait(5)
-    if boat then
-        boat:Destroy()
-        if connection then connection:Disconnect() end
-    end
-end)
-
--- ============================================
--- ⚡ HIZ / ZIPLAMA AYARLARI
--- ============================================
-
-createRightButton("🏃 Hız: 16/50", 0.62, Color3.fromRGB(30, 144, 255), function()
-    if humanoid.WalkSpeed == 16 then
-        humanoid.WalkSpeed = 50
-    else
-        humanoid.WalkSpeed = 16
-    end
-end)
-
-createRightButton("⬆️ Zıplama: 50/80", 0.72, Color3.fromRGB(0, 200, 100), function()
-    if humanoid.JumpPower == 50 then
-        humanoid.JumpPower = 80
-    else
-        humanoid.JumpPower = 50
-    end
-end)
-
--- ============================================
--- 👁️ ESP / UÇUŞ BUTONLARI (SAĞ TARAF)
--- ============================================
-
-createRightButton("👁️ ESP Aç/Kapa", 0.82, Color3.fromRGB(150, 0, 200), function()
+createButton("👁️ ESP", 0.18, Color3.fromRGB(150, 0, 200), function()
     espEnabled = not espEnabled
     if espEnabled then
         clearESP()
@@ -457,64 +327,204 @@ createRightButton("👁️ ESP Aç/Kapa", 0.82, Color3.fromRGB(150, 0, 200), fun
     end
 end)
 
-createRightButton("🛩️ Uçuş Aç/Kapa", 0.92, Color3.fromRGB(0, 200, 255), function()
-    flying = not flying
-    
-    if flying then
-        local char = player.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            flyBodyVel = Instance.new("BodyVelocity")
-            flyBodyVel.Parent = char.HumanoidRootPart
-            flyBodyVel.MaxForce = Vector3.new(4000, 4000, 4000)
-            flyBodyVel.Velocity = Vector3.new(0, 50, 0)
-            
-            flyConnection = game:GetService("RunService").Heartbeat:Connect(function()
-                if flying and char and char:FindFirstChild("HumanoidRootPart") then
-                    flyBodyVel.Velocity = Vector3.new(0, 50, 0)
-                end
-            end)
-            
-            local uis = game:GetService("UserInputService")
-            uis.InputBegan:Connect(function(input, gameProcessed)
-                if gameProcessed or not flying then return end
-                local root = char:FindFirstChild("HumanoidRootPart")
-                if not root then return end
-                
-                if input.KeyCode == Enum.KeyCode.W then
-                    root.CFrame = root.CFrame + root.CFrame.LookVector * 2
-                elseif input.KeyCode == Enum.KeyCode.S then
-                    root.CFrame = root.CFrame - root.CFrame.LookVector * 2
-                elseif input.KeyCode == Enum.KeyCode.A then
-                    root.CFrame = root.CFrame - root.CFrame.RightVector * 2
-                elseif input.KeyCode == Enum.KeyCode.D then
-                    root.CFrame = root.CFrame + root.CFrame.RightVector * 2
-                end
-            end)
+-- 3. TELEPORT
+createButton("📦 Teleport", 0.28, Color3.fromRGB(0, 200, 255), function()
+    if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local targetRoot = selectedPlayer.Character.HumanoidRootPart
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = targetRoot.CFrame + Vector3.new(0, 3, 0)
+            print("✅ " .. selectedPlayer.Name .. "'e ışınlandın!")
         end
-        print("✅ UÇUŞ AÇIK")
     else
-        if flyBodyVel then flyBodyVel:Destroy() end
-        if flyConnection then flyConnection:Disconnect() end
-        print("❌ UÇUŞ KAPALI")
+        print("❌ Geçerli bir oyuncu seç!")
+    end
+end)
+
+-- 4. BRING
+createButton("📥 Bring", 0.38, Color3.fromRGB(255, 200, 0), function()
+    if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local targetRoot = selectedPlayer.Character.HumanoidRootPart
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            targetRoot.CFrame = character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 3)
+            print("✅ " .. selectedPlayer.Name .. " getirildi!")
+        end
+    else
+        print("❌ Geçerli bir oyuncu seç!")
+    end
+end)
+
+-- 5. KILL
+createButton("💀 Kill", 0.48, Color3.fromRGB(255, 0, 0), function()
+    if selectedPlayer and selectedPlayer.Character then
+        local hum = selectedPlayer.Character:FindFirstChild("Humanoid")
+        if hum then
+            hum.Health = 0
+            print("💀 " .. selectedPlayer.Name .. " öldürüldü!")
+        end
+    else
+        print("❌ Geçerli bir oyuncu seç!")
+    end
+end)
+
+-- 6. FLING
+createButton("💥 Fling", 0.58, Color3.fromRGB(255, 100, 0), function()
+    if selectedPlayer and selectedPlayer.Character then
+        local root = selectedPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if root then
+            local vel = Instance.new("BodyVelocity")
+            vel.Parent = root
+            vel.MaxForce = Vector3.new(400000, 400000, 400000)
+            vel.Velocity = Vector3.new(math.random(-150, 150), math.random(100, 300), math.random(-150, 150))
+            task.wait(0.5)
+            vel:Destroy()
+            print("💥 " .. selectedPlayer.Name .. " fırlatıldı!")
+        end
+    else
+        print("❌ Geçerli bir oyuncu seç!")
+    end
+end)
+
+-- 7. KILL ALL
+createButton("💀 Kill All", 0.68, Color3.fromRGB(200, 0, 0), function()
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= player and plr.Character then
+            local hum = plr.Character:FindFirstChild("Humanoid")
+            if hum and hum.Health > 0 then
+                hum.Health = 0
+            end
+        end
+    end
+    print("💀 Herkes öldürüldü!")
+end)
+
+-- 8. FLING ALL
+createButton("💥 Fling All", 0.78, Color3.fromRGB(200, 50, 0), function()
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= player and plr.Character then
+            local root = plr.Character:FindFirstChild("HumanoidRootPart")
+            if root then
+                local vel = Instance.new("BodyVelocity")
+                vel.Parent = root
+                vel.MaxForce = Vector3.new(400000, 400000, 400000)
+                vel.Velocity = Vector3.new(math.random(-200, 200), math.random(150, 400), math.random(-200, 200))
+                task.wait(0.1)
+                vel:Destroy()
+            end
+        end
+    end
+    print("💥 Herkes fırlatıldı!")
+end)
+
+-- 9. BOAT ATTACK
+createButton("🚤 Boat Attack", 0.88, Color3.fromRGB(200, 50, 50), function()
+    if selectedPlayer and selectedPlayer.Character then
+        local targetRoot = selectedPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if targetRoot and character and character:FindFirstChild("HumanoidRootPart") then
+            local boat = Instance.new("Part")
+            boat.Parent = workspace
+            boat.Size = Vector3.new(10, 3, 5)
+            boat.Position = character.HumanoidRootPart.Position + Vector3.new(0, 25, 0)
+            boat.Material = Enum.Material.Neon
+            boat.Color = Color3.fromRGB(255, 0, 0)
+            boat.Anchored = false
+            boat.Name = "Boat_Attack"
+            
+            local vel = Instance.new("BodyVelocity")
+            vel.Parent = boat
+            vel.MaxForce = Vector3.new(400000, 400000, 400000)
+            vel.Velocity = (targetRoot.Position - boat.Position).Unit * 200 + Vector3.new(0, 50, 0)
+            
+            local connection
+            connection = runService.Heartbeat:Connect(function()
+                if boat and targetRoot and selectedPlayer.Character then
+                    local dist = (boat.Position - targetRoot.Position).Magnitude
+                    if dist < 15 then
+                        local explosion = Instance.new("Explosion")
+                        explosion.Parent = workspace
+                        explosion.Position = targetRoot.Position
+                        explosion.BlastRadius = 20
+                        explosion.BlastPressure = 100000
+                        selectedPlayer.Character:FindFirstChild("Humanoid").Health = 0
+                        boat:Destroy()
+                        connection:Disconnect()
+                        print("🚤 " .. selectedPlayer.Name .. " gemi ile yok edildi!")
+                    end
+                end
+            end)
+            
+            task.wait(5)
+            if boat then
+                boat:Destroy()
+                if connection then connection:Disconnect() end
+            end
+        end
+    else
+        print("❌ Geçerli bir oyuncu seç!")
     end
 end)
 
 -- ============================================
--- 🎯 OYUNCU EKLEME/ÇIKARMA OTOMATİK
+-- ⚡ HIZ VE ZIPLAMA (SAĞ ÜST KÖŞE KÜÇÜK)
 -- ============================================
 
-game.Players.PlayerAdded:Connect(function()
-    refreshPlayerList()
+local speedBtn = Instance.new("TextButton")
+speedBtn.Parent = rightPanel
+speedBtn.Size = UDim2.new(0.4, 0, 0, 30)
+speedBtn.Position = UDim2.new(0.05, 0, 0.95, 0)
+speedBtn.Text = "🏃 16"
+speedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedBtn.TextSize = 12
+speedBtn.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+
+local speedCorner = Instance.new("UICorner")
+speedCorner.Parent = speedBtn
+speedCorner.CornerRadius = UDim.new(0, 6)
+
+speedBtn.MouseButton1Click:Connect(function()
+    if humanoid.WalkSpeed == 16 then
+        humanoid.WalkSpeed = 50
+        speedBtn.Text = "🏃 50"
+    else
+        humanoid.WalkSpeed = 16
+        speedBtn.Text = "🏃 16"
+    end
 end)
 
-game.Players.PlayerRemoving:Connect(function()
-    refreshPlayerList()
+local jumpBtn = Instance.new("TextButton")
+jumpBtn.Parent = rightPanel
+jumpBtn.Size = UDim2.new(0.4, 0, 0, 30)
+jumpBtn.Position = UDim2.new(0.55, 0, 0.95, 0)
+jumpBtn.Text = "⬆️ 50"
+jumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+jumpBtn.TextSize = 12
+jumpBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+
+local jumpCorner = Instance.new("UICorner")
+jumpCorner.Parent = jumpBtn
+jumpCorner.CornerRadius = UDim.new(0, 6)
+
+jumpBtn.MouseButton1Click:Connect(function()
+    if humanoid.JumpPower == 50 then
+        humanoid.JumpPower = 80
+        jumpBtn.Text = "⬆️ 80"
+    else
+        humanoid.JumpPower = 50
+        jumpBtn.Text = "⬆️ 50"
+    end
 end)
+
+-- ============================================
+-- 🔄 OTOMATİK YENİLEME
+-- ============================================
+
+game.Players.PlayerAdded:Connect(refreshPlayerList)
+game.Players.PlayerRemoving:Connect(refreshPlayerList)
 
 -- ============================================
 -- 📋 BAŞLAT
 -- ============================================
 
 refreshPlayerList()
-print("🔥 LORD HUB V2 YÜKLENDİ!")
+print("🔥 LORD HUB V3 YÜKLENDİ!")
 print("📌 Menüyü açmak için sağ alttaki 🔥 butonuna tıkla")
+print("📌 Bir oyuncu seçip işlem yapabilirsin!")
