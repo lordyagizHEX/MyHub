@@ -1,7 +1,8 @@
 --[[
-  LORD HUB — MURDER MYSTERY 2  (V2 MOBİL + PC)
+  LORD HUB — MURDER MYSTERY 2  (V3 MOBİL + PC)
   Otomatik mobil/PC algılama | Dokunmatik hızlı butonlar
-  Kill Aura · Aimbot · Uzak Bıçak · Katil Vur · Optimizasyon
+  Kill Aura · Aimbot · Silah Kazan · Katil Vur · Optimizasyon
+  V3: Kompakt UI, ışınlanmasız kill aura, ölü oyuncu filtresi
 --]]
 
 local Players  = game:GetService("Players")
@@ -27,9 +28,9 @@ local SCALE    = isMobile and math.clamp(vp.X / 480, 0.75, 1.3) or 1
 local function S(n)  return math.floor(n * SCALE) end   -- sayı ölçekle
 local function SP(n) return UDim.new(0, S(n)) end        -- UDim ölçekle
 
--- Pencere boyutu
-local W  = isMobile and S(300) or 340
-local HH = isMobile and S(450) or 490
+-- Pencere boyutu (V3: daha kompakt)
+local W  = isMobile and S(285) or 318
+local HH = isMobile and S(400) or 430
 
 -- ══════════════════════════════════════════════
 -- OPTİMİZASYON MOTORU
@@ -225,15 +226,15 @@ else
 end
 win.BackgroundColor3 = Color3.fromRGB(10,10,18)
 win.BorderSizePixel  = 0; win.Active = true; win.Draggable = true
-Instance.new("UICorner", win).CornerRadius = UDim.new(0,10)
-do local s=Instance.new("UIStroke",win); s.Color=Color3.fromRGB(30,120,255); s.Thickness=1.5 end
+Instance.new("UICorner", win).CornerRadius = UDim.new(0,4)
+do local s=Instance.new("UIStroke",win); s.Color=Color3.fromRGB(30,120,255); s.Thickness=1.2 end
 
 -- ── Başlık barı ────────────────────────────────
-local barH = S(44)
+local barH = S(38)
 local bar  = Instance.new("Frame", win)
 bar.Size = UDim2.new(1,0,0,barH)
 bar.BackgroundColor3 = Color3.fromRGB(14,14,26); bar.BorderSizePixel = 0
-Instance.new("UICorner", bar).CornerRadius = UDim.new(0,10)
+Instance.new("UICorner", bar).CornerRadius = UDim.new(0,4)
 -- Alt kısmı düzelt
 local bfix = Instance.new("Frame", bar)
 bfix.Size = UDim2.new(1,0,0.5,0); bfix.Position = UDim2.new(0,0,0.5,0)
@@ -264,12 +265,12 @@ fpsLbl.Position = UDim2.new(1, -S(130), 0, S(4))
 
 local function hBtn(txt, col, ox)
     local b = Instance.new("TextButton", bar)
-    local bSz = isMobile and S(30) or S(24)
+    local bSz = isMobile and S(28) or S(22)
     b.Size = UDim2.fromOffset(bSz, bSz)
     b.Position = UDim2.new(1, ox, 0.5, -bSz/2)
-    b.Text = txt; b.TextSize = S(11); b.Font = Enum.Font.GothamBold
+    b.Text = txt; b.TextSize = S(10); b.Font = Enum.Font.GothamBold
     b.TextColor3 = Color3.new(1,1,1); b.BackgroundColor3 = col; b.BorderSizePixel = 0
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0,5)
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0,3)
     return b
 end
 local bSz   = isMobile and S(30) or S(24)
