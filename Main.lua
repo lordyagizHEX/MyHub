@@ -1,5 +1,5 @@
 -- [[ LK SYSTEM - Premium Roblox ESP & Hile Menüsü ]]
--- [[ Sürüm: Beta v2.0 - TAM ÇALIŞAN ]]
+-- [[ Sürüm: Beta v2.0 - BUTONLAR ÇALIŞIYOR ]]
 -- [[ Geliştirici: LK System ]]
 
 local Players = game:GetService("Players")
@@ -25,6 +25,7 @@ local WatermarkGui = Instance.new("ScreenGui")
 WatermarkGui.Name = "WatermarkGui"
 WatermarkGui.Parent = game:GetService("CoreGui")
 WatermarkGui.ResetOnSpawn = false
+WatermarkGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local Watermark = Instance.new("Frame")
 Watermark.Name = "Watermark"
@@ -63,6 +64,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "LKSystem"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
@@ -74,23 +76,21 @@ MainFrame.ClipsDescendants = true
 MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
 MainFrame.Size = UDim2.new(0, 600, 0, 400)
 MainFrame.Visible = true
-MainFrame.ZIndex = 100
-MainFrame.Active = true
-MainFrame.Selectable = true
+MainFrame.ZIndex = 1
 
 local GlassEffect = Instance.new("Frame")
 GlassEffect.Parent = MainFrame
 GlassEffect.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 GlassEffect.BackgroundTransparency = 0.95
 GlassEffect.Size = UDim2.new(1, 0, 1, 0)
-GlassEffect.ZIndex = 101
+GlassEffect.ZIndex = 2
 
 local GradientOverlay = Instance.new("Frame")
 GradientOverlay.Parent = MainFrame
 GradientOverlay.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 GradientOverlay.BackgroundTransparency = 0.15
 GradientOverlay.Size = UDim2.new(1, 0, 1, 0)
-GradientOverlay.ZIndex = 102
+GradientOverlay.ZIndex = 3
 
 local MainCorner = Instance.new("UICorner")
 MainCorner.Parent = MainFrame
@@ -104,7 +104,7 @@ TopBar.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 TopBar.BackgroundTransparency = 0.2
 TopBar.BorderSizePixel = 0
 TopBar.Size = UDim2.new(1, 0, 0, 40)
-TopBar.ZIndex = 103
+TopBar.ZIndex = 10
 local TopBarCorner = Instance.new("UICorner")
 TopBarCorner.Parent = TopBar
 TopBarCorner.CornerRadius = UDim.new(0, UI_CORNER)
@@ -119,7 +119,7 @@ Title.Text = "LK SYSTEM"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 18
 Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.ZIndex = 104
+Title.ZIndex = 11
 
 local BetaTag = Instance.new("TextLabel")
 BetaTag.Parent = Title
@@ -130,7 +130,7 @@ BetaTag.Font = Enum.Font.GothamBold
 BetaTag.Text = "BETA"
 BetaTag.TextColor3 = Color3.fromRGB(255, 200, 0)
 BetaTag.TextSize = 10
-BetaTag.ZIndex = 104
+BetaTag.ZIndex = 11
 
 local CloseButton = Instance.new("TextButton")
 CloseButton.Name = "CloseButton"
@@ -144,7 +144,7 @@ CloseButton.Font = Enum.Font.GothamBold
 CloseButton.Text = "✕"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.TextSize = 16
-CloseButton.ZIndex = 104
+CloseButton.ZIndex = 12
 local CloseCorner = Instance.new("UICorner")
 CloseCorner.Parent = CloseButton
 CloseCorner.CornerRadius = UDim.new(0, 6)
@@ -190,11 +190,10 @@ TabContainer.Parent = MainFrame
 TabContainer.BackgroundTransparency = 1
 TabContainer.Position = UDim2.new(0, 0, 0, 40)
 TabContainer.Size = UDim2.new(1, 0, 0, 32)
-TabContainer.ZIndex = 103
+TabContainer.ZIndex = 10
 
 local Tabs = {"Home", "ESP", "Players", "Troll", "GP", "House", "Car", "Set"}
 local TabButtons = {}
-local CurrentTab = "Home"
 
 for i, tabName in ipairs(Tabs) do
     local button = Instance.new("TextButton")
@@ -209,7 +208,8 @@ for i, tabName in ipairs(Tabs) do
     button.Text = tabName
     button.TextColor3 = Color3.fromRGB(200, 200, 200)
     button.TextSize = 10
-    button.ZIndex = 104
+    button.ZIndex = 11
+    button.AutoButtonColor = true
     local buttonCorner = Instance.new("UICorner")
     buttonCorner.Parent = button
     buttonCorner.CornerRadius = UDim.new(0, 5)
@@ -230,7 +230,8 @@ ContentFrame.Parent = MainFrame
 ContentFrame.BackgroundTransparency = 1
 ContentFrame.Position = UDim2.new(0, 8, 0, 75)
 ContentFrame.Size = UDim2.new(1, -16, 1, -85)
-ContentFrame.ZIndex = 103
+ContentFrame.ZIndex = 5
+ContentFrame.ClipsDescendants = true
 
 -- =================================================================
 -- [[ HOME SEKMESİ ]]
@@ -243,7 +244,7 @@ HomeTab.Size = UDim2.new(1, 0, 1, 0)
 HomeTab.CanvasSize = UDim2.new(0, 0, 0, 200)
 HomeTab.ScrollBarThickness = 0
 HomeTab.Visible = true
-HomeTab.ZIndex = 104
+HomeTab.ZIndex = 6
 
 local HomeTitle = Instance.new("TextLabel")
 HomeTitle.Parent = HomeTab
@@ -255,6 +256,7 @@ HomeTitle.Text = "🏠 ANA SAYFA"
 HomeTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 HomeTitle.TextSize = 18
 HomeTitle.TextScaled = true
+HomeTitle.ZIndex = 7
 
 local HomeInfo = Instance.new("TextLabel")
 HomeInfo.Parent = HomeTab
@@ -268,9 +270,10 @@ HomeInfo.TextSize = 12
 HomeInfo.TextScaled = true
 HomeInfo.TextWrapped = true
 HomeInfo.TextYAlignment = Enum.TextYAlignment.Top
+HomeInfo.ZIndex = 7
 
 -- =================================================================
--- [[ PLAYERS SEKMESİ - TAM ÇALIŞAN ]]
+-- [[ PLAYERS SEKMESİ ]]
 -- =================================================================
 local PlayersTab = Instance.new("ScrollingFrame")
 PlayersTab.Name = "PlayersTab"
@@ -281,7 +284,7 @@ PlayersTab.CanvasSize = UDim2.new(0, 0, 0, 450)
 PlayersTab.ScrollBarThickness = 3
 PlayersTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 PlayersTab.Visible = false
-PlayersTab.ZIndex = 104
+PlayersTab.ZIndex = 6
 
 -- Arama Çubuğu
 local SearchFrame = Instance.new("Frame")
@@ -291,6 +294,7 @@ SearchFrame.BackgroundTransparency = 0.3
 SearchFrame.BorderSizePixel = 0
 SearchFrame.Position = UDim2.new(0.05, 0, 0, 5)
 SearchFrame.Size = UDim2.new(0.9, 0, 0, 28)
+SearchFrame.ZIndex = 7
 local SearchCorner = Instance.new("UICorner")
 SearchCorner.Parent = SearchFrame
 SearchCorner.CornerRadius = UDim.new(0, 6)
@@ -306,6 +310,7 @@ SearchBox.Text = ""
 SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 SearchBox.TextSize = 12
 SearchBox.ClearTextOnFocus = false
+SearchBox.ZIndex = 8
 
 -- Oyuncu Listesi
 local PlayerScroll = Instance.new("ScrollingFrame")
@@ -316,9 +321,9 @@ PlayerScroll.Size = UDim2.new(0.9, 0, 0, 320)
 PlayerScroll.CanvasSize = UDim2.new(0, 0, 0, 10)
 PlayerScroll.ScrollBarThickness = 3
 PlayerScroll.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
+PlayerScroll.ZIndex = 7
 
 local function UpdatePlayerList(filter)
-    -- Eski butonları temizle
     for _, child in ipairs(PlayerScroll:GetChildren()) do
         if child:IsA("TextButton") then
             child:Destroy()
@@ -345,26 +350,25 @@ local function UpdatePlayerList(filter)
             btn.BorderSizePixel = 0
             btn.Position = UDim2.new(0, 0, 0, yPos)
             btn.Size = UDim2.new(1, 0, 0, 32)
-            btn.ZIndex = 105
+            btn.ZIndex = 8
+            btn.AutoButtonColor = true
             btn.Text = ""
             local btnCorner = Instance.new("UICorner")
             btnCorner.Parent = btn
             btnCorner.CornerRadius = UDim.new(0, 5)
             
-            -- İsim
             local nameLabel = Instance.new("TextLabel")
             nameLabel.Parent = btn
             nameLabel.BackgroundTransparency = 1
             nameLabel.Position = UDim2.new(0.05, 0, 0, 0)
-            nameLabel.Size = UDim2.new(0.5, 0, 1, 0)
+            nameLabel.Size = UDim2.new(0.4, 0, 1, 0)
             nameLabel.Font = Enum.Font.GothamSemibold
             nameLabel.Text = name
             nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
             nameLabel.TextSize = 12
             nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-            nameLabel.ZIndex = 106
+            nameLabel.ZIndex = 9
             
-            -- Mesafe
             local dist = 0
             if LocalPlayer.Character and player.Character then
                 local myPos = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -376,32 +380,30 @@ local function UpdatePlayerList(filter)
             local distLabel = Instance.new("TextLabel")
             distLabel.Parent = btn
             distLabel.BackgroundTransparency = 1
-            distLabel.Position = UDim2.new(0.55, 0, 0, 0)
+            distLabel.Position = UDim2.new(0.5, 0, 0, 0)
             distLabel.Size = UDim2.new(0.15, 0, 1, 0)
             distLabel.Font = Enum.Font.GothamSemibold
             distLabel.Text = dist .. "m"
             distLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
             distLabel.TextSize = 10
             distLabel.TextXAlignment = Enum.TextXAlignment.Center
-            distLabel.ZIndex = 106
+            distLabel.ZIndex = 9
             
-            -- Sağlık
             local health = 100
             local hum = player.Character and player.Character:FindFirstChild("Humanoid")
             if hum then health = math.floor(hum.Health) end
             local healthLabel = Instance.new("TextLabel")
             healthLabel.Parent = btn
             healthLabel.BackgroundTransparency = 1
-            healthLabel.Position = UDim2.new(0.7, 0, 0, 0)
+            healthLabel.Position = UDim2.new(0.68, 0, 0, 0)
             healthLabel.Size = UDim2.new(0.12, 0, 1, 0)
             healthLabel.Font = Enum.Font.GothamSemibold
             healthLabel.Text = "❤" .. health
             healthLabel.TextColor3 = health > 50 and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
             healthLabel.TextSize = 10
             healthLabel.TextXAlignment = Enum.TextXAlignment.Center
-            healthLabel.ZIndex = 106
+            healthLabel.ZIndex = 9
             
-            -- Seç Butonu
             local selectBtn = Instance.new("TextButton")
             selectBtn.Parent = btn
             selectBtn.BackgroundColor3 = (SELECTED_PLAYER == player) and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(0, 150, 255)
@@ -413,10 +415,11 @@ local function UpdatePlayerList(filter)
             selectBtn.Text = (SELECTED_PLAYER == player) and "✓" or "Seç"
             selectBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
             selectBtn.TextSize = 10
+            selectBtn.ZIndex = 10
+            selectBtn.AutoButtonColor = true
             local selCorner = Instance.new("UICorner")
             selCorner.Parent = selectBtn
             selCorner.CornerRadius = UDim.new(0, 4)
-            selectBtn.ZIndex = 106
             
             selectBtn.MouseButton1Click:Connect(function()
                 SELECTED_PLAYER = player
@@ -449,7 +452,7 @@ Players.PlayerRemoving:Connect(function()
 end)
 
 -- =================================================================
--- [[ ESP SEKMESİ - TAM ÇALIŞAN ]]
+-- [[ ESP SEKMESİ ]]
 -- =================================================================
 local ESPTab = Instance.new("ScrollingFrame")
 ESPTab.Name = "ESPTab"
@@ -460,14 +463,15 @@ ESPTab.CanvasSize = UDim2.new(0, 0, 0, 350)
 ESPTab.ScrollBarThickness = 3
 ESPTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 ESPTab.Visible = false
-ESPTab.ZIndex = 104
+ESPTab.ZIndex = 6
 
--- ESP Aç/Kapa Butonu
+-- ESP Aç/Kapa
 local ESPToggleFrame = Instance.new("Frame")
 ESPToggleFrame.Parent = ESPTab
 ESPToggleFrame.BackgroundTransparency = 1
 ESPToggleFrame.Position = UDim2.new(0.1, 0, 0, 10)
 ESPToggleFrame.Size = UDim2.new(0.8, 0, 0, 40)
+ESPToggleFrame.ZIndex = 7
 
 local ESPToggleLabel = Instance.new("TextLabel")
 ESPToggleLabel.Parent = ESPToggleFrame
@@ -478,6 +482,7 @@ ESPToggleLabel.Text = "🔮 ESP AÇ/KAPA"
 ESPToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 ESPToggleLabel.TextSize = 14
 ESPToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
+ESPToggleLabel.ZIndex = 8
 
 local ESPToggleBtn = Instance.new("TextButton")
 ESPToggleBtn.Parent = ESPToggleFrame
@@ -490,6 +495,8 @@ ESPToggleBtn.Font = Enum.Font.GothamBold
 ESPToggleBtn.Text = "KAPALI"
 ESPToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ESPToggleBtn.TextSize = 11
+ESPToggleBtn.ZIndex = 9
+ESPToggleBtn.AutoButtonColor = true
 local espToggleCorner = Instance.new("UICorner")
 espToggleCorner.Parent = ESPToggleBtn
 espToggleCorner.CornerRadius = UDim.new(0, 5)
@@ -501,12 +508,13 @@ ESPToggleBtn.MouseButton1Click:Connect(function()
     ShowNotification(ESP_ENABLED and "✅ ESP Açıldı!" or "❌ ESP Kapatıldı!")
 end)
 
--- ESP Mesafe Kaydırıcı
+-- ESP Mesafe
 local DistFrame = Instance.new("Frame")
 DistFrame.Parent = ESPTab
 DistFrame.BackgroundTransparency = 1
 DistFrame.Position = UDim2.new(0.1, 0, 0, 60)
 DistFrame.Size = UDim2.new(0.8, 0, 0, 35)
+DistFrame.ZIndex = 7
 
 local DistLabel = Instance.new("TextLabel")
 DistLabel.Parent = DistFrame
@@ -517,6 +525,7 @@ DistLabel.Text = "📡 ESP Mesafesi"
 DistLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 DistLabel.TextSize = 11
 DistLabel.TextXAlignment = Enum.TextXAlignment.Left
+DistLabel.ZIndex = 8
 
 local DistValue = Instance.new("TextLabel")
 DistValue.Parent = DistFrame
@@ -528,6 +537,7 @@ DistValue.Text = "200"
 DistValue.TextColor3 = Color3.fromRGB(30, 144, 255)
 DistValue.TextSize = 11
 DistValue.TextXAlignment = Enum.TextXAlignment.Right
+DistValue.ZIndex = 8
 
 local DistSliderBg = Instance.new("Frame")
 DistSliderBg.Parent = DistFrame
@@ -536,6 +546,7 @@ DistSliderBg.BackgroundTransparency = 0.3
 DistSliderBg.BorderSizePixel = 0
 DistSliderBg.Position = UDim2.new(0, 0, 0.6, 0)
 DistSliderBg.Size = UDim2.new(1, 0, 0, 4)
+DistSliderBg.ZIndex = 8
 local DistSliderCorner = Instance.new("UICorner")
 DistSliderCorner.Parent = DistSliderBg
 DistSliderCorner.CornerRadius = UDim.new(0, 2)
@@ -546,6 +557,7 @@ DistSliderFill.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 DistSliderFill.BackgroundTransparency = 0
 DistSliderFill.BorderSizePixel = 0
 DistSliderFill.Size = UDim2.new(0.15, 0, 1, 0)
+DistSliderFill.ZIndex = 9
 local DistFillCorner = Instance.new("UICorner")
 DistFillCorner.Parent = DistSliderFill
 DistFillCorner.CornerRadius = UDim.new(0, 2)
@@ -577,11 +589,13 @@ function UpdateDist(input)
     local mousePos = input.Position
     local absPos = DistSliderBg.AbsolutePosition
     local size = DistSliderBg.AbsoluteSize.X
-    local percent = math.clamp((mousePos.X - absPos.X) / size, 0, 1)
-    local value = math.round(50 + 950 * percent)
-    DistValue.Text = tostring(value)
-    DistSliderFill.Size = UDim2.new(percent, 0, 1, 0)
-    ESP_DISTANCE = value
+    if size > 0 then
+        local percent = math.clamp((mousePos.X - absPos.X) / size, 0, 1)
+        local value = math.round(50 + 950 * percent)
+        DistValue.Text = tostring(value)
+        DistSliderFill.Size = UDim2.new(percent, 0, 1, 0)
+        ESP_DISTANCE = value
+    end
 end
 
 -- ESP Özellikleri
@@ -599,6 +613,7 @@ for _, feature in ipairs(espFeatures) do
     frame.BackgroundTransparency = 1
     frame.Position = UDim2.new(0.1, 0, 0, espY)
     frame.Size = UDim2.new(0.8, 0, 0, 26)
+    frame.ZIndex = 7
     
     local label = Instance.new("TextLabel")
     label.Parent = frame
@@ -609,6 +624,7 @@ for _, feature in ipairs(espFeatures) do
     label.TextColor3 = Color3.fromRGB(220, 220, 220)
     label.TextSize = 11
     label.TextXAlignment = Enum.TextXAlignment.Left
+    label.ZIndex = 8
     
     local toggle = Instance.new("TextButton")
     toggle.Parent = frame
@@ -621,6 +637,8 @@ for _, feature in ipairs(espFeatures) do
     toggle.Text = feature.default and "ON" or "OFF"
     toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggle.TextSize = 9
+    toggle.ZIndex = 9
+    toggle.AutoButtonColor = true
     local togCorner = Instance.new("UICorner")
     togCorner.Parent = toggle
     togCorner.CornerRadius = UDim.new(0, 4)
@@ -636,7 +654,7 @@ for _, feature in ipairs(espFeatures) do
 end
 
 -- =================================================================
--- [[ TROLL SEKMESİ - TAM ÇALIŞAN ]]
+-- [[ TROLL SEKMESİ ]]
 -- =================================================================
 local TrollTab = Instance.new("ScrollingFrame")
 TrollTab.Name = "TrollTab"
@@ -647,7 +665,7 @@ TrollTab.CanvasSize = UDim2.new(0, 0, 0, 350)
 TrollTab.ScrollBarThickness = 3
 TrollTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 TrollTab.Visible = false
-TrollTab.ZIndex = 104
+TrollTab.ZIndex = 6
 
 local trollY = 10
 local trollOptions = {
@@ -671,6 +689,8 @@ for _, option in ipairs(trollOptions) do
     btn.Text = option
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.TextSize = 13
+    btn.ZIndex = 8
+    btn.AutoButtonColor = true
     local btnCorner = Instance.new("UICorner")
     btnCorner.Parent = btn
     btnCorner.CornerRadius = UDim.new(0, 8)
@@ -720,7 +740,7 @@ for _, option in ipairs(trollOptions) do
 end
 
 -- =================================================================
--- [[ DİĞER SEKMELER - BASİT ]]
+-- [[ DİĞER SEKMELER ]]
 -- =================================================================
 local function CreateSimpleTab(tabName)
     local tab = Instance.new("ScrollingFrame")
@@ -731,7 +751,7 @@ local function CreateSimpleTab(tabName)
     tab.CanvasSize = UDim2.new(0, 0, 0, 100)
     tab.ScrollBarThickness = 0
     tab.Visible = false
-    tab.ZIndex = 104
+    tab.ZIndex = 6
     
     local label = Instance.new("TextLabel")
     label.Parent = tab
@@ -743,6 +763,7 @@ local function CreateSimpleTab(tabName)
     label.TextColor3 = Color3.fromRGB(255, 215, 0)
     label.TextSize = 20
     label.TextScaled = true
+    label.ZIndex = 7
     
     local info = Instance.new("TextLabel")
     info.Parent = tab
@@ -754,6 +775,7 @@ local function CreateSimpleTab(tabName)
     info.TextColor3 = Color3.fromRGB(150, 150, 150)
     info.TextSize = 14
     info.TextScaled = true
+    info.ZIndex = 7
     
     return tab
 end
@@ -767,14 +789,12 @@ local SetTab = CreateSimpleTab("Set")
 -- [[ SEKME GEÇİŞ SİSTEMİ ]]
 -- =================================================================
 local function SwitchTab(tabName)
-    -- Tüm sekmeleri gizle
     for _, child in ipairs(ContentFrame:GetChildren()) do
         if child:IsA("ScrollingFrame") then
             child.Visible = false
         end
     end
     
-    -- Butonları güncelle
     for name, button in pairs(TabButtons) do
         if name == tabName then
             button.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
@@ -787,7 +807,6 @@ local function SwitchTab(tabName)
         end
     end
     
-    -- İlgili sekmeyi göster
     local tabMap = {
         Home = HomeTab,
         ESP = ESPTab,
@@ -829,31 +848,28 @@ ToggleButton.Font = Enum.Font.GothamBold
 ToggleButton.Text = "LK"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.TextSize = 14
+ToggleButton.ZIndex = 100
+ToggleButton.AutoButtonColor = true
 local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.Parent = ToggleButton
 ToggleCorner.CornerRadius = UDim.new(0, 10)
-ToggleButton.ZIndex = 200
 
-local uiOpen = true
 ToggleButton.MouseButton1Click:Connect(function()
     if MainFrame.Visible then
         MainFrame.Visible = false
         ToggleButton.Visible = true
-        uiOpen = false
     else
         MainFrame.Visible = true
         ToggleButton.Visible = false
-        uiOpen = true
     end
 end)
 
 -- =================================================================
--- [[ ESP ÇİZİM SİSTEMİ - ÇALIŞAN ]]
+-- [[ ESP ÇİZİM SİSTEMİ ]]
 -- =================================================================
 local function DrawESP()
     if not ESP_ENABLED then return end
     
-    -- Eski objeleri temizle
     for _, obj in ipairs(ESP_OBJECTS) do
         if obj and obj.Parent then
             obj:Destroy()
@@ -875,7 +891,6 @@ local function DrawESP()
                     local pos = Vector2.new(screenPos.X, screenPos.Y)
                     local size = 50 / (dist / 50 + 1)
                     
-                    -- Kutu ESP
                     local box = Instance.new("Frame")
                     box.Parent = ScreenGui
                     box.BackgroundTransparency = 0.5
@@ -884,68 +899,59 @@ local function DrawESP()
                     box.Size = UDim2.new(0, size, 0, size * 1.3)
                     box.Position = UDim2.new(0, pos.X - size/2, 0, pos.Y - size * 0.6)
                     box.ZIndex = 500
+                    box.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
                     table.insert(ESP_OBJECTS, box)
                     
-                    -- İsim
-                    if true then
-                        local nameTag = Instance.new("TextLabel")
-                        nameTag.Parent = ScreenGui
-                        nameTag.BackgroundTransparency = 1
-                        nameTag.Text = player.Name
-                        nameTag.TextColor3 = Color3.fromRGB(255, 255, 255)
-                        nameTag.TextSize = 12
-                        nameTag.Font = Enum.Font.GothamBold
-                        nameTag.Size = UDim2.new(0, 100, 0, 20)
-                        nameTag.Position = UDim2.new(0, pos.X - 50, 0, pos.Y - size * 0.7 - 20)
-                        nameTag.ZIndex = 500
-                        nameTag.TextXAlignment = Enum.TextXAlignment.Center
-                        table.insert(ESP_OBJECTS, nameTag)
-                    end
+                    local nameTag = Instance.new("TextLabel")
+                    nameTag.Parent = ScreenGui
+                    nameTag.BackgroundTransparency = 1
+                    nameTag.Text = player.Name
+                    nameTag.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    nameTag.TextSize = 12
+                    nameTag.Font = Enum.Font.GothamBold
+                    nameTag.Size = UDim2.new(0, 100, 0, 20)
+                    nameTag.Position = UDim2.new(0, pos.X - 50, 0, pos.Y - size * 0.7 - 20)
+                    nameTag.ZIndex = 500
+                    nameTag.TextXAlignment = Enum.TextXAlignment.Center
+                    table.insert(ESP_OBJECTS, nameTag)
                     
-                    -- Mesafe
-                    if true then
-                        local distTag = Instance.new("TextLabel")
-                        distTag.Parent = ScreenGui
-                        distTag.BackgroundTransparency = 1
-                        distTag.Text = math.floor(dist) .. "m"
-                        distTag.TextColor3 = Color3.fromRGB(255, 200, 0)
-                        distTag.TextSize = 10
-                        distTag.Font = Enum.Font.GothamSemibold
-                        distTag.Size = UDim2.new(0, 50, 0, 16)
-                        distTag.Position = UDim2.new(0, pos.X - 25, 0, pos.Y + size * 0.8)
-                        distTag.ZIndex = 500
-                        distTag.TextXAlignment = Enum.TextXAlignment.Center
-                        table.insert(ESP_OBJECTS, distTag)
-                    end
+                    local distTag = Instance.new("TextLabel")
+                    distTag.Parent = ScreenGui
+                    distTag.BackgroundTransparency = 1
+                    distTag.Text = math.floor(dist) .. "m"
+                    distTag.TextColor3 = Color3.fromRGB(255, 200, 0)
+                    distTag.TextSize = 10
+                    distTag.Font = Enum.Font.GothamSemibold
+                    distTag.Size = UDim2.new(0, 50, 0, 16)
+                    distTag.Position = UDim2.new(0, pos.X - 25, 0, pos.Y + size * 0.8)
+                    distTag.ZIndex = 500
+                    distTag.TextXAlignment = Enum.TextXAlignment.Center
+                    table.insert(ESP_OBJECTS, distTag)
                     
-                    -- Sağlık
-                    if true then
-                        local healthPercent = hum.Health / hum.MaxHealth
-                        local healthBar = Instance.new("Frame")
-                        healthBar.Parent = ScreenGui
-                        healthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-                        healthBar.BackgroundTransparency = 0.5
-                        healthBar.BorderSizePixel = 0
-                        healthBar.Size = UDim2.new(0, size, 0, 3)
-                        healthBar.Position = UDim2.new(0, pos.X - size/2, 0, pos.Y + size * 0.6)
-                        healthBar.ZIndex = 500
-                        table.insert(ESP_OBJECTS, healthBar)
-                        
-                        local healthFill = Instance.new("Frame")
-                        healthFill.Parent = healthBar
-                        healthFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-                        healthFill.BackgroundTransparency = 0
-                        healthFill.BorderSizePixel = 0
-                        healthFill.Size = UDim2.new(healthPercent, 0, 1, 0)
-                        table.insert(ESP_OBJECTS, healthFill)
-                    end
+                    local healthPercent = hum.Health / hum.MaxHealth
+                    local healthBar = Instance.new("Frame")
+                    healthBar.Parent = ScreenGui
+                    healthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                    healthBar.BackgroundTransparency = 0.5
+                    healthBar.BorderSizePixel = 0
+                    healthBar.Size = UDim2.new(0, size, 0, 3)
+                    healthBar.Position = UDim2.new(0, pos.X - size/2, 0, pos.Y + size * 0.6)
+                    healthBar.ZIndex = 500
+                    table.insert(ESP_OBJECTS, healthBar)
+                    
+                    local healthFill = Instance.new("Frame")
+                    healthFill.Parent = healthBar
+                    healthFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                    healthFill.BackgroundTransparency = 0
+                    healthFill.BorderSizePixel = 0
+                    healthFill.Size = UDim2.new(healthPercent, 0, 1, 0)
+                    table.insert(ESP_OBJECTS, healthFill)
                 end
             end
         end
     end
 end
 
--- ESP döngüsü
 RunService.RenderStepped:Connect(function()
     DrawESP()
 end)
@@ -968,14 +974,13 @@ task.wait(0.5)
 UpdatePlayerList("")
 
 ShowNotification("✅ LK SYSTEM Yüklendi!")
-ShowNotification("👋 Hoş geldiniz!")
 
 print("╔═══════════════════════════════════════╗")
-print("║     LK SYSTEM v2.0 - ÇALIŞAN         ║")
+print("║     LK SYSTEM v2.0 - ÇALIŞIYOR       ║")
 print("║                                      ║")
-print("║  ✅ Tüm butonlar çalışıyor           ║")
+print("║  ✅ Tüm butonlar tıklanabilir        ║")
+print("║  ✅ ZIndex sorunu çözüldü            ║")
 print("║  ✅ ESP sistemi aktif                ║")
 print("║  ✅ Oyuncu seçme aktif               ║")
 print("║  ✅ Troll sistemleri aktif           ║")
-print("║  ✅ LK butonu düzeltildi             ║")
 print("╚═══════════════════════════════════════╝")
