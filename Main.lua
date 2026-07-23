@@ -1,5 +1,5 @@
 -- [[ LK SYSTEM - Premium Roblox ESP & Hile Menüsü ]]
--- [[ Sürüm: Beta v2.0 - HIZLI BAŞLATMA ]]
+-- [[ Sürüm: Beta v2.0 - KÜÇÜK UI ]]
 -- [[ Geliştirici: LK System ]]
 
 local Players = game:GetService("Players")
@@ -11,7 +11,7 @@ local Mouse = LocalPlayer:GetMouse()
 local Camera = workspace.CurrentCamera
 
 -- [[ KONSTANTLAR ]]
-local UI_CORNER = 12
+local UI_CORNER = 10
 local GLASS_BLUR = 0.85
 
 -- =================================================================
@@ -27,38 +27,36 @@ local Watermark = Instance.new("Frame")
 Watermark.Name = "Watermark"
 Watermark.Parent = WatermarkGui
 Watermark.BackgroundTransparency = 1
-Watermark.Position = UDim2.new(1, -160, 0, 20)
-Watermark.Size = UDim2.new(0, 140, 0, 55)
+Watermark.Position = UDim2.new(1, -120, 0, 15)
+Watermark.Size = UDim2.new(0, 100, 0, 40)
 Watermark.ZIndex = 1000
 
 local WatermarkTitle = Instance.new("TextLabel")
 WatermarkTitle.Name = "WatermarkTitle"
 WatermarkTitle.Parent = Watermark
 WatermarkTitle.BackgroundTransparency = 1
-WatermarkTitle.Size = UDim2.new(1, 0, 0.65, 0)
+WatermarkTitle.Size = UDim2.new(1, 0, 0.6, 0)
 WatermarkTitle.Font = Enum.Font.GothamBold
 WatermarkTitle.Text = "LK SYSTEM"
 WatermarkTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-WatermarkTitle.TextSize = 22
+WatermarkTitle.TextSize = 16
 WatermarkTitle.TextStrokeTransparency = 0.3
-WatermarkTitle.TextScaled = false
 WatermarkTitle.TextXAlignment = Enum.TextXAlignment.Right
 
 local WatermarkBeta = Instance.new("TextLabel")
 WatermarkBeta.Name = "WatermarkBeta"
 WatermarkBeta.Parent = Watermark
 WatermarkBeta.BackgroundTransparency = 1
-WatermarkBeta.Position = UDim2.new(0, 0, 0.65, 0)
-WatermarkBeta.Size = UDim2.new(1, 0, 0.35, 0)
+WatermarkBeta.Position = UDim2.new(0, 0, 0.6, 0)
+WatermarkBeta.Size = UDim2.new(1, 0, 0.4, 0)
 WatermarkBeta.Font = Enum.Font.GothamBold
 WatermarkBeta.Text = "Beta"
 WatermarkBeta.TextColor3 = Color3.fromRGB(255, 200, 0)
-WatermarkBeta.TextSize = 14
-WatermarkBeta.TextScaled = false
+WatermarkBeta.TextSize = 11
 WatermarkBeta.TextXAlignment = Enum.TextXAlignment.Right
 
 -- =================================================================
--- [[ ANA UI SİSTEMİ ]]
+-- [[ ANA UI SİSTEMİ - KÜÇÜK BOYUT ]]
 -- =================================================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "LKSystem"
@@ -66,7 +64,7 @@ ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- [[ ANA FRAME ]]
+-- [[ ANA FRAME - KÜÇÜK VE ORANTILI ]]
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
@@ -74,8 +72,8 @@ MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 MainFrame.BackgroundTransparency = GLASS_BLUR
 MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
-MainFrame.Position = UDim2.new(0.5, -420, 0.5, -350)
-MainFrame.Size = UDim2.new(0, 840, 0, 700)
+MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+MainFrame.Size = UDim2.new(0, 600, 0, 400)
 MainFrame.Visible = true
 MainFrame.ZIndex = 100
 MainFrame.Active = true
@@ -105,21 +103,21 @@ ShadowFrame.Parent = MainFrame
 ShadowFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 ShadowFrame.BackgroundTransparency = 0.7
 ShadowFrame.BorderSizePixel = 0
-ShadowFrame.Position = UDim2.new(0, 5, 0, 5)
-ShadowFrame.Size = UDim2.new(1, -10, 1, -10)
+ShadowFrame.Position = UDim2.new(0, 4, 0, 4)
+ShadowFrame.Size = UDim2.new(1, -8, 1, -8)
 ShadowFrame.ZIndex = 99
 local ShadowCorner = Instance.new("UICorner")
 ShadowCorner.Parent = ShadowFrame
-ShadowCorner.CornerRadius = UDim.new(0, UI_CORNER + 4)
+ShadowCorner.CornerRadius = UDim.new(0, UI_CORNER + 3)
 
--- [[ ÜST BAR - SÜRÜKLEME ALANI ]]
+-- [[ ÜST BAR - KÜÇÜK ]]
 local TopBar = Instance.new("Frame")
 TopBar.Name = "TopBar"
 TopBar.Parent = MainFrame
 TopBar.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 TopBar.BackgroundTransparency = 0.2
 TopBar.BorderSizePixel = 0
-TopBar.Size = UDim2.new(1, 0, 0, 55)
+TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.ZIndex = 103
 local TopBarCorner = Instance.new("UICorner")
 TopBarCorner.Parent = TopBar
@@ -128,24 +126,24 @@ TopBarCorner.CornerRadius = UDim.new(0, UI_CORNER)
 local Title = Instance.new("TextLabel")
 Title.Parent = TopBar
 Title.BackgroundTransparency = 1
-Title.Position = UDim2.new(0, 15, 0, 0)
-Title.Size = UDim2.new(0.6, 0, 1, 0)
+Title.Position = UDim2.new(0, 12, 0, 0)
+Title.Size = UDim2.new(0.5, 0, 1, 0)
 Title.Font = Enum.Font.GothamBold
 Title.Text = "LK SYSTEM"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 22
+Title.TextSize = 18
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.ZIndex = 104
 
 local BetaTag = Instance.new("TextLabel")
 BetaTag.Parent = Title
 BetaTag.BackgroundTransparency = 1
-BetaTag.Position = UDim2.new(0, 110, 0, 30)
-BetaTag.Size = UDim2.new(0, 45, 0, 18)
+BetaTag.Position = UDim2.new(0, 90, 0, 22)
+BetaTag.Size = UDim2.new(0, 35, 0, 14)
 BetaTag.Font = Enum.Font.GothamBold
 BetaTag.Text = "BETA"
 BetaTag.TextColor3 = Color3.fromRGB(255, 200, 0)
-BetaTag.TextSize = 12
+BetaTag.TextSize = 10
 BetaTag.ZIndex = 104
 
 local CloseButton = Instance.new("TextButton")
@@ -154,16 +152,16 @@ CloseButton.Parent = TopBar
 CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 CloseButton.BackgroundTransparency = 0.8
 CloseButton.BorderSizePixel = 0
-CloseButton.Position = UDim2.new(1, -45, 0, 10)
-CloseButton.Size = UDim2.new(0, 35, 0, 35)
+CloseButton.Position = UDim2.new(1, -35, 0, 6)
+CloseButton.Size = UDim2.new(0, 28, 0, 28)
 CloseButton.Font = Enum.Font.GothamBold
 CloseButton.Text = "✕"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 20
+CloseButton.TextSize = 16
 CloseButton.ZIndex = 104
 local CloseCorner = Instance.new("UICorner")
 CloseCorner.Parent = CloseButton
-CloseCorner.CornerRadius = UDim.new(0, 8)
+CloseCorner.CornerRadius = UDim.new(0, 6)
 
 CloseButton.MouseButton1Click:Connect(function()
     TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
@@ -174,13 +172,12 @@ CloseButton.MouseButton1Click:Connect(function()
 end)
 
 -- =================================================================
--- [[ UI SÜRÜKLEME SİSTEMİ - TAM ÇALIŞAN ]]
+-- [[ UI SÜRÜKLEME SİSTEMİ ]]
 -- =================================================================
 local isDragging = false
 local dragStartPos = Vector2.new()
 local frameStartPos = Vector2.new()
 
--- TopBar üzerinden sürükleme
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or 
        input.UserInputType == Enum.UserInputType.Touch then
@@ -201,24 +198,24 @@ UserInputService.InputChanged:Connect(function(input)
     if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or 
                        input.UserInputType == Enum.UserInputType.Touch) then
         local delta = Vector2.new(input.Position.X, input.Position.Y) - dragStartPos
-        local newX = math.clamp(frameStartPos.X + delta.X, -400, 400)
-        local newY = math.clamp(frameStartPos.Y + delta.Y, -300, 300)
+        local newX = math.clamp(frameStartPos.X + delta.X, -300, 300)
+        local newY = math.clamp(frameStartPos.Y + delta.Y, -200, 200)
         MainFrame.Position = UDim2.new(0, newX, 0, newY)
     end
 end)
 
 -- =================================================================
--- [[ SEKME BUTONLARI ]]
+-- [[ SEKME BUTONLARI - KÜÇÜK ]]
 -- =================================================================
 local TabContainer = Instance.new("Frame")
 TabContainer.Name = "TabContainer"
 TabContainer.Parent = MainFrame
 TabContainer.BackgroundTransparency = 1
-TabContainer.Position = UDim2.new(0, 0, 0, 55)
-TabContainer.Size = UDim2.new(1, 0, 0, 45)
+TabContainer.Position = UDim2.new(0, 0, 0, 40)
+TabContainer.Size = UDim2.new(1, 0, 0, 32)
 TabContainer.ZIndex = 103
 
-local Tabs = {"Home", "ESP", "Players", "Troll", "Gamepass", "Houses", "Car", "Settings"}
+local Tabs = {"Home", "ESP", "Players", "Troll", "GP", "House", "Car", "Set"}
 local TabButtons = {}
 
 for i, tabName in ipairs(Tabs) do
@@ -229,15 +226,15 @@ for i, tabName in ipairs(Tabs) do
     button.BackgroundTransparency = 0.6
     button.BorderSizePixel = 0
     button.Position = UDim2.new((i-1) / #Tabs, 0, 0, 0)
-    button.Size = UDim2.new(1/#Tabs, -2, 1, 0)
+    button.Size = UDim2.new(1/#Tabs, -1, 1, 0)
     button.Font = Enum.Font.GothamSemibold
     button.Text = tabName
     button.TextColor3 = Color3.fromRGB(200, 200, 200)
-    button.TextSize = 11
+    button.TextSize = 10
     button.ZIndex = 104
     local buttonCorner = Instance.new("UICorner")
     buttonCorner.Parent = button
-    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.CornerRadius = UDim.new(0, 5)
     
     if tabName == "Home" then
         button.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
@@ -248,52 +245,52 @@ for i, tabName in ipairs(Tabs) do
     TabButtons[tabName] = button
 end
 
--- [[ İÇERİK ALANI ]]
+-- [[ İÇERİK ALANI - KÜÇÜK ]]
 local ContentFrame = Instance.new("Frame")
 ContentFrame.Name = "ContentFrame"
 ContentFrame.Parent = MainFrame
 ContentFrame.BackgroundTransparency = 1
-ContentFrame.Position = UDim2.new(0, 10, 0, 100)
-ContentFrame.Size = UDim2.new(1, -20, 1, -110)
+ContentFrame.Position = UDim2.new(0, 8, 0, 75)
+ContentFrame.Size = UDim2.new(1, -16, 1, -85)
 ContentFrame.ZIndex = 103
 
 -- =================================================================
--- [[ OYUNCU SEÇİM SİSTEMİ ]]
+-- [[ OYUNCU SEÇİM SİSTEMİ - KÜÇÜK ]]
 -- =================================================================
 local PlayersTab = Instance.new("ScrollingFrame")
 PlayersTab.Name = "PlayersTab"
 PlayersTab.Parent = ContentFrame
 PlayersTab.BackgroundTransparency = 1
 PlayersTab.Size = UDim2.new(1, 0, 1, 0)
-PlayersTab.CanvasSize = UDim2.new(0, 0, 0, 600)
-PlayersTab.ScrollBarThickness = 4
+PlayersTab.CanvasSize = UDim2.new(0, 0, 0, 400)
+PlayersTab.ScrollBarThickness = 3
 PlayersTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 PlayersTab.Visible = false
 PlayersTab.ZIndex = 104
 
 local selectedPlayer = nil
 
--- Arama Çubuğu
+-- Arama Çubuğu - Küçük
 local SearchFrame = Instance.new("Frame")
 SearchFrame.Parent = PlayersTab
 SearchFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
 SearchFrame.BackgroundTransparency = 0.3
 SearchFrame.BorderSizePixel = 0
-SearchFrame.Position = UDim2.new(0.05, 0, 0, 10)
-SearchFrame.Size = UDim2.new(0.9, 0, 0, 40)
+SearchFrame.Position = UDim2.new(0.05, 0, 0, 5)
+SearchFrame.Size = UDim2.new(0.9, 0, 0, 28)
 local SearchCorner = Instance.new("UICorner")
 SearchCorner.Parent = SearchFrame
-SearchCorner.CornerRadius = UDim.new(0, 8)
+SearchCorner.CornerRadius = UDim.new(0, 6)
 
 local SearchIcon = Instance.new("TextLabel")
 SearchIcon.Parent = SearchFrame
 SearchIcon.BackgroundTransparency = 1
 SearchIcon.Position = UDim2.new(0.02, 0, 0, 0)
-SearchIcon.Size = UDim2.new(0, 30, 1, 0)
+SearchIcon.Size = UDim2.new(0, 22, 1, 0)
 SearchIcon.Font = Enum.Font.GothamBold
 SearchIcon.Text = "🔍"
 SearchIcon.TextColor3 = Color3.fromRGB(200, 200, 200)
-SearchIcon.TextSize = 18
+SearchIcon.TextSize = 14
 
 local SearchBox = Instance.new("TextBox")
 SearchBox.Parent = SearchFrame
@@ -301,25 +298,25 @@ SearchBox.BackgroundTransparency = 1
 SearchBox.Position = UDim2.new(0.08, 0, 0, 0)
 SearchBox.Size = UDim2.new(0.9, 0, 1, 0)
 SearchBox.Font = Enum.Font.GothamSemibold
-SearchBox.PlaceholderText = "Oyuncu Ara..."
+SearchBox.PlaceholderText = "Ara..."
 SearchBox.Text = ""
 SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-SearchBox.TextSize = 14
+SearchBox.TextSize = 12
 SearchBox.ClearTextOnFocus = false
 
 -- Oyuncu Listesi
 local PlayerListFrame = Instance.new("Frame")
 PlayerListFrame.Parent = PlayersTab
 PlayerListFrame.BackgroundTransparency = 1
-PlayerListFrame.Position = UDim2.new(0.05, 0, 0, 60)
-PlayerListFrame.Size = UDim2.new(0.9, 0, 0, 500)
+PlayerListFrame.Position = UDim2.new(0.05, 0, 0, 38)
+PlayerListFrame.Size = UDim2.new(0.9, 0, 0, 300)
 
 local PlayerScroll = Instance.new("ScrollingFrame")
 PlayerScroll.Parent = PlayerListFrame
 PlayerScroll.BackgroundTransparency = 1
 PlayerScroll.Size = UDim2.new(1, 0, 1, 0)
-PlayerScroll.CanvasSize = UDim2.new(0, 0, 0, 600)
-PlayerScroll.ScrollBarThickness = 4
+PlayerScroll.CanvasSize = UDim2.new(0, 0, 0, 400)
+PlayerScroll.ScrollBarThickness = 3
 PlayerScroll.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 
 local function UpdatePlayerList(filter)
@@ -347,17 +344,17 @@ local function UpdatePlayerList(filter)
             btn.BackgroundTransparency = 0.3
             btn.BorderSizePixel = 0
             btn.Position = UDim2.new(0, 0, 0, yPos)
-            btn.Size = UDim2.new(1, 0, 0, 50)
+            btn.Size = UDim2.new(1, 0, 0, 32)
             btn.ZIndex = 105
             local btnCorner = Instance.new("UICorner")
             btnCorner.Parent = btn
-            btnCorner.CornerRadius = UDim.new(0, 8)
+            btnCorner.CornerRadius = UDim.new(0, 5)
             
             local avatar = Instance.new("ImageLabel")
             avatar.Parent = btn
             avatar.BackgroundTransparency = 1
             avatar.Position = UDim2.new(0.02, 0, 0.1, 0)
-            avatar.Size = UDim2.new(0, 35, 0.8, 0)
+            avatar.Size = UDim2.new(0, 22, 0.8, 0)
             avatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=48&h=48"
             avatar.ZIndex = 106
             
@@ -365,11 +362,11 @@ local function UpdatePlayerList(filter)
             nameLabel.Parent = btn
             nameLabel.BackgroundTransparency = 1
             nameLabel.Position = UDim2.new(0.1, 0, 0, 0)
-            nameLabel.Size = UDim2.new(0.35, 0, 1, 0)
+            nameLabel.Size = UDim2.new(0.3, 0, 1, 0)
             nameLabel.Font = Enum.Font.GothamSemibold
             nameLabel.Text = player.Name
             nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            nameLabel.TextSize = 14
+            nameLabel.TextSize = 11
             nameLabel.TextXAlignment = Enum.TextXAlignment.Left
             nameLabel.ZIndex = 106
             
@@ -384,12 +381,12 @@ local function UpdatePlayerList(filter)
             local distLabel = Instance.new("TextLabel")
             distLabel.Parent = btn
             distLabel.BackgroundTransparency = 1
-            distLabel.Position = UDim2.new(0.5, 0, 0, 0)
-            distLabel.Size = UDim2.new(0.15, 0, 1, 0)
+            distLabel.Position = UDim2.new(0.45, 0, 0, 0)
+            distLabel.Size = UDim2.new(0.12, 0, 1, 0)
             distLabel.Font = Enum.Font.GothamSemibold
             distLabel.Text = dist .. "m"
             distLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-            distLabel.TextSize = 12
+            distLabel.TextSize = 10
             distLabel.TextXAlignment = Enum.TextXAlignment.Center
             distLabel.ZIndex = 106
             
@@ -399,12 +396,12 @@ local function UpdatePlayerList(filter)
             local healthLabel = Instance.new("TextLabel")
             healthLabel.Parent = btn
             healthLabel.BackgroundTransparency = 1
-            healthLabel.Position = UDim2.new(0.68, 0, 0, 0)
+            healthLabel.Position = UDim2.new(0.6, 0, 0, 0)
             healthLabel.Size = UDim2.new(0.12, 0, 1, 0)
             healthLabel.Font = Enum.Font.GothamSemibold
-            healthLabel.Text = "❤️ " .. health
+            healthLabel.Text = "❤️" .. health
             healthLabel.TextColor3 = health > 50 and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
-            healthLabel.TextSize = 12
+            healthLabel.TextSize = 10
             healthLabel.TextXAlignment = Enum.TextXAlignment.Center
             healthLabel.ZIndex = 106
             
@@ -413,34 +410,34 @@ local function UpdatePlayerList(filter)
             selectBtn.BackgroundColor3 = (selectedPlayer == player) and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(0, 150, 255)
             selectBtn.BackgroundTransparency = 0.2
             selectBtn.BorderSizePixel = 0
-            selectBtn.Position = UDim2.new(0.85, 0, 0.1, 0)
-            selectBtn.Size = UDim2.new(0.12, 0, 0.8, 0)
+            selectBtn.Position = UDim2.new(0.78, 0, 0.1, 0)
+            selectBtn.Size = UDim2.new(0.18, 0, 0.8, 0)
             selectBtn.Font = Enum.Font.GothamSemibold
-            selectBtn.Text = (selectedPlayer == player) and "✅" or "Seç"
+            selectBtn.Text = (selectedPlayer == player) and "✓" or "Seç"
             selectBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-            selectBtn.TextSize = 12
+            selectBtn.TextSize = 10
             local selCorner = Instance.new("UICorner")
             selCorner.Parent = selectBtn
-            selCorner.CornerRadius = UDim.new(0, 6)
+            selCorner.CornerRadius = UDim.new(0, 4)
             selectBtn.ZIndex = 106
             
             selectBtn.MouseButton1Click:Connect(function()
                 selectedPlayer = player
                 UpdatePlayerList(SearchBox.Text)
-                ShowNotification("🎯 Hedef: " .. player.Name)
+                ShowNotification("🎯 " .. player.Name)
             end)
             
             btn.MouseButton1Click:Connect(function()
                 selectedPlayer = player
                 UpdatePlayerList(SearchBox.Text)
-                ShowNotification("🎯 Hedef: " .. player.Name)
+                ShowNotification("🎯 " .. player.Name)
             end)
             
-            yPos = yPos + 55
+            yPos = yPos + 36
         end
     end
     
-    PlayerScroll.CanvasSize = UDim2.new(0, 0, 0, yPos + 20)
+    PlayerScroll.CanvasSize = UDim2.new(0, 0, 0, yPos + 10)
 end
 
 SearchBox.Changed:Connect(function()
@@ -455,20 +452,19 @@ Players.PlayerRemoving:Connect(function()
 end)
 
 -- =================================================================
--- [[ ESP SİSTEMİ ]]
+-- [[ ESP SİSTEMİ - KÜÇÜK ]]
 -- =================================================================
 local ESPTab = Instance.new("ScrollingFrame")
 ESPTab.Name = "ESPTab"
 ESPTab.Parent = ContentFrame
 ESPTab.BackgroundTransparency = 1
 ESPTab.Size = UDim2.new(1, 0, 1, 0)
-ESPTab.CanvasSize = UDim2.new(0, 0, 0, 600)
-ESPTab.ScrollBarThickness = 4
+ESPTab.CanvasSize = UDim2.new(0, 0, 0, 450)
+ESPTab.ScrollBarThickness = 3
 ESPTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 ESPTab.Visible = false
 ESPTab.ZIndex = 104
 
--- ESP Ayarları
 local ESPEnabled = false
 local ESPDistance = 200
 local ESPObjects = {}
@@ -482,7 +478,7 @@ local ESPColors = {
     Glow = Color3.fromRGB(255, 200, 0)
 }
 
--- ESP Aç/Kapa
+-- UI Elemanları - Küçültülmüş
 local function CreateToggleButton(parent, label, yPos, default)
     default = default or false
     
@@ -490,7 +486,7 @@ local function CreateToggleButton(parent, label, yPos, default)
     frame.Parent = parent
     frame.BackgroundTransparency = 1
     frame.Position = UDim2.new(0.05, 0, 0, yPos)
-    frame.Size = UDim2.new(0.9, 0, 0, 35)
+    frame.Size = UDim2.new(0.9, 0, 0, 26)
     
     local labelText = Instance.new("TextLabel")
     labelText.Parent = frame
@@ -499,7 +495,7 @@ local function CreateToggleButton(parent, label, yPos, default)
     labelText.Font = Enum.Font.GothamSemibold
     labelText.Text = label
     labelText.TextColor3 = Color3.fromRGB(220, 220, 220)
-    labelText.TextSize = 14
+    labelText.TextSize = 11
     labelText.TextXAlignment = Enum.TextXAlignment.Left
     
     local toggleBtn = Instance.new("TextButton")
@@ -510,18 +506,18 @@ local function CreateToggleButton(parent, label, yPos, default)
     toggleBtn.Position = UDim2.new(0.85, 0, 0.1, 0)
     toggleBtn.Size = UDim2.new(0.12, 0, 0.8, 0)
     toggleBtn.Font = Enum.Font.GothamBold
-    toggleBtn.Text = default and "AÇIK" or "KAPALI"
+    toggleBtn.Text = default and "ON" or "OFF"
     toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleBtn.TextSize = 11
+    toggleBtn.TextSize = 9
     local toggleCorner = Instance.new("UICorner")
     toggleCorner.Parent = toggleBtn
-    toggleCorner.CornerRadius = UDim.new(0, 6)
+    toggleCorner.CornerRadius = UDim.new(0, 4)
     
     local isOn = default
     
     toggleBtn.MouseButton1Click:Connect(function()
         isOn = not isOn
-        toggleBtn.Text = isOn and "AÇIK" or "KAPALI"
+        toggleBtn.Text = isOn and "ON" or "OFF"
         toggleBtn.BackgroundColor3 = isOn and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(60, 60, 60)
         
         if label:find("ESP") then
@@ -543,27 +539,27 @@ local function CreateSlider(parent, label, min, max, default, yPos)
     frame.Parent = parent
     frame.BackgroundTransparency = 1
     frame.Position = UDim2.new(0.05, 0, 0, yPos)
-    frame.Size = UDim2.new(0.9, 0, 0, 45)
+    frame.Size = UDim2.new(0.9, 0, 0, 32)
     
     local labelText = Instance.new("TextLabel")
     labelText.Parent = frame
     labelText.BackgroundTransparency = 1
-    labelText.Size = UDim2.new(0.5, 0, 0.4, 0)
+    labelText.Size = UDim2.new(0.4, 0, 0.4, 0)
     labelText.Font = Enum.Font.GothamSemibold
     labelText.Text = label
     labelText.TextColor3 = Color3.fromRGB(220, 220, 220)
-    labelText.TextSize = 14
+    labelText.TextSize = 11
     labelText.TextXAlignment = Enum.TextXAlignment.Left
     
     local valueText = Instance.new("TextLabel")
     valueText.Parent = frame
     valueText.BackgroundTransparency = 1
-    valueText.Position = UDim2.new(0.6, 0, 0, 0)
+    valueText.Position = UDim2.new(0.5, 0, 0, 0)
     valueText.Size = UDim2.new(0.4, 0, 0.4, 0)
     valueText.Font = Enum.Font.GothamBold
     valueText.Text = tostring(default)
     valueText.TextColor3 = Color3.fromRGB(30, 144, 255)
-    valueText.TextSize = 14
+    valueText.TextSize = 11
     valueText.TextXAlignment = Enum.TextXAlignment.Right
     
     local sliderBg = Instance.new("Frame")
@@ -572,10 +568,10 @@ local function CreateSlider(parent, label, min, max, default, yPos)
     sliderBg.BackgroundTransparency = 0.3
     sliderBg.BorderSizePixel = 0
     sliderBg.Position = UDim2.new(0, 0, 0.5, 0)
-    sliderBg.Size = UDim2.new(1, 0, 0, 6)
+    sliderBg.Size = UDim2.new(1, 0, 0, 4)
     local sliderCorner = Instance.new("UICorner")
     sliderCorner.Parent = sliderBg
-    sliderCorner.CornerRadius = UDim.new(0, 3)
+    sliderCorner.CornerRadius = UDim.new(0, 2)
     
     local sliderFill = Instance.new("Frame")
     sliderFill.Parent = sliderBg
@@ -585,7 +581,7 @@ local function CreateSlider(parent, label, min, max, default, yPos)
     sliderFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
     local fillCorner = Instance.new("UICorner")
     fillCorner.Parent = sliderFill
-    fillCorner.CornerRadius = UDim.new(0, 3)
+    fillCorner.CornerRadius = UDim.new(0, 2)
     
     local dragging = false
     sliderBg.InputBegan:Connect(function(input)
@@ -632,7 +628,7 @@ local function CreateColorPicker(parent, label, key, yPos)
     frame.Parent = parent
     frame.BackgroundTransparency = 1
     frame.Position = UDim2.new(0.05, 0, 0, yPos)
-    frame.Size = UDim2.new(0.9, 0, 0, 35)
+    frame.Size = UDim2.new(0.9, 0, 0, 26)
     
     local labelText = Instance.new("TextLabel")
     labelText.Parent = frame
@@ -641,7 +637,7 @@ local function CreateColorPicker(parent, label, key, yPos)
     labelText.Font = Enum.Font.GothamSemibold
     labelText.Text = label
     labelText.TextColor3 = Color3.fromRGB(220, 220, 220)
-    labelText.TextSize = 14
+    labelText.TextSize = 11
     labelText.TextXAlignment = Enum.TextXAlignment.Left
     
     local colorBtn = Instance.new("TextButton")
@@ -654,10 +650,10 @@ local function CreateColorPicker(parent, label, key, yPos)
     colorBtn.Font = Enum.Font.GothamBold
     colorBtn.Text = "🎨"
     colorBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    colorBtn.TextSize = 16
+    colorBtn.TextSize = 13
     local colorCorner = Instance.new("UICorner")
     colorCorner.Parent = colorBtn
-    colorCorner.CornerRadius = UDim.new(0, 6)
+    colorCorner.CornerRadius = UDim.new(0, 4)
     
     local colorOptions = {
         Color3.fromRGB(255, 0, 0),
@@ -684,44 +680,41 @@ local function CreateColorPicker(parent, label, key, yPos)
     end)
 end
 
-local ESPToggleBtn = CreateToggleButton(ESPTab, "🔮 ESP AÇ/KAPA", 20)
+-- ESP Ayarları - Küçük boyut
+CreateToggleButton(ESPTab, "🔮 ESP", 5)
 
 local espSettings = {
-    {name = "📦 Kutu ESP", key = "box", default = true},
-    {name = "🦴 İskelet ESP", key = "skeleton", default = false},
-    {name = "📏 İz Çizgisi", key = "line", default = true},
-    {name = "📝 İsim Göster", key = "name", default = true},
-    {name = "❤️ Sağlık Çubuğu", key = "health", default = true},
-    {name = "📐 Mesafe Göster", key = "distance", default = true},
-    {name = "👥 Takım Kontrolü", key = "team", default = true},
-    {name = "✨ Parlama Efekti", key = "glow", default = false}
+    {name = "Kutu", key = "box", default = true},
+    {name = "İskelet", key = "skeleton", default = false},
+    {name = "Çizgi", key = "line", default = true},
+    {name = "İsim", key = "name", default = true},
+    {name = "Sağlık", key = "health", default = true},
+    {name = "Mesafe", key = "distance", default = true},
+    {name = "Takım", key = "team", default = true},
+    {name = "Parlama", key = "glow", default = false}
 }
 
-local espY = 80
+local espY = 35
 for _, setting in ipairs(espSettings) do
     CreateToggleButton(ESPTab, setting.name, espY, setting.default)
-    espY = espY + 45
+    espY = espY + 30
 end
 
-CreateSlider(ESPTab, "📡 ESP Mesafesi", 50, 1000, 200, espY)
-espY = espY + 55
+CreateSlider(ESPTab, "Mesafe", 50, 1000, 200, espY)
+espY = espY + 38
 
 local colorSettings = {
-    {name = "🎨 Kutu Rengi", key = "Box"},
-    {name = "🎨 İskelet Rengi", key = "Skeleton"},
-    {name = "🎨 İsim Rengi", key = "Name"},
-    {name = "🎨 Sağlık Rengi", key = "Health"},
-    {name = "🎨 Mesafe Rengi", key = "Distance"},
-    {name = "🎨 Takım Rengi", key = "Team"},
-    {name = "🎨 Parlama Rengi", key = "Glow"}
+    {name = "Kutu Renk", key = "Box"},
+    {name = "İsim Renk", key = "Name"},
+    {name = "Sağlık Renk", key = "Health"}
 }
 
 for _, color in ipairs(colorSettings) do
     CreateColorPicker(ESPTab, color.name, color.key, espY)
-    espY = espY + 55
+    espY = espY + 30
 end
 
--- [[ ESP ÇİZİM FONKSİYONLARI ]]
+-- ESP Çizim
 local function DrawESP()
     if not ESPEnabled then return end
     
@@ -743,7 +736,7 @@ local function DrawESP()
                 local dist = (hrp.Position - Camera.CFrame.Position).Magnitude
                 
                 if onScreen and dist <= ESPDistance then
-                    -- ESP çizimleri burada yapılabilir
+                    -- ESP çizimleri burada
                 end
             end
         end
@@ -755,14 +748,14 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- =================================================================
--- [[ EKSİK SEKMELER ]]
+-- [[ EKSİK SEKMELER - KÜÇÜK ]]
 -- =================================================================
 local HomeTab = Instance.new("ScrollingFrame")
 HomeTab.Name = "HomeTab"
 HomeTab.Parent = ContentFrame
 HomeTab.BackgroundTransparency = 1
 HomeTab.Size = UDim2.new(1, 0, 1, 0)
-HomeTab.CanvasSize = UDim2.new(0, 0, 0, 300)
+HomeTab.CanvasSize = UDim2.new(0, 0, 0, 150)
 HomeTab.ScrollBarThickness = 0
 HomeTab.Visible = true
 HomeTab.ZIndex = 104
@@ -770,21 +763,34 @@ HomeTab.ZIndex = 104
 local HomeTitle = Instance.new("TextLabel")
 HomeTitle.Parent = HomeTab
 HomeTitle.BackgroundTransparency = 1
-HomeTitle.Position = UDim2.new(0.5, -100, 0, 20)
-HomeTitle.Size = UDim2.new(0, 200, 0, 40)
+HomeTitle.Position = UDim2.new(0.5, -80, 0, 10)
+HomeTitle.Size = UDim2.new(0, 160, 0, 30)
 HomeTitle.Font = Enum.Font.GothamBold
 HomeTitle.Text = "🏠 ANA SAYFA"
 HomeTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-HomeTitle.TextSize = 24
+HomeTitle.TextSize = 18
 HomeTitle.TextScaled = true
+
+local HomeInfo = Instance.new("TextLabel")
+HomeInfo.Parent = HomeTab
+HomeInfo.BackgroundTransparency = 1
+HomeInfo.Position = UDim2.new(0.5, -100, 0, 50)
+HomeInfo.Size = UDim2.new(0, 200, 0, 80)
+HomeInfo.Font = Enum.Font.GothamSemibold
+HomeInfo.Text = "LK SYSTEM v2.0\nHoş geldiniz!\n\nOyuncu seçmek için\nPLAYERS sekmesine gidin"
+HomeInfo.TextColor3 = Color3.fromRGB(180, 180, 180)
+HomeInfo.TextSize = 12
+HomeInfo.TextScaled = true
+HomeInfo.TextWrapped = true
+HomeInfo.TextYAlignment = Enum.TextYAlignment.Top
 
 local TrollTab = Instance.new("ScrollingFrame")
 TrollTab.Name = "TrollTab"
 TrollTab.Parent = ContentFrame
 TrollTab.BackgroundTransparency = 1
 TrollTab.Size = UDim2.new(1, 0, 1, 0)
-TrollTab.CanvasSize = UDim2.new(0, 0, 0, 400)
-TrollTab.ScrollBarThickness = 4
+TrollTab.CanvasSize = UDim2.new(0, 0, 0, 300)
+TrollTab.ScrollBarThickness = 3
 TrollTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 TrollTab.Visible = false
 TrollTab.ZIndex = 104
@@ -794,8 +800,8 @@ GamepassTab.Name = "GamepassTab"
 GamepassTab.Parent = ContentFrame
 GamepassTab.BackgroundTransparency = 1
 GamepassTab.Size = UDim2.new(1, 0, 1, 0)
-GamepassTab.CanvasSize = UDim2.new(0, 0, 0, 500)
-GamepassTab.ScrollBarThickness = 4
+GamepassTab.CanvasSize = UDim2.new(0, 0, 0, 300)
+GamepassTab.ScrollBarThickness = 3
 GamepassTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 GamepassTab.Visible = false
 GamepassTab.ZIndex = 104
@@ -805,8 +811,8 @@ HousesTab.Name = "HousesTab"
 HousesTab.Parent = ContentFrame
 HousesTab.BackgroundTransparency = 1
 HousesTab.Size = UDim2.new(1, 0, 1, 0)
-HousesTab.CanvasSize = UDim2.new(0, 0, 0, 500)
-HousesTab.ScrollBarThickness = 4
+HousesTab.CanvasSize = UDim2.new(0, 0, 0, 300)
+HousesTab.ScrollBarThickness = 3
 HousesTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 HousesTab.Visible = false
 HousesTab.ZIndex = 104
@@ -816,8 +822,8 @@ CarTab.Name = "CarTab"
 CarTab.Parent = ContentFrame
 CarTab.BackgroundTransparency = 1
 CarTab.Size = UDim2.new(1, 0, 1, 0)
-CarTab.CanvasSize = UDim2.new(0, 0, 0, 400)
-CarTab.ScrollBarThickness = 4
+CarTab.CanvasSize = UDim2.new(0, 0, 0, 300)
+CarTab.ScrollBarThickness = 3
 CarTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 CarTab.Visible = false
 CarTab.ZIndex = 104
@@ -827,8 +833,8 @@ SettingsTab.Name = "SettingsTab"
 SettingsTab.Parent = ContentFrame
 SettingsTab.BackgroundTransparency = 1
 SettingsTab.Size = UDim2.new(1, 0, 1, 0)
-SettingsTab.CanvasSize = UDim2.new(0, 0, 0, 300)
-SettingsTab.ScrollBarThickness = 4
+SettingsTab.CanvasSize = UDim2.new(0, 0, 0, 200)
+SettingsTab.ScrollBarThickness = 3
 SettingsTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 SettingsTab.Visible = false
 SettingsTab.ZIndex = 104
@@ -861,10 +867,10 @@ local function SwitchTab(tabName)
         PlayersTab.Visible = true
         UpdatePlayerList("")
     elseif tabName == "Troll" then TrollTab.Visible = true
-    elseif tabName == "Gamepass" then GamepassTab.Visible = true
-    elseif tabName == "Houses" then HousesTab.Visible = true
+    elseif tabName == "GP" then GamepassTab.Visible = true
+    elseif tabName == "House" then HousesTab.Visible = true
     elseif tabName == "Car" then CarTab.Visible = true
-    elseif tabName == "Settings" then SettingsTab.Visible = true
+    elseif tabName == "Set" then SettingsTab.Visible = true
     end
 end
 
@@ -875,7 +881,7 @@ for _, button in pairs(TabButtons) do
 end
 
 -- =================================================================
--- [[ AÇ/KAPA BUTONU ]]
+-- [[ AÇ/KAPA BUTONU - KÜÇÜK ]]
 -- =================================================================
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Name = "ToggleButton"
@@ -883,15 +889,15 @@ ToggleButton.Parent = ScreenGui
 ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 ToggleButton.BackgroundTransparency = 0.2
 ToggleButton.BorderSizePixel = 0
-ToggleButton.Position = UDim2.new(0.02, 0, 0.8, 0)
-ToggleButton.Size = UDim2.new(0, 55, 0, 55)
+ToggleButton.Position = UDim2.new(0.02, 0, 0.85, 0)
+ToggleButton.Size = UDim2.new(0, 40, 0, 40)
 ToggleButton.Font = Enum.Font.GothamBold
 ToggleButton.Text = "LK"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.TextSize = 18
+ToggleButton.TextSize = 14
 local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.Parent = ToggleButton
-ToggleCorner.CornerRadius = UDim.new(0, 14)
+ToggleCorner.CornerRadius = UDim.new(0, 10)
 ToggleButton.ZIndex = 200
 
 ToggleButton.MouseButton1Click:Connect(function()
@@ -914,32 +920,25 @@ function ShowNotification(text)
     game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = "LK SYSTEM",
         Text = text,
-        Duration = 3
+        Duration = 2
     })
 end
 
 -- =================================================================
--- [[ BAŞLAT - DOĞRUDAN UI ]]
+-- [[ BAŞLAT ]]
 -- =================================================================
--- Oyuncu listesini güncelle
-task.wait(0.5)
+task.wait(0.3)
 UpdatePlayerList("")
 
--- Ana UI açık
 MainFrame.Visible = true
 MainFrame.BackgroundTransparency = GLASS_BLUR
 
-ShowNotification("✅ LK SYSTEM Başarıyla Yüklendi!")
-ShowNotification("👋 UI'yı sürükleyerek hareket ettirebilirsiniz!")
+ShowNotification("✅ LK SYSTEM Yüklendi!")
 
 print("╔═══════════════════════════════════════╗")
-print("║        LK SYSTEM v2.0               ║")
-print("║    Premium Roblox Hack Suite         ║")
+print("║     LK SYSTEM v2.0 - KÜÇÜK UI       ║")
 print("║                                      ║")
-print("║  ✅ Yükleme ekranı KALDIRILDI        ║")
-print("║  ✅ Direkt UI aktif                  ║")
-print("║  ✅ UI Sürükleme aktif               ║")
-print("║  ✅ Oyuncu Seçim Sistemi aktif       ║")
-print("║  ✅ ESP Sistemi aktif                ║")
-print("║  ✅ Tüm özellikler hazır             ║")
+print("║  ✅ UI küçültüldü                    ║")
+print("║  ✅ Orantılı boyut                   ║")
+print("║  ✅ Tüm özellikler aktif             ║")
 print("╚═══════════════════════════════════════╝")
