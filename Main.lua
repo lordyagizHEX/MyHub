@@ -1,11 +1,11 @@
 --[[
-  LORD HUB V5 — MURDER MYSTERY 2  (PROFESYONEL)
-  ✅ Katil olduğunda otomatik bıçak fırlatma (TP YOK)
-  ✅ Şerif olduğunda otomatik katil vurma
-  ✅ Gelişmiş ESP (Kırmızı/Yeşil)
-  ✅ Oyuncuları yanına çekip kesme sistemi
-  ✅ FPS oyunu kalitesinde performans
-  ✅ Modern UI tasarımı
+  🔪 LORD HUB V5 — MURDER MYSTERY 2  (PROFESSIONAL)
+  ✅ Katil: Otomatik bıçak fırlatma & çevredekileri kesme
+  ✅ Şerif: Otomatik katil vurma
+  ✅ Profesyonel ESP: Sadece KIRMIZI (katil) & YEŞİL (masum/şerif)
+  ✅ Ultra optimize — donma/kasılma yok
+  ✅ Gelişmiş mobil/PC UI
+  ✅ FPS oyunu kalitesinde hile sistemi
 --]]
 
 local Players  = game:GetService("Players")
@@ -14,39 +14,91 @@ local UIS      = game:GetService("UserInputService")
 local TS       = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local Debris   = game:GetService("Debris")
-local VU       = game:GetService("VirtualUser")
+local Http     = game:GetService("HttpService")
 local lp       = Players.LocalPlayer
 local pgui     = lp.PlayerGui
 local cam      = workspace.CurrentCamera
-local mouse    = lp:GetMouse()
 
-if pgui:FindFirstChild("LORDHUBV5") then pgui.LORDHUBV5:Destroy() end
+if pgui:FindFirstChild("MM2HubV5") then pgui.MM2HubV5:Destroy() end
 
 -- ══════════════════════════════════════════════
--- OPTİMİZASYON & PERFORMANS
+-- MOBİL ALGILAMA
 -- ══════════════════════════════════════════════
-local Connections = {}
-local FPS = 60
-local frameTime = 0
 local isMobile = UIS.TouchEnabled and not UIS.KeyboardEnabled
+local vp = cam.ViewportSize
 
-RS.Heartbeat:Connect(function(dt)
-    frameTime = dt
-    FPS = math.clamp(1 / (dt + 0.001), 1, 144)
-end)
-
-local function connectEvent(event, fn, tag)
-    local c = event:Connect(fn)
-    if tag then
-        if Connections[tag] then Connections[tag]:Disconnect() end
-        Connections[tag] = c
-    end
-    return c
+local function getScale()
+    local w = cam.ViewportSize.X
+    local h = cam.ViewportSize.Y
+    if not isMobile then return 1 end
+    local base = math.min(w, h) / 390
+    return math.clamp(base, 0.80, 1.40)
 end
 
-local function disconnectEvent(tag)
+local SCALE = getScale()
+local function S(n) return math.floor(n * SCALE) end
+
+-- ══════════════════════════════════════════════
+-- ROL TESPİTİ (Hızlı)
+-- ══════════════════════════════════════════════
+local KNIFE_KW = {"knife","bıçak","mm2knife","sickle","virtual","darkblade","elderwood","chrome","luger","candy","saw","bat"}
+local GUN_KW   = {"revolver","gun","sheriff","luger","mm2gun","pistol","magnum"}
+
+local roleCache = {}
+local roleCacheTime = 0
+
+local function getRole(plr)
+    if plr == lp then return "self" end
+    local now = tick()
+    if roleCache[plr] and now - roleCacheTime < 0.3 then
+        return roleCache[plr]
+    end
+    
+    local ch = plr.Character
+    if not ch then return "unknown" end
+    
+    -- Önce eldeki tool'a bak
+    for _, t in pairs(ch:GetChildren()) do
+        if t:IsA("Tool") then
+            local n = t.Name:lower()
+            for _, k in pairs(KNIFE_KW) do if n:find(k) then roleCache[plr] = "murderer"; roleCacheTime = now; return "murderer" end end
+            for _, g in pairs(GUN_KW) do if n:find(g) then roleCache[plr] = "sheriff"; roleCacheTime = now; return "sheriff" end end
+        end
+    end
+    
+    -- Backpack'e bak
+    local bp = plr:FindFirstChild("Backpack")
+    if bp then
+        for _, t in pairs(bp:GetChildren()) do
+            if t:IsA("Tool") then
+                local n = t.Name:lower()
+                for _, k in pairs(KNIFE_KW) do if n:find(k) then roleCache[plr] = "murderer"; roleCacheTime = now; return "murderer" end end
+                for _, g in pairs(GUN_KW) do if n:find(g) then roleCache[plr] = "sheriff"; roleCacheTime = now; return "sheriff" end end
+            end
+        end
+    end
+    
+    roleCache[plr] = "innocent"
+    roleCacheTime = now
+    return "innocent"
+end
+
+-- ══════════════════════════════════════════════
+-- OPTİMİZE EDİLMİŞ CONNECTION YÖNETİMİ
+-- ══════════════════════════════════════════════
+local Connections = {}
+local function connect(event, fn, tag)
+    if tag and Connections[tag] then
+        pcall(function() Connections[tag]:Disconnect() end)
+        Connections[tag] = nil
+    end
+    local c = event:Connect(fn)
+    if tag then Connections[tag] = c end
+    return c
+end
+local function disconnect(tag)
     if Connections[tag] then
-        Connections[tag]:Disconnect()
+        pcall(function() Connections[tag]:Disconnect() end)
         Connections[tag] = nil
     end
 end
@@ -54,262 +106,247 @@ end
 -- ══════════════════════════════════════════════
 -- YARDIMCI FONKSİYONLAR
 -- ══════════════════════════════════════════════
-local function getCharacter() return lp.Character end
-local function getRoot() 
-    local c = getCharacter()
-    return c and c:FindFirstChild("HumanoidRootPart")
-end
-local function getHumanoid()
-    local c = getCharacter()
-    return c and c:FindFirstChildOfClass("Humanoid")
-end
+local function C() return lp.Character end
+local function R() local c = C(); return c and c:FindFirstChild("HumanoidRootPart") end
+local function H() local c = C(); return c and c:FindFirstChildOfClass("Humanoid") end
 
-local function getPlayerRole(plr)
-    if plr == lp then return "self" end
-    local char = plr.Character
-    if not char then return "unknown" end
-    
-    -- Ölü kontrolü
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum and hum.Health <= 0 then return "dead" end
-    
-    -- Elindeki eşyaya göre rol tespiti
-    for _, tool in pairs(char:GetChildren()) do
-        if tool:IsA("Tool") then
-            local name = tool.Name:lower()
-            if name:find("knife") or name:find("bıçak") or name:find("sickle") or 
-               name:find("blade") or name:find("dagger") or name:find("chrome") then
-                return "murderer"
-            end
-            if name:find("gun") or name:find("revolver") or name:find("sheriff") or
-               name:find("pistol") or name:find("magnum") or name:find("luger") then
-                return "sheriff"
-            end
-        end
-    end
-    return "innocent"
-end
-
+-- Görünürlük kontrolü (optimize)
 local function isVisible(from, to)
     local dir = to - from
     local dist = dir.Magnitude
-    if dist < 0.1 then return true end
-    
-    local params = RaycastParams.new()
-    params.FilterType = Enum.RaycastFilterType.Exclude
+    if dist < 0.5 then return true end
+    local rp = RaycastParams.new()
+    rp.FilterType = Enum.RaycastFilterType.Exclude
     local filter = {}
     for _, p in pairs(Players:GetPlayers()) do
         if p.Character then table.insert(filter, p.Character) end
     end
-    params.FilterDescendantsInstances = filter
-    
-    local ray = workspace:Raycast(from, dir.Unit * dist, params)
+    rp.FilterDescendantsInstances = filter
+    local ray = workspace:Raycast(from, dir.Unit * dist, rp)
     return not ray
 end
 
-local function findNearest(roles, maxDist)
-    local root = getRoot()
+-- En yakın hedef bul
+local function findNearest(roles, requireVis, maxDist)
+    local root = R()
     if not root then return nil, math.huge end
+    local best, bestD = nil, maxDist or math.huge
+    local rootPos = root.Position
+    local rootY = rootPos.Y
     
-    local best, bestDist = nil, maxDist or math.huge
     for _, plr in pairs(Players:GetPlayers()) do
         if plr == lp then continue end
-        local role = getPlayerRole(plr)
-        if role == "dead" then continue end
-        
-        local match = false
-        for _, r in pairs(roles) do
-            if role == r then match = true; break end
-        end
-        if not match then continue end
-        
-        local tRoot = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+        local ch = plr.Character
+        if not ch then continue end
+        local hum = ch:FindFirstChildOfClass("Humanoid")
+        if hum and hum.Health <= 0 then continue end
+        local tRoot = ch:FindFirstChild("HumanoidRootPart")
         if not tRoot then continue end
         
-        local dist = (tRoot.Position - root.Position).Magnitude
-        if dist < bestDist then
-            bestDist = dist
-            best = plr
+        local role = getRole(plr)
+        local match = false
+        for _, r in pairs(roles) do if role == r then match = true; break end end
+        if not match then continue end
+        
+        local d = (tRoot.Position - rootPos).Magnitude
+        if d < bestD and d < maxDist then
+            if requireVis then
+                if isVisible(rootPos + Vector3.new(0, 2, 0), tRoot.Position + Vector3.new(0, 2, 0)) then
+                    bestD = d; best = plr
+                end
+            else
+                bestD = d; best = plr
+            end
         end
     end
-    return best, bestDist
-end
-
-local function findMurderer()
-    return findNearest({"murderer"}, math.huge)
-end
-
-local function findInnocents()
-    return findNearest({"innocent", "sheriff"}, math.huge)
+    return best, bestD
 end
 
 -- ══════════════════════════════════════════════
--- REMOTE BULMA SİSTEMİ
+-- REMOTE BULMA (Geliştirilmiş)
 -- ══════════════════════════════════════════════
 local throwRemote = nil
+local remoteCache = {}
+
 local function findThrowRemote()
     if throwRemote then return throwRemote end
     
-    local keywords = {"throw", "attack", "swing", "stab", "hit", "slash", "fire", "shoot", "kill", "damage"}
-    for _, obj in pairs(game:GetDescendants()) do
-        if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
-            local name = obj.Name:lower()
-            for _, kw in pairs(keywords) do
-                if name:find(kw) then
-                    throwRemote = obj
-                    return obj
+    local keywords = {"throw","attack","swing","stab","hit","slash","fire","shoot","kill","damage","activate"}
+    
+    -- Önce karakterdeki tool'u kontrol et
+    local ch = C()
+    if ch then
+        for _, t in pairs(ch:GetChildren()) do
+            if t:IsA("Tool") then
+                for _, child in pairs(t:GetDescendants()) do
+                    if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") then
+                        throwRemote = child
+                        return throwRemote
+                    end
                 end
             end
         end
     end
+    
+    -- Global ara
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
+            local n = obj.Name:lower()
+            for _, kw in pairs(keywords) do
+                if n:find(kw) then
+                    throwRemote = obj
+                    return throwRemote
+                end
+            end
+        end
+    end
+    
     return nil
 end
 
 -- ══════════════════════════════════════════════
--- SALDIRI SİSTEMİ (TP YOK - SADECE FIRLATMA)
+-- ANA SALDIRI SİSTEMİ (ULTRA HIZLI)
 -- ══════════════════════════════════════════════
-local throwCooldown = 0
+local attackCooldown = 0
 local attackDelay = 0.06
+local attackRange = 30
 
-local function throwKnife(target, force)
-    if not target then return false end
+-- Hedef pozisyon tahmini (daha hassas)
+local prevPositions = {}
+local function predictPosition(plr, ahead)
+    local root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+    if not root then return nil end
+    local cur = root.Position
+    local prev = prevPositions[plr]
+    local vel = prev and (cur - prev) * 60 or Vector3.zero
+    prevPositions[plr] = cur
+    return cur + vel * (ahead or 0.1)
+end
+
+-- Bıçak fırlat / saldır (TP YOK!)
+local function attackTarget(target, force)
+    if not target then return end
     local now = tick()
-    if now - throwCooldown < attackDelay and not force then return false end
-    throwCooldown = now
+    if now - attackCooldown < attackDelay and not force then return end
+    attackCooldown = now
     
-    local root = getRoot()
-    if not root then return false end
-    
+    local root = R()
+    if not root then return end
     local tRoot = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
-    if not tRoot then return false end
-    
+    if not tRoot then return end
     local tHum = target.Character:FindFirstChildOfClass("Humanoid")
-    if tHum and tHum.Health <= 0 then return false end
+    if tHum and tHum.Health <= 0 then return end
     
-    -- Hedefe yönel (TP yok!)
-    local aimPos = tRoot.Position
+    -- Hedef pozisyonu tahmin et
+    local aimPos = predictPosition(target, 0.08) or tRoot.Position
+    
+    -- Sadece yöne bak (TP YOK!)
     root.CFrame = CFrame.lookAt(root.Position, Vector3.new(aimPos.X, root.Position.Y, aimPos.Z))
     
-    local char = getCharacter()
-    if not char then return false end
+    local ch = C()
+    if not ch then return end
     
     -- Eldeki tool'u bul
     local tool = nil
-    for _, t in pairs(char:GetChildren()) do
+    for _, t in pairs(ch:GetChildren()) do
         if t:IsA("Tool") then
             tool = t
             break
         end
     end
     
-    -- Remote ateşle
+    -- Remote event'leri bul ve ateşle
     local remote = findThrowRemote()
     if remote then
         pcall(function()
             if remote:IsA("RemoteEvent") then
                 remote:FireServer(aimPos)
                 remote:FireServer(tRoot)
+                remote:FireServer(target.Character)
             else
                 remote:InvokeServer(aimPos)
             end
         end)
     end
     
-    -- Tool aktivasyonu
+    -- Tool içindeki remote'lar
     if tool then
-        pcall(function()
-            -- Tool içindeki remote
-            local toolRemote = tool:FindFirstChildOfClass("RemoteEvent") or tool:FindFirstChildOfClass("RemoteFunction")
-            if toolRemote then
-                if toolRemote:IsA("RemoteEvent") then
-                    toolRemote:FireServer(aimPos)
-                    toolRemote:FireServer(tRoot)
-                else
-                    toolRemote:InvokeServer(aimPos)
-                end
-            end
-            tool:Activate()
-        end)
-    end
-    
-    return true
-end
-
--- ══════════════════════════════════════════════
--- OTOMATİK SALDIRI SİSTEMLERİ
--- ══════════════════════════════════════════════
-local autoAttackOn = false
-local autoAttackTarget = nil
-
--- Katil olarak oyuncuları yanına çekip kesme
-local pullRange = 30
-local pullEnabled = false
-
-local function pullPlayer(target)
-    if not target then return end
-    local root = getRoot()
-    if not root then return end
-    
-    local tRoot = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
-    if not tRoot then return end
-    
-    local dist = (tRoot.Position - root.Position).Magnitude
-    if dist > pullRange then return end
-    
-    -- Oyuncuyu yanına çek
-    local pullPos = root.Position + (tRoot.Position - root.Position).Unit * 3
-    tRoot.CFrame = CFrame.new(pullPos)
-    
-    -- Bıçak fırlat
-    throwKnife(target, true)
-end
-
--- Otomatik saldırı loop'u
-local function startAutoAttack()
-    if autoAttackOn then return end
-    autoAttackOn = true
-    
-    connectEvent(RS.Heartbeat, function()
-        if not autoAttackOn then return end
-        
-        local role = getPlayerRole(lp)
-        local root = getRoot()
-        if not root then return end
-        
-        if role == "murderer" then
-            -- Katil: En yakın oyuncuyu bul ve fırlat
-            local target = findNearest({"innocent", "sheriff"}, 50)
-            if target then
-                -- Oyuncuyu yanına çek (pull)
-                local tRoot = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
-                if tRoot then
-                    local dist = (tRoot.Position - root.Position).Magnitude
-                    if dist < pullRange and pullEnabled then
-                        local pullPos = root.Position + (tRoot.Position - root.Position).Unit * 3
-                        tRoot.CFrame = CFrame.new(pullPos)
+        for _, child in pairs(tool:GetDescendants()) do
+            if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") then
+                pcall(function()
+                    if child:IsA("RemoteEvent") then
+                        child:FireServer(aimPos)
+                        child:FireServer(tRoot)
+                    else
+                        child:InvokeServer(aimPos)
                     end
-                end
-                throwKnife(target, true)
-            end
-            
-        elseif role == "sheriff" then
-            -- Şerif: Katili bul ve vur
-            local murderer = findMurderer()
-            if murderer then
-                throwKnife(murderer, true)
+                end)
             end
         end
-        
-    end, "autoAttack")
-end
-
-local function stopAutoAttack()
-    autoAttackOn = false
-    disconnectEvent("autoAttack")
+        pcall(function() tool:Activate() end)
+    end
+    
+    -- Mouse simülasyonu
+    pcall(function()
+        local ms = lp:GetMouse()
+        if ms then
+            ms.Target = tRoot
+            ms.Hit = CFrame.new(aimPos)
+        end
+    end)
 end
 
 -- ══════════════════════════════════════════════
--- ESP SİSTEMİ (KIRMIZI / YEŞİL)
+-- OTOMATİK SALDIRI SİSTEMLERİ (PROFESSIONAL)
+-- ══════════════════════════════════════════════
+local autoAttackEnabled = false
+local autoAttackMode = "all" -- "all", "murderer", "sheriff"
+
+-- Katil modu: Çevredeki tüm oyunculara otomatik saldır
+local function murdererAutoAttack()
+    local root = R()
+    if not root then return end
+    
+    local targets = {}
+    local rootPos = root.Position
+    
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr == lp then continue end
+        local ch = plr.Character
+        if not ch then continue end
+        local hum = ch:FindFirstChildOfClass("Humanoid")
+        if hum and hum.Health <= 0 then continue end
+        local tRoot = ch:FindFirstChild("HumanoidRootPart")
+        if not tRoot then continue end
+        
+        local d = (tRoot.Position - rootPos).Magnitude
+        if d < attackRange then
+            -- Görünürlük kontrolü
+            if isVisible(rootPos + Vector3.new(0, 2, 0), tRoot.Position + Vector3.new(0, 2, 0)) then
+                table.insert(targets, {plr = plr, dist = d, root = tRoot})
+            end
+        end
+    end
+    
+    -- Mesafeye göre sırala (en yakın önce)
+    table.sort(targets, function(a, b) return a.dist < b.dist end)
+    
+    -- En yakın hedefe saldır
+    if #targets > 0 then
+        attackTarget(targets[1].plr, false)
+    end
+end
+
+-- Şerif modu: Katili otomatik vur
+local function sheriffAutoAttack()
+    local murderer = findNearest({"murderer"}, true, attackRange * 1.5)
+    if murderer then
+        attackTarget(murderer, false)
+    end
+end
+
+-- ══════════════════════════════════════════════
+-- ESP SİSTEMİ (Sadece KIRMIZI & YEŞİL)
 -- ══════════════════════════════════════════════
 local espEnabled = false
 local espObjects = {}
@@ -321,790 +358,641 @@ local function clearESP()
     espObjects = {}
 end
 
-local function createESP(plr)
-    if plr == lp then return end
-    
-    local char = plr.Character
-    if not char then return end
-    
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum and hum.Health <= 0 then return end
-    
-    local head = char:FindFirstChild("Head")
-    if not head then return end
-    
-    local role = getPlayerRole(plr)
-    local isMurderer = role == "murderer"
-    local color = isMurderer and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
-    local roleText = isMurderer and "🔴 KATİL" or "🟢 MASUM"
-    
-    local bill = Instance.new("BillboardGui", head)
-    bill.Name = "ESP_V5"
-    bill.AlwaysOnTop = true
-    bill.Size = UDim2.fromOffset(200, 70)
-    bill.StudsOffset = Vector3.new(0, 3.5, 0)
-    bill.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    
-    -- Arka plan
-    local bg = Instance.new("Frame", bill)
-    bg.Size = UDim2.new(1, 0, 1, 0)
-    bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    bg.BackgroundTransparency = 0.4
-    bg.BorderSizePixel = 0
-    Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 8)
-    
-    -- Çerçeve (renkli)
-    local stroke = Instance.new("UIStroke", bg)
-    stroke.Color = color
-    stroke.Thickness = 2
-    stroke.Transparency = 0.3
-    
-    -- İsim
-    local nameLabel = Instance.new("TextLabel", bg)
-    nameLabel.Size = UDim2.new(1, 0, 0.4, 0)
-    nameLabel.Position = UDim2.new(0, 0, 0, 0)
-    nameLabel.Text = plr.Name
-    nameLabel.TextColor3 = Color3.new(1, 1, 1)
-    nameLabel.TextSize = 14
-    nameLabel.Font = Enum.Font.GothamBold
-    nameLabel.BackgroundTransparency = 1
-    nameLabel.TextXAlignment = Enum.TextXAlignment.Center
-    
-    -- Rol
-    local roleLabel = Instance.new("TextLabel", bg)
-    roleLabel.Size = UDim2.new(1, 0, 0.35, 0)
-    roleLabel.Position = UDim2.new(0, 0, 0.4, 0)
-    roleLabel.Text = roleText
-    roleLabel.TextColor3 = color
-    roleLabel.TextSize = 12
-    roleLabel.Font = Enum.Font.GothamSemibold
-    roleLabel.BackgroundTransparency = 1
-    roleLabel.TextXAlignment = Enum.TextXAlignment.Center
-    
-    -- Can
-    local healthLabel = Instance.new("TextLabel", bg)
-    healthLabel.Size = UDim2.new(1, 0, 0.25, 0)
-    healthLabel.Position = UDim2.new(0, 0, 0.75, 0)
-    healthLabel.Text = "❤️ " .. math.floor(hum.Health) .. "/" .. math.floor(hum.MaxHealth)
-    healthLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-    healthLabel.TextSize = 10
-    healthLabel.Font = Enum.Font.Gotham
-    healthLabel.BackgroundTransparency = 1
-    healthLabel.TextXAlignment = Enum.TextXAlignment.Center
-    
-    -- Can değişimini takip et
-    hum:GetPropertyChangedSignal("Health"):Connect(function()
-        if healthLabel.Parent then
-            healthLabel.Text = "❤️ " .. math.floor(hum.Health) .. "/" .. math.floor(hum.MaxHealth)
-        end
-    end)
-    
-    -- Mesafe güncellemesi
-    local root = getRoot()
-    if root then
-        local distLabel = Instance.new("TextLabel", bg)
-        distLabel.Size = UDim2.new(1, 0, 0.25, 0)
-        distLabel.Position = UDim2.new(0, 0, 0.75, 0)
-        distLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        distLabel.TextSize = 10
-        distLabel.Font = Enum.Font.Gotham
-        distLabel.BackgroundTransparency = 1
-        distLabel.TextXAlignment = Enum.TextXAlignment.Right
-        
-        connectEvent(RS.Heartbeat, function()
-            if distLabel.Parent and root and head then
-                local dist = (head.Position - root.Position).Magnitude
-                distLabel.Text = math.floor(dist) .. "m"
-            end
-        end, "dist_" .. plr.Name)
-    end
-    
-    table.insert(espObjects, bill)
-end
-
 local function buildESP()
     clearESP()
     if not espEnabled then return end
     
+    local root = R()
+    local rootPos = root and root.Position or Vector3.zero
+    
     for _, plr in pairs(Players:GetPlayers()) do
-        createESP(plr)
-    end
-end
-
-local function toggleESP(on)
-    espEnabled = on
-    if on then
-        buildESP()
-        connectEvent(Players.PlayerAdded, function() task.wait(0.1); buildESP() end, "espAdd")
-        connectEvent(Players.PlayerRemoving, function() task.wait(0.1); buildESP() end, "espRemove")
-        connectEvent(workspace.DescendantAdded, function(obj)
-            if obj:IsA("Tool") or obj.Name == "Head" then
-                task.wait(0.05)
-                if espEnabled then buildESP() end
-            end
-        end, "espTool")
-    else
-        clearESP()
-        disconnectEvent("espAdd")
-        disconnectEvent("espRemove")
-        disconnectEvent("espTool")
+        if plr == lp then continue end
+        local ch = plr.Character
+        if not ch then continue end
+        local hum = ch:FindFirstChildOfClass("Humanoid")
+        if hum and hum.Health <= 0 then continue end
+        local head = ch:FindFirstChild("Head")
+        if not head then continue end
+        
+        local role = getRole(plr)
+        
+        -- Sadece KIRMIZI (katil) veya YEŞİL (masum/şerif)
+        local color
+        local roleText
+        if role == "murderer" then
+            color = Color3.fromRGB(255, 30, 30)
+            roleText = "🔪 KATİL"
+        elseif role == "sheriff" then
+            color = Color3.fromRGB(50, 255, 50)
+            roleText = "🔫 ŞERİF"
+        else
+            color = Color3.fromRGB(50, 255, 50)
+            roleText = "👤 MASUM"
+        end
+        
+        local bill = Instance.new("BillboardGui", head)
+        bill.Name = "ESP_V5"
+        bill.AlwaysOnTop = true
+        bill.Size = UDim2.fromOffset(S(170), S(55))
+        bill.StudsOffset = Vector3.new(0, 3.5, 0)
+        
+        local bg = Instance.new("Frame", bill)
+        bg.Size = UDim2.new(1, 0, 1, 0)
+        bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        bg.BackgroundTransparency = 0.3
+        bg.BorderSizePixel = 0
+        Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 6)
+        
+        local stroke = Instance.new("UIStroke", bg)
+        stroke.Color = color
+        stroke.Thickness = 2
+        
+        -- İsim
+        local nameLbl = Instance.new("TextLabel", bg)
+        nameLbl.Size = UDim2.new(1, 0, 0.5, 0)
+        nameLbl.Position = UDim2.new(0, 0, 0, 0)
+        nameLbl.Text = plr.Name
+        nameLbl.TextSize = S(11)
+        nameLbl.Font = Enum.Font.GothamBold
+        nameLbl.TextColor3 = color
+        nameLbl.BackgroundTransparency = 1
+        
+        -- Rol
+        local roleLbl = Instance.new("TextLabel", bg)
+        roleLbl.Size = UDim2.new(1, 0, 0.5, 0)
+        roleLbl.Position = UDim2.new(0, 0, 0.5, 0)
+        roleLbl.Text = roleText
+        roleLbl.TextSize = S(9)
+        roleLbl.Font = Enum.Font.GothamSemibold
+        roleLbl.TextColor3 = color
+        roleLbl.BackgroundTransparency = 1
+        
+        table.insert(espObjects, bill)
     end
 end
 
 -- ══════════════════════════════════════════════
--- MODERN UI
+-- PROFESYONEL UI
 -- ══════════════════════════════════════════════
 local sg = Instance.new("ScreenGui", pgui)
-sg.Name = "LORDHUBV5"
+sg.Name = "MM2HubV5"
 sg.ResetOnSpawn = false
 sg.IgnoreGuiInset = true
 sg.DisplayOrder = 999
 
-local function getScale()
-    local w, h = cam.ViewportSize.X, cam.ViewportSize.Y
-    local base = isMobile and math.min(w, h) / 390 or 1
-    return math.clamp(base, 0.8, 1.3)
-end
-
-local SCALE = getScale()
-local function S(n) return math.floor(n * SCALE) end
-
 -- Ana Pencere
+local W = isMobile and S(320) or 340
+local HH = isMobile and S(480) or 480
+
 local win = Instance.new("Frame", sg)
-win.Size = UDim2.fromOffset(isMobile and 340 or 400, isMobile and 500 or 550)
-win.Position = UDim2.new(0.5, -win.Size.X.Offset/2, 0.5, -win.Size.Y.Offset/2)
-win.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
-win.BackgroundTransparency = 0.05
+win.Size = UDim2.fromOffset(W, HH)
+if isMobile then
+    win.Position = UDim2.new(0, 8, 0, 8)
+else
+    win.Position = UDim2.new(0.5, -W/2, 0.5, -HH/2)
+end
+win.BackgroundColor3 = Color3.fromRGB(6, 6, 16)
 win.BorderSizePixel = 0
-win.ClipsDescendants = true
 win.Active = true
 win.Draggable = true
+Instance.new("UICorner", win).CornerRadius = UDim.new(0, 12)
 
-Instance.new("UICorner", win).CornerRadius = UDim.new(0, 16)
-
--- Arka plan efekti
-local bgEffect = Instance.new("ImageLabel", win)
-bgEffect.Size = UDim2.new(1, 0, 1, 0)
-bgEffect.BackgroundTransparency = 1
-bgEffect.Image = "rbxassetid://1316045217"
-bgEffect.ImageColor3 = Color3.fromRGB(30, 80, 200)
-bgEffect.ImageTransparency = 0.85
-bgEffect.ScaleType = Enum.ScaleType.Slice
-bgEffect.SliceCenter = Rect.new(10, 10, 118, 118)
+-- Glow efekti
+local glow = Instance.new("ImageLabel", win)
+glow.Size = UDim2.new(1, 40, 1, 40)
+glow.Position = UDim2.new(0, -20, 0, -20)
+glow.BackgroundTransparency = 1
+glow.ZIndex = -1
+glow.Image = "rbxassetid://1316045217"
+glow.ImageColor3 = Color3.fromRGB(255, 50, 50)
+glow.ImageTransparency = 0.6
+glow.ScaleType = Enum.ScaleType.Slice
+glow.SliceCenter = Rect.new(10, 10, 118, 118)
 
 -- Başlık
-local header = Instance.new("Frame", win)
-header.Size = UDim2.new(1, 0, 0, S(60))
-header.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
-header.BackgroundTransparency = 0.2
-header.BorderSizePixel = 0
-Instance.new("UICorner", header).CornerRadius = UDim.new(0, 16)
+local barH = S(44)
+local bar = Instance.new("Frame", win)
+bar.Size = UDim2.new(1, 0, 0, barH)
+bar.BackgroundColor3 = Color3.fromRGB(10, 10, 22)
+bar.BorderSizePixel = 0
+Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 12)
 
-local title = Instance.new("TextLabel", header)
-title.Size = UDim2.new(1, -S(40), 1, 0)
-title.Position = UDim2.new(0, S(20), 0, 0)
-title.Text = "🔥 LORD HUB V5"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = S(isMobile and 18 or 22)
-title.Font = Enum.Font.GothamBold
-title.BackgroundTransparency = 1
-title.TextXAlignment = Enum.TextXAlignment.Left
+local titleLbl = Instance.new("TextLabel", bar)
+titleLbl.Size = UDim2.new(1, -S(100), 1, 0)
+titleLbl.Position = UDim2.new(0, S(12), 0, 0)
+titleLbl.Text = "🔪 LORD HUB V5"
+titleLbl.TextSize = S(isMobile and 15 or 14)
+titleLbl.Font = Enum.Font.GothamBold
+titleLbl.TextColor3 = Color3.fromRGB(255, 60, 60)
+titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+titleLbl.BackgroundTransparency = 1
 
-local subTitle = Instance.new("TextLabel", header)
-subTitle.Size = UDim2.new(1, -S(40), 0, S(20))
-subTitle.Position = UDim2.new(0, S(20), 0, S(35))
-subTitle.Text = "PROFESSIONAL MURDER MYSTERY 2"
-subTitle.TextColor3 = Color3.fromRGB(100, 180, 255)
-subTitle.TextSize = S(isMobile and 9 or 11)
-subTitle.Font = Enum.Font.GothamSemibold
-subTitle.BackgroundTransparency = 1
-subTitle.TextXAlignment = Enum.TextXAlignment.Left
+-- FPS
+local fpsLbl = Instance.new("TextLabel", bar)
+fpsLbl.Size = UDim2.fromOffset(S(60), S(20))
+fpsLbl.Position = UDim2.new(1, -S(70), 0.5, -S(10))
+fpsLbl.Text = "60 FPS"
+fpsLbl.TextSize = S(10)
+fpsLbl.Font = Enum.Font.GothamBold
+fpsLbl.TextColor3 = Color3.fromRGB(50, 255, 50)
+fpsLbl.BackgroundTransparency = 1
 
--- Kapat butonu
-local closeBtn = Instance.new("TextButton", header)
-closeBtn.Size = UDim2.fromOffset(S(36), S(36))
-closeBtn.Position = UDim2.new(1, -S(44), 0, S(12))
+-- Kapat
+local closeBtn = Instance.new("TextButton", bar)
+closeBtn.Size = UDim2.fromOffset(S(28), S(28))
+closeBtn.Position = UDim2.new(1, -S(34), 0.5, -S(14))
 closeBtn.Text = "✕"
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.TextSize = S(16)
+closeBtn.TextSize = S(12)
 closeBtn.Font = Enum.Font.GothamBold
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 30, 50)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 30, 40)
 closeBtn.BorderSizePixel = 0
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 8)
-
-closeBtn.MouseButton1Click:Connect(function()
-    win.Visible = not win.Visible
-    quickBar.Visible = not quickBar.Visible
-end)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
+closeBtn.MouseButton1Click:Connect(function() win.Visible = false end)
 
 -- İçerik
 local content = Instance.new("ScrollingFrame", win)
-content.Size = UDim2.new(1, 0, 1, -S(60))
-content.Position = UDim2.new(0, 0, 0, S(60))
+content.Size = UDim2.new(1, 0, 1, -barH - S(10))
+content.Position = UDim2.new(0, 0, 0, barH + S(5))
 content.BackgroundTransparency = 1
 content.BorderSizePixel = 0
-content.ScrollBarThickness = isMobile and 3 or 2
-content.ScrollBarImageColor3 = Color3.fromRGB(30, 120, 255)
+content.ScrollBarThickness = isMobile and 4 or 2
+content.ScrollBarImageColor3 = Color3.fromRGB(255, 50, 50)
 content.CanvasSize = UDim2.new(0, 0, 0, 0)
 content.AutomaticCanvasSize = Enum.AutomaticSize.Y
-content.ClipsDescendants = false
+content.ElasticBehavior = Enum.ElasticBehavior.Always
 
-local padding = Instance.new("UIPadding", content)
-padding.PaddingLeft = UDim.new(0, S(10))
-padding.PaddingRight = UDim.new(0, S(10))
-padding.PaddingTop = UDim.new(0, S(10))
-padding.PaddingBottom = UDim.new(0, S(10))
-
-local layout = Instance.new("UIListLayout", content)
-layout.Padding = UDim.new(0, S(8))
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
--- ══════════════════════════════════════════════
--- UI BİLEŞENLERİ
--- ══════════════════════════════════════════════
-local function Section(text)
-    local frame = Instance.new("Frame", content)
-    frame.Size = UDim2.new(1, 0, 0, S(30))
-    frame.BackgroundTransparency = 1
+local function mkSection(parent, title)
+    local f = Instance.new("Frame", parent)
+    f.Size = UDim2.new(1, -S(12), 0, S(26))
+    f.BackgroundTransparency = 1
     
-    local label = Instance.new("TextLabel", frame)
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.Text = "▸ " .. text
-    label.TextColor3 = Color3.fromRGB(30, 120, 255)
-    label.TextSize = S(12)
-    label.Font = Enum.Font.GothamBold
-    label.BackgroundTransparency = 1
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    
-    local line = Instance.new("Frame", frame)
-    line.Size = UDim2.new(1, 0, 0, 1)
-    line.Position = UDim2.new(0, 0, 1, -1)
-    line.BackgroundColor3 = Color3.fromRGB(30, 120, 255)
-    line.BackgroundTransparency = 0.5
-    line.BorderSizePixel = 0
+    local l = Instance.new("TextLabel", f)
+    l.Size = UDim2.new(1, 0, 1, 0)
+    l.Text = "▸ " .. title
+    l.TextSize = S(10)
+    l.Font = Enum.Font.GothamBold
+    l.TextColor3 = Color3.fromRGB(255, 60, 60)
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.BackgroundTransparency = 1
+    return f
 end
 
-local function Button(text, color, callback)
-    local btn = Instance.new("TextButton", content)
-    btn.Size = UDim2.new(1, 0, 0, S(isMobile and 50 or 40))
-    btn.Text = text
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.TextSize = S(isMobile and 14 or 12)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.BackgroundColor3 = color or Color3.fromRGB(30, 80, 200)
+local function mkToggle(parent, text, default, callback)
+    local btnH = isMobile and S(48) or S(38)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = UDim2.new(1, 0, 0, btnH)
+    btn.Text = ""
+    btn.BackgroundColor3 = Color3.fromRGB(12, 12, 26)
     btn.BorderSizePixel = 0
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
     
-    -- Hover efekti
-    local hoverTween = TS:Create(btn, TweenInfo.new(0.15), {
-        BackgroundTransparency = 0.3,
-        Size = UDim2.new(0.97, 0, 0, S(isMobile and 50 or 40))
-    })
-    local leaveTween = TS:Create(btn, TweenInfo.new(0.15), {
-        BackgroundTransparency = 0,
-        Size = UDim2.new(1, 0, 0, S(isMobile and 50 or 40))
-    })
+    local lbl = Instance.new("TextLabel", btn)
+    lbl.Size = UDim2.new(0.7, 0, 1, 0)
+    lbl.Position = UDim2.new(0, S(10), 0, 0)
+    lbl.Text = text
+    lbl.TextSize = S(11)
+    lbl.Font = Enum.Font.GothamSemibold
+    lbl.TextColor3 = Color3.fromRGB(200, 200, 230)
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.BackgroundTransparency = 1
     
-    btn.MouseEnter:Connect(function() hoverTween:Play() end)
-    btn.MouseLeave:Connect(function() leaveTween:Play() end)
+    local swW = isMobile and S(48) or S(38)
+    local swH = isMobile and S(24) or S(19)
+    local sw = Instance.new("Frame", btn)
+    sw.Size = UDim2.fromOffset(swW, swH)
+    sw.Position = UDim2.new(1, -swW - S(8), 0.5, -swH/2)
+    sw.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+    sw.BorderSizePixel = 0
+    Instance.new("UICorner", sw).CornerRadius = UDim.new(1, 0)
+    
+    local dot = Instance.new("Frame", sw)
+    local dotS = isMobile and S(16) or S(13)
+    dot.Size = UDim2.fromOffset(dotS, dotS)
+    dot.Position = UDim2.new(0, S(3), 0.5, -dotS/2)
+    dot.BackgroundColor3 = Color3.fromRGB(150, 150, 180)
+    dot.BorderSizePixel = 0
+    Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+    
+    local state = default or false
+    local dotOnX = swW - dotS - S(3)
+    
+    local function setState(v)
+        state = v
+        if v then
+            TS:Create(sw, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 50, 50)}):Play()
+            TS:Create(dot, TweenInfo.new(0.15), {Position = UDim2.new(0, dotOnX, 0.5, -dotS/2), BackgroundColor3 = Color3.new(1, 1, 1)}):Play()
+        else
+            TS:Create(sw, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 60)}):Play()
+            TS:Create(dot, TweenInfo.new(0.15), {Position = UDim2.new(0, S(3), 0.5, -dotS/2), BackgroundColor3 = Color3.fromRGB(150, 150, 180)}):Play()
+        end
+        callback(v)
+    end
+    
+    btn.MouseButton1Click:Connect(function() setState(not state) end)
+    return {set = setState, get = function() return state end}
+end
+
+local function mkButton(parent, text, color, callback)
+    local btnH = isMobile and S(46) or S(36)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = UDim2.new(1, 0, 0, btnH)
+    btn.Text = text
+    btn.TextSize = S(11)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.BackgroundColor3 = color or Color3.fromRGB(255, 50, 50)
+    btn.BorderSizePixel = 0
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
     btn.MouseButton1Click:Connect(callback)
-    
     return btn
 end
 
-local function Toggle(text, defaultValue, callback)
-    local frame = Instance.new("Frame", content)
-    frame.Size = UDim2.new(1, 0, 0, S(isMobile and 50 or 42))
-    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
-    frame.BackgroundTransparency = 0.5
-    frame.BorderSizePixel = 0
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
-    
-    local label = Instance.new("TextLabel", frame)
-    label.Size = UDim2.new(0.7, 0, 1, 0)
-    label.Position = UDim2.new(0, S(12), 0, 0)
-    label.Text = text
-    label.TextColor3 = Color3.fromRGB(220, 220, 255)
-    label.TextSize = S(isMobile and 13 or 11)
-    label.Font = Enum.Font.GothamSemibold
-    label.BackgroundTransparency = 1
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    
-    local switchBg = Instance.new("Frame", frame)
-    local swW, swH = S(50), S(26)
-    switchBg.Size = UDim2.fromOffset(swW, swH)
-    switchBg.Position = UDim2.new(1, -swW - S(10), 0.5, -swH/2)
-    switchBg.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
-    switchBg.BorderSizePixel = 0
-    Instance.new("UICorner", switchBg).CornerRadius = UDim.new(1, 0)
-    
-    local knob = Instance.new("Frame", switchBg)
-    local knW = S(18)
-    knob.Size = UDim2.fromOffset(knW, knW)
-    knob.Position = UDim2.new(0, S(4), 0.5, -knW/2)
-    knob.BackgroundColor3 = Color3.fromRGB(150, 150, 180)
-    knob.BorderSizePixel = 0
-    Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
-    
-    local isOn = defaultValue or false
-    
-    local function setState(on)
-        isOn = on
-        local color = on and Color3.fromRGB(30, 200, 80) or Color3.fromRGB(50, 50, 70)
-        local knobColor = on and Color3.new(1, 1, 1) or Color3.fromRGB(150, 150, 180)
-        local knobPos = on and UDim2.new(0, swW - knW - S(4), 0.5, -knW/2) or UDim2.new(0, S(4), 0.5, -knW/2)
-        
-        TS:Create(switchBg, TweenInfo.new(0.15), {BackgroundColor3 = color}):Play()
-        TS:Create(knob, TweenInfo.new(0.15), {
-            Position = knobPos,
-            BackgroundColor3 = knobColor
-        }):Play()
-        
-        callback(on)
-    end
-    
-    frame.MouseButton1Click:Connect(function() setState(not isOn) end)
-    
-    setState(defaultValue or false)
-    
-    return {
-        set = setState,
-        get = function() return isOn end
-    }
-end
+-- ══════════════════════════════════════════════
+-- ANA MENÜ İÇERİĞİ
+-- ══════════════════════════════════════════════
+local padding = Instance.new("UIPadding", content)
+padding.PaddingTop = UDim.new(0, S(5))
+padding.PaddingLeft = UDim.new(0, S(6))
+padding.PaddingRight = UDim.new(0, S(6))
+local layout = Instance.new("UIListLayout", content)
+layout.Padding = UDim.new(0, S(4))
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-local function Slider(text, min, max, default, callback)
-    local frame = Instance.new("Frame", content)
-    frame.Size = UDim2.new(1, 0, 0, S(isMobile and 60 or 50))
-    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
-    frame.BackgroundTransparency = 0.5
-    frame.BorderSizePixel = 0
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+-- ==== BÖLÜM 1: OTOMATİK SALDIRI ====
+mkSection(content, "⚔️ OTOMATİK SALDIRI")
+
+local autoToggle = mkToggle(content, "🔴 Katil Modu (Otomatik fırlat)", false, function(v)
+    autoAttackEnabled = v
+    if v then
+        local role = getRole(lp)
+        if role == "murderer" then
+            connect(RS.Heartbeat, function()
+                if autoAttackEnabled then murdererAutoAttack() end
+            end, "autoAttack")
+        elseif role == "sheriff" then
+            connect(RS.Heartbeat, function()
+                if autoAttackEnabled then sheriffAutoAttack() end
+            end, "autoAttack")
+        end
+    else
+        disconnect("autoAttack")
+    end
+end)
+
+local statusLbl = Instance.new("TextLabel", content)
+statusLbl.Size = UDim2.new(1, 0, 0, S(24))
+statusLbl.BackgroundTransparency = 1
+statusLbl.Text = "⏳ Rol bekleniyor..."
+statusLbl.TextSize = S(10)
+statusLbl.Font = Enum.Font.Gotham
+statusLbl.TextColor3 = Color3.fromRGB(150, 150, 180)
+
+-- Rol kontrolü
+connect(RS.Heartbeat, function()
+    local role = getRole(lp)
+    if role == "murderer" then
+        statusLbl.Text = "🔪 KATİL MODU: Çevredekileri otomatik kesiyor!"
+        statusLbl.TextColor3 = Color3.fromRGB(255, 60, 60)
+    elseif role == "sheriff" then
+        statusLbl.Text = "🔫 ŞERİF MODU: Katili otomatik vuruyor!"
+        statusLbl.TextColor3 = Color3.fromRGB(50, 255, 50)
+    else
+        statusLbl.Text = "👤 MASUM: Katil olana kadar bekle..."
+        statusLbl.TextColor3 = Color3.fromRGB(150, 150, 180)
+    end
+end, "roleStatus")
+
+-- Menzil ayarı
+local rangeLabel = Instance.new("TextLabel", content)
+rangeLabel.Size = UDim2.new(1, 0, 0, S(22))
+rangeLabel.BackgroundTransparency = 1
+rangeLabel.Text = "📏 Saldırı Menzili: 30"
+rangeLabel.TextSize = S(10)
+rangeLabel.Font = Enum.Font.Gotham
+rangeLabel.TextColor3 = Color3.fromRGB(180, 180, 210)
+
+local function createSlider(parent, text, min, max, default, callback)
+    local f = Instance.new("Frame", parent)
+    f.Size = UDim2.new(1, 0, 0, isMobile and S(60) or S(48))
+    f.BackgroundColor3 = Color3.fromRGB(12, 12, 26)
+    f.BorderSizePixel = 0
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
     
-    local label = Instance.new("TextLabel", frame)
-    label.Size = UDim2.new(0.6, 0, 0, S(22))
-    label.Position = UDim2.new(0, S(12), 0, S(4))
-    label.Text = text
-    label.TextColor3 = Color3.fromRGB(220, 220, 255)
-    label.TextSize = S(isMobile and 13 or 11)
-    label.Font = Enum.Font.GothamSemibold
-    label.BackgroundTransparency = 1
-    label.TextXAlignment = Enum.TextXAlignment.Left
+    local lbl = Instance.new("TextLabel", f)
+    lbl.Size = UDim2.new(0.6, 0, 0, S(20))
+    lbl.Position = UDim2.new(0, S(10), 0, S(4))
+    lbl.Text = text
+    lbl.TextSize = S(10)
+    lbl.Font = Enum.Font.GothamSemibold
+    lbl.TextColor3 = Color3.fromRGB(200, 200, 230)
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.BackgroundTransparency = 1
     
-    local valueLabel = Instance.new("TextLabel", frame)
-    valueLabel.Size = UDim2.new(0.3, 0, 0, S(22))
-    valueLabel.Position = UDim2.new(0.6, 0, 0, S(4))
-    valueLabel.Text = tostring(default)
-    valueLabel.TextColor3 = Color3.fromRGB(30, 180, 255)
-    valueLabel.TextSize = S(isMobile and 13 or 11)
-    valueLabel.Font = Enum.Font.GothamBold
-    valueLabel.BackgroundTransparency = 1
-    valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+    local valLbl = Instance.new("TextLabel", f)
+    valLbl.Size = UDim2.new(0.35, 0, 0, S(20))
+    valLbl.Position = UDim2.new(0.6, 0, 0, S(4))
+    valLbl.Text = tostring(default)
+    valLbl.TextSize = S(10)
+    valLbl.Font = Enum.Font.GothamBold
+    valLbl.TextColor3 = Color3.fromRGB(255, 60, 60)
+    valLbl.TextXAlignment = Enum.TextXAlignment.Right
+    valLbl.BackgroundTransparency = 1
     
-    local sliderBg = Instance.new("Frame", frame)
-    sliderBg.Size = UDim2.new(1, -S(20), 0, S(6))
-    sliderBg.Position = UDim2.new(0, S(10), 0, S(40))
-    sliderBg.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-    sliderBg.BorderSizePixel = 0
-    Instance.new("UICorner", sliderBg).CornerRadius = UDim.new(1, 0)
+    local trH = isMobile and S(6) or S(4)
+    local tr = Instance.new("Frame", f)
+    tr.Size = UDim2.new(1, -S(20), 0, trH)
+    tr.Position = UDim2.new(0, S(10), 0, isMobile and S(44) or S(36))
+    tr.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+    tr.BorderSizePixel = 0
+    Instance.new("UICorner", tr).CornerRadius = UDim.new(1, 0)
     
-    local fill = Instance.new("Frame", sliderBg)
-    fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(30, 120, 255)
+    local p = (default - min) / (max - min)
+    local fill = Instance.new("Frame", tr)
+    fill.Size = UDim2.new(p, 0, 1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
     fill.BorderSizePixel = 0
     Instance.new("UICorner", fill).CornerRadius = UDim.new(1, 0)
     
-    local knob = Instance.new("Frame", sliderBg)
-    local knobSize = S(18)
-    knob.Size = UDim2.fromOffset(knobSize, knobSize)
+    local knobS = isMobile and S(20) or S(14)
+    local knob = Instance.new("Frame", tr)
+    knob.Size = UDim2.fromOffset(knobS, knobS)
     knob.AnchorPoint = Vector2.new(0.5, 0.5)
-    knob.Position = UDim2.new((default - min) / (max - min), 0, 0.5, 0)
+    knob.Position = UDim2.new(p, 0, 0.5, 0)
     knob.BackgroundColor3 = Color3.new(1, 1, 1)
     knob.BorderSizePixel = 0
     Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+    local stroke = Instance.new("UIStroke", knob)
+    stroke.Color = Color3.fromRGB(255, 50, 50)
+    stroke.Thickness = 1.5
     
-    local isDragging = false
-    local value = default
+    local dragging = false
     
-    local function updateValue(x)
-        local p = math.clamp((x - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
-        value = math.floor(min + p * (max - min))
-        valueLabel.Text = tostring(value)
+    local function update(x)
+        local p = math.clamp((x - tr.AbsolutePosition.X) / tr.AbsoluteSize.X, 0, 1)
+        local v = math.floor(min + p * (max - min))
+        valLbl.Text = tostring(v)
         fill.Size = UDim2.new(p, 0, 1, 0)
         knob.Position = UDim2.new(p, 0, 0.5, 0)
-        callback(value)
+        callback(v)
     end
     
-    local function startDrag(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
-           input.UserInputType == Enum.UserInputType.Touch then
-            isDragging = true
-            updateValue(input.Position.X)
+    local function onInputBegan(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            update(i.Position.X)
         end
     end
     
-    sliderBg.InputBegan:Connect(startDrag)
-    knob.InputBegan:Connect(startDrag)
+    tr.InputBegan:Connect(onInputBegan)
+    knob.InputBegan:Connect(onInputBegan)
     
-    UIS.InputChanged:Connect(function(input)
-        if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or
-                          input.UserInputType == Enum.UserInputType.Touch) then
-            updateValue(input.Position.X)
+    UIS.InputChanged:Connect(function(i)
+        if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            update(i.Position.X)
         end
     end)
     
-    UIS.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or
-           input.UserInputType == Enum.UserInputType.Touch then
-            isDragging = false
+    UIS.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
         end
     end)
+    
+    return f
 end
 
--- ══════════════════════════════════════════════
--- AYARLAR & DURUM
--- ══════════════════════════════════════════════
-local attackRange = 40
-local pullEnabled = true
-
--- Rol durumunu göster
-local statusFrame = Instance.new("Frame", content)
-statusFrame.Size = UDim2.new(1, 0, 0, S(50))
-statusFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
-statusFrame.BackgroundTransparency = 0.5
-statusFrame.BorderSizePixel = 0
-Instance.new("UICorner", statusFrame).CornerRadius = UDim.new(0, 10)
-
-local statusText = Instance.new("TextLabel", statusFrame)
-statusText.Size = UDim2.new(1, -S(20), 1, 0)
-statusText.Position = UDim2.new(0, S(10), 0, 0)
-statusText.Text = "🔍 Rol: Bekleniyor..."
-statusText.TextColor3 = Color3.fromRGB(200, 200, 255)
-statusText.TextSize = S(isMobile and 14 or 12)
-statusText.Font = Enum.Font.GothamBold
-statusText.BackgroundTransparency = 1
-statusText.TextXAlignment = Enum.TextXAlignment.Left
-statusText.TextWrapped = true
-
--- Rol takibi
-connectEvent(RS.Heartbeat, function()
-    local role = getPlayerRole(lp)
-    local emoji = role == "murderer" and "🔪" or role == "sheriff" and "🔫" or "👤"
-    local color = role == "murderer" and Color3.fromRGB(255, 50, 50) or 
-                  role == "sheriff" and Color3.fromRGB(50, 150, 255) or
-                  Color3.fromRGB(100, 255, 100)
-    local text = emoji .. " " .. string.upper(role) .. (role == "murderer" and " - OTOMATİK SALDIRI AKTİF!" or 
-                  role == "sheriff" and " - KATİL AVI AKTİF!" or " - BEKLEME MODU")
-    statusText.Text = text
-    statusText.TextColor3 = color
-end, "statusUpdate")
-
--- ══════════════════════════════════════════════
--- OTOMATİK SALDIRI AYARLARI
--- ══════════════════════════════════════════════
-Section("⚔️ OTOMATİK SALDIRI")
-
-Button("🔥 OTOMATİK SALDIRIYI BAŞLAT", Color3.fromRGB(30, 200, 80), function()
-    startAutoAttack()
+createSlider(content, "Menzil", 5, 60, 30, function(v)
+    attackRange = v
+    rangeLabel.Text = "📏 Saldırı Menzili: " .. v
 end)
 
-Button("⏹️ SALDIRIYI DURDUR", Color3.fromRGB(200, 30, 50), function()
-    stopAutoAttack()
-end)
+-- ==== BÖLÜM 2: ESP ====
+mkSection(content, "👁️ ESP SİSTEMİ")
 
-Toggle("👥 Oyuncuları Yanına Çek", true, function(on)
-    pullEnabled = on
-end)
-
-Slider("🎯 Saldırı Menzili", 10, 80, 40, function(value)
-    attackRange = value
-end)
-
-Section("🎯 HEDEF SEÇİMİ")
-
--- Manuel hedef seçme
-local targetList = Instance.new("ScrollingFrame", content)
-targetList.Size = UDim2.new(1, 0, 0, S(isMobile and 120 or 100))
-targetList.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
-targetList.BackgroundTransparency = 0.5
-targetList.BorderSizePixel = 0
-targetList.ScrollBarThickness = isMobile and 3 or 2
-targetList.ScrollBarImageColor3 = Color3.fromRGB(30, 120, 255)
-Instance.new("UICorner", targetList).CornerRadius = UDim.new(0, 10)
-
-local targetButtons = {}
-
-local function refreshTargetList()
-    for _, btn in pairs(targetButtons) do
-        pcall(function() btn:Destroy() end)
+local espToggle = mkToggle(content, "🔴🔵 ESP Aç (Kırmızı/Yeşil)", false, function(v)
+    espEnabled = v
+    if v then
+        buildESP()
+        connect(RS.Heartbeat, function()
+            if espEnabled then buildESP() end
+        end, "espUpdate")
+    else
+        disconnect("espUpdate")
+        clearESP()
     end
-    targetButtons = {}
-    
-    local y = 0
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= lp then
-            local btn = Instance.new("TextButton", targetList)
-            btn.Size = UDim2.new(1, -S(10), 0, S(30))
-            btn.Position = UDim2.new(0, S(5), 0, y)
-            btn.Text = plr.Name
-            btn.TextColor3 = Color3.new(1, 1, 1)
-            btn.TextSize = S(isMobile and 12 or 10)
-            btn.Font = Enum.Font.GothamSemibold
-            btn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-            btn.BorderSizePixel = 0
-            Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-            
-            btn.MouseButton1Click:Connect(function()
-                autoAttackTarget = plr
-                for _, b in pairs(targetButtons) do
-                    b.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-                end
-                btn.BackgroundColor3 = Color3.fromRGB(30, 120, 255)
-            end)
-            
-            table.insert(targetButtons, btn)
-            y = y + S(34)
-        end
-    end
-    
-    targetList.CanvasSize = UDim2.new(0, 0, 0, y + S(10))
-end
-
-refreshTargetList()
-
-Button("🔄 Oyuncu Listesini Yenile", Color3.fromRGB(30, 80, 200), function()
-    refreshTargetList()
 end)
 
--- ══════════════════════════════════════════════
--- ESP AYARLARI
--- ══════════════════════════════════════════════
-Section("👁️ ESP SİSTEMİ")
-
-Toggle("🔴 KIRMIZI / YEŞİL ESP", true, function(on)
-    toggleESP(on)
-end)
-
-Button("🔄 ESP'Yİ YENİLE", Color3.fromRGB(30, 80, 200), function()
+mkButton(content, "🔄 ESP Yenile", Color3.fromRGB(30, 30, 50), function()
     if espEnabled then buildESP() end
 end)
 
--- ══════════════════════════════════════════════
--- KARAKTER AYARLARI
--- ══════════════════════════════════════════════
-Section("⚡ KARAKTER AYARLARI")
+-- ==== BÖLÜM 3: ANI SALDIRI ====
+mkSection(content, "⚡ ANI SALDIRI")
 
-Slider("🏃 Hız", 16, 350, 16, function(value)
-    local hum = getHumanoid()
-    if hum then hum.WalkSpeed = value end
+mkButton(content, "🎯 Hedefe Saldır (TP YOK)", Color3.fromRGB(200, 40, 40), function()
+    local target = findNearest({"murderer", "sheriff", "innocent"}, false, 200)
+    if target then attackTarget(target, true) end
 end)
 
-Slider("⬆️ Zıplama Gücü", 50, 500, 50, function(value)
-    local hum = getHumanoid()
-    if hum then
-        pcall(function() hum.JumpPower = value end)
-        pcall(function() hum.JumpHeight = value / 5 end)
-    end
+mkButton(content, "🔪 Katili Vur", Color3.fromRGB(220, 30, 30), function()
+    local murderer = findNearest({"murderer"}, false, 200)
+    if murderer then attackTarget(murderer, true) end
 end)
 
-Toggle("🚀 Sonsuz Zıplama", false, function(on)
-    if on then
-        connectEvent(UIS.JumpRequest, function()
-            local hum = getHumanoid()
-            if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
-        end, "infiniteJump")
+-- ==== BÖLÜM 4: KARAKTER ====
+mkSection(content, "⚡ KARAKTER")
+
+local flyToggle = mkToggle(content, "🛩️ Uçuş Modu", false, function(v)
+    if v then
+        local root = R()
+        if root then
+            local bg = Instance.new("BodyGyro", root)
+            bg.MaxTorque = Vector3.new(9e8, 9e8, 9e8)
+            bg.P = 9e4
+            local bv = Instance.new("BodyVelocity", root)
+            bv.MaxForce = Vector3.new(9e8, 9e8, 9e8)
+            bv.Velocity = Vector3.zero
+            
+            connect(RS.Heartbeat, function()
+                local rt = R()
+                if not rt or not flyToggle.get() then return end
+                local dir = Vector3.zero
+                if UIS:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CFrame.LookVector end
+                if UIS:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CFrame.LookVector end
+                if UIS:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
+                if UIS:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
+                if UIS:IsKeyDown(Enum.KeyCode.Space) then dir = dir + Vector3.new(0, 1, 0) end
+                if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then dir = dir - Vector3.new(0, 1, 0) end
+                if dir.Magnitude > 0 then
+                    bv.Velocity = dir.Unit * 75
+                else
+                    bv.Velocity = Vector3.zero
+                end
+                bg.CFrame = cam.CFrame
+            end, "fly")
+        end
     else
-        disconnectEvent("infiniteJump")
+        disconnect("fly")
+        local root = R()
+        if root then
+            for _, v in pairs(root:GetChildren()) do
+                if v:IsA("BodyVelocity") or v:IsA("BodyGyro") then
+                    v:Destroy()
+                end
+            end
+        end
     end
 end)
 
-Toggle("🛡️ God Mode", false, function(on)
-    local hum = getHumanoid()
-    if not hum then return end
+mkToggle(content, "🚀 Sonsuz Zıplama", false, function(v)
+    if v then
+        connect(UIS.JumpRequest, function()
+            local h = H()
+            if h then h:ChangeState(Enum.HumanoidStateType.Jumping) end
+        end, "infJump")
+    else
+        disconnect("infJump")
+    end
+end)
+
+mkToggle(content, "🛡️ God Mode", false, function(v)
+    local h = H()
+    if not h then return end
+    if v then
+        h.MaxHealth = math.huge
+        h.Health = math.huge
+        connect(h.HealthChanged, function()
+            if h and h.Parent then h.Health = math.huge end
+        end, "god")
+    else
+        disconnect("god")
+        pcall(function() h.MaxHealth = 100; h.Health = 100 end)
+    end
+end)
+
+-- ==== BÖLÜM 5: AYARLAR ====
+mkSection(content, "⚙️ AYARLAR")
+
+mkButton(content, "🗑️ Tüm Bağlantıları Temizle", Color3.fromRGB(40, 40, 60), function()
+    for tag, c in pairs(Connections) do
+        pcall(function() c:Disconnect() end)
+        Connections[tag] = nil
+    end
+    clearESP()
+    print("[LORD V5] Tüm bağlantılar temizlendi")
+end)
+
+mkButton(content, "🔄 Remote Sıfırla", Color3.fromRGB(40, 40, 60), function()
+    throwRemote = nil
+    remoteCache = {}
+    print("[LORD V5] Remote sıfırlandı")
+end)
+
+-- Bilgi
+local infoLbl = Instance.new("TextLabel", content)
+infoLbl.Size = UDim2.new(1, 0, 0, S(60))
+infoLbl.BackgroundColor3 = Color3.fromRGB(8, 8, 20)
+infoLbl.BorderSizePixel = 0
+Instance.new("UICorner", infoLbl).CornerRadius = UDim.new(0, 8)
+infoLbl.Text = "🔪 LORD HUB V5\n✅ Işınlanma YOK - Sadece fırlatma\n✅ Katil: Otomatik çevre temizliği\n✅ Şerif: Otomatik katil avı"
+infoLbl.TextSize = S(10)
+infoLbl.Font = Enum.Font.Gotham
+infoLbl.TextColor3 = Color3.fromRGB(180, 180, 210)
+infoLbl.TextWrapped = true
+
+-- ══════════════════════════════════════════════
+-- MOBİL HIZLI BUTONLAR
+-- ══════════════════════════════════════════════
+local qBar = Instance.new("Frame", sg)
+qBar.Size = UDim2.fromOffset(S(56), S(56) * 4 + S(10) * 3)
+qBar.Position = UDim2.new(1, -S(66), 0.5, -(S(56) * 4 + S(10) * 3) / 2)
+qBar.BackgroundTransparency = 1
+
+local function qBtn(icon, color, y, callback)
+    local b = Instance.new("TextButton", qBar)
+    b.Size = UDim2.fromOffset(S(56), S(56))
+    b.Position = UDim2.fromOffset(0, y * (S(56) + S(10)))
+    b.Text = icon
+    b.TextSize = S(22)
+    b.Font = Enum.Font.GothamBold
+    b.TextColor3 = Color3.new(1, 1, 1)
+    b.BackgroundColor3 = color
+    b.BorderSizePixel = 0
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, S(12))
     
-    if on then
-        hum.MaxHealth = math.huge
-        hum.Health = math.huge
-        connectEvent(hum.HealthChanged, function()
-            if hum and hum.Parent then hum.Health = math.huge end
-        end, "godMode")
-    else
-        disconnectEvent("godMode")
-        pcall(function()
-            hum.MaxHealth = 100
-            hum.Health = 100
-        end)
-    end
-end)
-
-Toggle("💤 Anti-AFK", false, function(on)
-    if on then
-        connectEvent(RS.Heartbeat, function()
-            VU:Button2Down(Vector2.zero, cam.CFrame)
-            VU:Button2Up(Vector2.zero, cam.CFrame)
-        end, "antiAfk")
-    else
-        disconnectEvent("antiAfk")
-    end
-end)
-
-Button("🔄 Respawn", Color3.fromRGB(200, 150, 50), function()
-    lp:LoadCharacter()
-end)
-
--- ══════════════════════════════════════════════
--- GÖRSEL AYARLAR
--- ══════════════════════════════════════════════
-Section("🎨 GÖRSEL AYARLAR")
-
-Toggle("💡 Fullbright", false, function(on)
-    if on then
-        Lighting.Brightness = 10
-        Lighting.ClockTime = 14
-        Lighting.FogEnd = 100000
-        Lighting.GlobalShadows = false
-        Lighting.Ambient = Color3.fromRGB(255, 255, 255)
-        Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
-    else
-        Lighting.Brightness = 2
-        Lighting.ClockTime = 14
-        Lighting.FogEnd = 1000
-        Lighting.GlobalShadows = true
-        Lighting.Ambient = Color3.fromRGB(127, 127, 127)
-        Lighting.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
-    end
-end)
-
-Slider("🎥 FOV", 50, 120, 70, function(value)
-    cam.FieldOfView = value
-end)
-
--- ══════════════════════════════════════════════
--- HIZLI BUTONLAR (MOBİL)
--- ══════════════════════════════════════════════
-local quickBar = Instance.new("Frame", sg)
-quickBar.Size = UDim2.fromOffset(S(70), S(280))
-quickBar.Position = UDim2.new(1, -S(85), 0.5, -S(140))
-quickBar.BackgroundTransparency = 1
-quickBar.Visible = true
-
-local quickButtons = {}
-
-local function createQuickButton(icon, color, tooltip, callback, yPos)
-    local btn = Instance.new("TextButton", quickBar)
-    btn.Size = UDim2.fromOffset(S(60), S(60))
-    btn.Position = UDim2.fromOffset(0, yPos or 0)
-    btn.Text = icon
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.TextSize = S(isMobile and 24 or 20)
-    btn.Font = Enum.Font.GothamBold
-    btn.BackgroundColor3 = color
-    btn.BorderSizePixel = 0
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, S(12))
-    
-    local stroke = Instance.new("UIStroke", btn)
+    local stroke = Instance.new("UIStroke", b)
     stroke.Color = Color3.new(1, 1, 1)
-    stroke.Thickness = 1.5
+    stroke.Thickness = 1.2
     stroke.Transparency = 0.5
     
-    -- Tooltip
-    local tip = Instance.new("TextLabel", sg)
-    tip.Text = tooltip
-    tip.TextColor3 = Color3.new(1, 1, 1)
-    tip.TextSize = S(10)
-    tip.Font = Enum.Font.GothamSemibold
-    tip.Size = UDim2.fromOffset(S(120), S(28))
-    tip.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
-    tip.BorderSizePixel = 0
-    tip.Visible = false
-    Instance.new("UICorner", tip).CornerRadius = UDim.new(0, 6)
-    
-    btn.MouseEnter:Connect(function()
-        local abs = btn.AbsolutePosition
-        tip.Position = UDim2.fromOffset(abs.X - S(130), abs.Y + S(16))
-        tip.Visible = true
-    end)
-    btn.MouseLeave:Connect(function()
-        tip.Visible = false
-    end)
-    
-    btn.MouseButton1Click:Connect(callback)
-    
-    return btn
+    b.MouseButton1Click:Connect(callback)
+    return b
 end
 
--- Menü Aç/Kapat
-createQuickButton("☰", Color3.fromRGB(30, 80, 200), "Menü", function()
+qBtn("🔪", Color3.fromRGB(200, 40, 40), 0, function()
     win.Visible = not win.Visible
-end, 0)
+end)
 
--- Otomatik Saldırı Başlat
-createQuickButton("⚔️", Color3.fromRGB(30, 200, 80), "Saldırı Başlat", function()
-    startAutoAttack()
-end, S(70))
+qBtn("⚔️", Color3.fromRGB(180, 30, 30), 1, function()
+    autoToggle.set(not autoToggle.get())
+end)
 
--- Otomatik Saldırı Durdur
-createQuickButton("⏹️", Color3.fromRGB(200, 30, 50), "Saldırı Durdur", function()
-    stopAutoAttack()
-end, S(140))
+qBtn("🎯", Color3.fromRGB(220, 50, 50), 2, function()
+    local murderer = findNearest({"murderer"}, false, 200)
+    if murderer then attackTarget(murderer, true) end
+end)
 
--- ESP Aç/Kapat
-createQuickButton("👁️", Color3.fromRGB(100, 100, 200), "ESP", function()
-    toggleESP(not espEnabled)
-end, S(210))
+qBtn("🏃", Color3.fromRGB(40, 160, 40), 3, function()
+    local root = R()
+    if not root then return end
+    local murderer = findNearest({"murderer"}, false, 200)
+    if murderer then
+        local tRoot = murderer.Character and murderer.Character:FindFirstChild("HumanoidRootPart")
+        if tRoot then
+            local diff = root.Position - tRoot.Position
+            root.CFrame = CFrame.new(root.Position + diff.Unit * 50 + Vector3.new(0, 10, 0))
+        end
+    end
+end)
 
 -- ══════════════════════════════════════════════
 -- KLAVYE KISAYOLLARI
 -- ══════════════════════════════════════════════
-UIS.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    
-    if input.KeyCode == Enum.KeyCode.RightShift then
+UIS.InputBegan:Connect(function(i, gp)
+    if gp then return end
+    if i.KeyCode == Enum.KeyCode.RightShift then
         win.Visible = not win.Visible
-        quickBar.Visible = not quickBar.Visible
-    elseif input.KeyCode == Enum.KeyCode.Delete then
-        win.Visible = false
-        quickBar.Visible = false
-    elseif input.KeyCode == Enum.KeyCode.Insert then
-        win.Visible = true
-        quickBar.Visible = true
-    elseif input.KeyCode == Enum.KeyCode.F then
-        if autoAttackOn then
-            stopAutoAttack()
-        else
-            startAutoAttack()
-        end
-    elseif input.KeyCode == Enum.KeyCode.E then
-        toggleESP(not espEnabled)
+    elseif i.KeyCode == Enum.KeyCode.F then
+        local target = findNearest({"murderer", "sheriff", "innocent"}, false, 200)
+        if target then attackTarget(target, true) end
+    elseif i.KeyCode == Enum.KeyCode.G then
+        local murderer = findNearest({"murderer"}, false, 200)
+        if murderer then attackTarget(murderer, true) end
     end
 end)
 
 -- ══════════════════════════════════════════════
--- OYUNCU EKLEME/ÇIKARMA
+-- KARAKTER YENİLENMESİ
 -- ══════════════════════════════════════════════
-Players.PlayerAdded:Connect(function()
-    task.wait(0.3)
-    refreshTargetList()
-    if espEnabled then buildESP() end
-end)
-
-Players.PlayerRemoving:Connect(function()
-    task.wait(0.1)
-    refreshTargetList()
-    if espEnabled then buildESP() end
-end)
-
 lp.CharacterAdded:Connect(function()
     task.wait(1)
     if espEnabled then buildESP() end
-    refreshTargetList()
+    throwRemote = nil
+    prevPositions = {}
 end)
 
 -- ══════════════════════════════════════════════
--- BAŞLANGIÇ
+-- BAŞLAT
 -- ══════════════════════════════════════════════
-print("🔥 LORD HUB V5 YÜKLENDİ!")
-print("📌 KATİL: Otomatik bıçak fırlatma + Oyuncuları çekme")
-print("📌 ŞERİF: Otomatik katil vurma")
-print("📌 Kısayollar: F=Saldırı, E=ESP, RightShift=Menü")
-print("📌 TP KALDIRILDI - Sadece fırlatma sistemi aktif!")
+connect(RS.Heartbeat, function()
+    local fps = math.floor(1 / (RS.Heartbeat:Wait() or 0.016))
+    fpsLbl.Text = fps .. " FPS"
+    fpsLbl.TextColor3 = fps > 50 and Color3.fromRGB(50, 255, 50) or fps > 30 and Color3.fromRGB(255, 200, 50) or Color3.fromRGB(255, 50, 50)
+end, "fps")
+
+print("🔪 LORD HUB V5 YÜKLENDİ!")
+print("✅ Katil: Otomatik fırlatma & kesme")
+print("✅ Şerif: Otomatik katil vurma")
+print("✅ ESP: Kırmızı (Katil) / Yeşil (Diğer)")
+print("✅ TP YOK - Sadece Remote/Activate")
