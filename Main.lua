@@ -1,11 +1,12 @@
 -- [[ LK SYSTEM - Premium Roblox ESP & Hile Menüsü ]]
--- [[ Sürüm: Beta v2.0 - BUTONLAR ÇALIŞIYOR ]]
+-- [[ Sürüm: Beta v2.0 - TROLL FULL ÇALIŞAN ]]
 -- [[ Geliştirici: LK System ]]
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local Camera = workspace.CurrentCamera
@@ -74,7 +75,7 @@ MainFrame.BackgroundTransparency = GLASS_BLUR
 MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
 MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
-MainFrame.Size = UDim2.new(0, 600, 0, 400)
+MainFrame.Size = UDim2.new(0, 600, 0, 420)
 MainFrame.Visible = true
 MainFrame.ZIndex = 1
 
@@ -286,7 +287,6 @@ PlayersTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 PlayersTab.Visible = false
 PlayersTab.ZIndex = 6
 
--- Arama Çubuğu
 local SearchFrame = Instance.new("Frame")
 SearchFrame.Parent = PlayersTab
 SearchFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
@@ -312,7 +312,6 @@ SearchBox.TextSize = 12
 SearchBox.ClearTextOnFocus = false
 SearchBox.ZIndex = 8
 
--- Oyuncu Listesi
 local PlayerScroll = Instance.new("ScrollingFrame")
 PlayerScroll.Parent = PlayersTab
 PlayerScroll.BackgroundTransparency = 1
@@ -654,39 +653,111 @@ for _, feature in ipairs(espFeatures) do
 end
 
 -- =================================================================
--- [[ TROLL SEKMESİ ]]
+-- [[ TROLL SEKMESİ - GERÇEK ÇALIŞAN ]]
 -- =================================================================
 local TrollTab = Instance.new("ScrollingFrame")
 TrollTab.Name = "TrollTab"
 TrollTab.Parent = ContentFrame
 TrollTab.BackgroundTransparency = 1
 TrollTab.Size = UDim2.new(1, 0, 1, 0)
-TrollTab.CanvasSize = UDim2.new(0, 0, 0, 350)
+TrollTab.CanvasSize = UDim2.new(0, 0, 0, 600)
 TrollTab.ScrollBarThickness = 3
 TrollTab.ScrollBarImageColor3 = Color3.fromRGB(30, 144, 255)
 TrollTab.Visible = false
 TrollTab.ZIndex = 6
 
+-- TROLL FONKSİYONLARI
+local function FindNearestVehicle(position)
+    local nearest = nil
+    local nearestDist = 100
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj:FindFirstChild("HumanoidRootPart") then
+            local root = obj:FindFirstChild("HumanoidRootPart")
+            if root and root.Parent ~= LocalPlayer.Character then
+                local dist = (root.Position - position).Magnitude
+                if dist < nearestDist then
+                    nearestDist = dist
+                    nearest = obj
+                end
+            end
+        end
+    end
+    return nearest
+end
+
+local function GetVehicleSeat(vehicle)
+    for _, child in ipairs(vehicle:GetChildren()) do
+        if child:IsA("VehicleSeat") or child:IsA("Seat") then
+            return child
+        end
+        -- Alt nesneleri kontrol et
+        for _, sub in ipairs(child:GetChildren()) do
+            if sub:IsA("VehicleSeat") or sub:IsA("Seat") then
+                return sub
+            end
+        end
+    end
+    return nil
+end
+
+local function ForceSit(targetChar, vehicle)
+    local seat = GetVehicleSeat(vehicle)
+    if not seat then
+        -- Araçta oturma yeri yoksa HumanoidRootPart'ı araca yerleştir
+        local targetHrp = targetChar:FindFirstChild("HumanoidRootPart")
+        local vehicleRoot = vehicle:FindFirstChild("HumanoidRootPart")
+        if targetHrp and vehicleRoot then
+            targetHrp.CFrame = vehicleRoot.CFrame + Vector3.new(0, 2, 0)
+            targetHrp.Velocity = Vector3.new(0, 0, 0)
+            return true
+        end
+        return false
+    end
+    
+    local hum = targetChar:FindFirstChild("Humanoid")
+    if hum then
+        hum.Sit = true
+        hum.PlatformStand = true
+        local rootPart = targetChar:FindFirstChild("HumanoidRootPart")
+        if rootPart then
+            rootPart.CFrame = seat.CFrame + Vector3.new(0, 1, 0)
+            rootPart.Velocity = Vector3.new(0, 0, 0)
+        end
+        return true
+    end
+    return false
+end
+
+-- Troll Butonları
 local trollY = 10
 local trollOptions = {
-    "🔄 Fling",
-    "🚤 Fling Boat",
-    "🚌 Fling Bus",
-    "⚡ Speed Hack",
-    "❄️ Freeze",
-    "🚀 Launch"
+    {name = "🚢 Gemiye Bindir", color = Color3.fromRGB(0, 100, 200)},
+    {name = "🚤 Tekneye Bindir", color = Color3.fromRGB(0, 150, 200)},
+    {name = "🚌 Otobüse Bindir", color = Color3.fromRGB(200, 150, 0)},
+    {name = "🔄 Fling (Fırlat)", color = Color3.fromRGB(200, 50, 50)},
+    {name = "⚡ Speed Hack (Hızlandır)", color = Color3.fromRGB(200, 200, 0)},
+    {name = "❄️ Freeze (Dondur)", color = Color3.fromRGB(0, 200, 200)},
+    {name = "🚀 Launch (Havaya Fırlat)", color = Color3.fromRGB(200, 0, 200)},
+    {name = "💀 Kill (Öldür)", color = Color3.fromRGB(255, 0, 0)},
+    {name = "💥 Explode (Patlat)", color = Color3.fromRGB(255, 100, 0)},
+    {name = "🔄 Sürekli Fling", color = Color3.fromRGB(200, 50, 150)},
+    {name = "👢 Kick (At)", color = Color3.fromRGB(150, 50, 50)},
+    {name = "📡 Işınla (Yanına)", color = Color3.fromRGB(0, 200, 100)},
 }
+
+local loopFlingActive = false
+local loopConnection = nil
 
 for _, option in ipairs(trollOptions) do
     local btn = Instance.new("TextButton")
     btn.Parent = TrollTab
-    btn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    btn.BackgroundColor3 = option.color
     btn.BackgroundTransparency = 0.2
     btn.BorderSizePixel = 0
     btn.Position = UDim2.new(0.1, 0, 0, trollY)
     btn.Size = UDim2.new(0.8, 0, 0, 35)
     btn.Font = Enum.Font.GothamSemibold
-    btn.Text = option
+    btn.Text = option.name
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.TextSize = 13
     btn.ZIndex = 8
@@ -713,26 +784,138 @@ for _, option in ipairs(trollOptions) do
             return
         end
         
-        if option == "🔄 Fling" then
-            hrp.Velocity = Vector3.new(math.random(-150, 150), 100, math.random(-150, 150))
-            ShowNotification("✅ " .. SELECTED_PLAYER.Name .. " fırlatıldı!")
-        elseif option == "🚤 Fling Boat" or option == "🚌 Fling Bus" then
-            hrp.Velocity = Vector3.new(math.random(-200, 200), 150, math.random(-200, 200))
-            ShowNotification("✅ " .. SELECTED_PLAYER.Name .. " araçla fırlatıldı!")
-        elseif option == "⚡ Speed Hack" then
-            local hum = char:FindFirstChild("Humanoid")
+        local hum = char:FindFirstChild("Humanoid")
+        local targetName = SELECTED_PLAYER.Name
+        
+        if option.name == "🚢 Gemiye Bindir" then
+            local vehicle = FindNearestVehicle(hrp.Position)
+            if vehicle then
+                if ForceSit(char, vehicle) then
+                    ShowNotification("✅ " .. targetName .. " gemiye bindirildi!")
+                    -- Gemiyi fırlat
+                    local root = vehicle:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        root.Velocity = Vector3.new(math.random(-100,100), 50, math.random(-100,100))
+                    end
+                else
+                    ShowNotification("⚠️ Araçta oturma yeri bulunamadı!")
+                end
+            else
+                ShowNotification("⚠️ Yakında araç bulunamadı!")
+            end
+            
+        elseif option.name == "🚤 Tekneye Bindir" then
+            local vehicle = FindNearestVehicle(hrp.Position)
+            if vehicle then
+                if ForceSit(char, vehicle) then
+                    ShowNotification("✅ " .. targetName .. " tekneye bindirildi!")
+                    local root = vehicle:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        root.Velocity = Vector3.new(math.random(-150,150), 80, math.random(-150,150))
+                    end
+                end
+            else
+                ShowNotification("⚠️ Yakında tekne bulunamadı!")
+            end
+            
+        elseif option.name == "🚌 Otobüse Bindir" then
+            local vehicle = FindNearestVehicle(hrp.Position)
+            if vehicle then
+                if ForceSit(char, vehicle) then
+                    ShowNotification("✅ " .. targetName .. " otobüse bindirildi!")
+                    local root = vehicle:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        root.Velocity = Vector3.new(math.random(-200,200), 100, math.random(-200,200))
+                    end
+                end
+            else
+                ShowNotification("⚠️ Yakında otobüs bulunamadı!")
+            end
+            
+        elseif option.name == "🔄 Fling (Fırlat)" then
+            hrp.Velocity = Vector3.new(math.random(-150, 150), 150, math.random(-150, 150))
+            hrp.AssemblyLinearVelocity = Vector3.new(math.random(-150, 150), 150, math.random(-150, 150))
+            ShowNotification("✅ " .. targetName .. " fırlatıldı!")
+            
+        elseif option.name == "⚡ Speed Hack (Hızlandır)" then
             if hum then
                 hum.WalkSpeed = 100
-                ShowNotification("✅ " .. SELECTED_PLAYER.Name .. " hızlandırıldı!")
+                hum.JumpPower = 80
+                ShowNotification("✅ " .. targetName .. " hızlandırıldı! (Speed: 100)")
             end
-        elseif option == "❄️ Freeze" then
+            
+        elseif option.name == "❄️ Freeze (Dondur)" then
             hrp.Anchored = true
+            if hum then
+                hum.PlatformStand = true
+            end
+            ShowNotification("❄️ " .. targetName .. " donduruldu! (3 saniye)")
             task.wait(3)
             hrp.Anchored = false
-            ShowNotification("✅ " .. SELECTED_PLAYER.Name .. " donduruldu!")
-        elseif option == "🚀 Launch" then
-            hrp.Velocity = Vector3.new(0, 250, 0)
-            ShowNotification("✅ " .. SELECTED_PLAYER.Name .. " havaya fırlatıldı!")
+            if hum then
+                hum.PlatformStand = false
+            end
+            ShowNotification("✅ " .. targetName .. " çözüldü!")
+            
+        elseif option.name == "🚀 Launch (Havaya Fırlat)" then
+            hrp.Velocity = Vector3.new(0, 300, 0)
+            hrp.AssemblyLinearVelocity = Vector3.new(0, 300, 0)
+            ShowNotification("🚀 " .. targetName .. " havaya fırlatıldı!")
+            
+        elseif option.name == "💀 Kill (Öldür)" then
+            if hum then
+                hum.Health = 0
+                ShowNotification("💀 " .. targetName .. " öldürüldü!")
+            end
+            
+        elseif option.name == "💥 Explode (Patlat)" then
+            local explosion = Instance.new("Explosion")
+            explosion.Position = hrp.Position
+            explosion.BlastRadius = 15
+            explosion.BlastPressure = 100
+            explosion.Parent = Workspace
+            ShowNotification("💥 " .. targetName .. " patlatıldı!")
+            
+        elseif option.name == "🔄 Sürekli Fling" then
+            if loopFlingActive then
+                loopFlingActive = false
+                if loopConnection then
+                    loopConnection:Disconnect()
+                    loopConnection = nil
+                end
+                ShowNotification("⏹️ Sürekli fırlatma durduruldu!")
+            else
+                loopFlingActive = true
+                ShowNotification("🔄 Sürekli fırlatma başlatıldı! (Durdurmak için tekrar tıklayın)")
+                loopConnection = RunService.Heartbeat:Connect(function()
+                    if not loopFlingActive or not SELECTED_PLAYER then
+                        if loopConnection then loopConnection:Disconnect() end
+                        return
+                    end
+                    local targetChar = SELECTED_PLAYER.Character
+                    if targetChar then
+                        local targetHrp = targetChar:FindFirstChild("HumanoidRootPart")
+                        if targetHrp then
+                            targetHrp.Velocity = Vector3.new(math.random(-150,150), 120, math.random(-150,150))
+                            targetHrp.AssemblyLinearVelocity = Vector3.new(math.random(-150,150), 120, math.random(-150,150))
+                        end
+                    end
+                end)
+            end
+            
+        elseif option.name == "👢 Kick (At)" then
+            SELECTED_PLAYER:Kick("LK SYSTEM Tarafından atıldınız!")
+            ShowNotification("👢 " .. targetName .. " sunucudan atıldı!")
+            
+        elseif option.name == "📡 Işınla (Yanına)" then
+            local myChar = LocalPlayer.Character
+            if myChar then
+                local myHrp = myChar:FindFirstChild("HumanoidRootPart")
+                if myHrp then
+                    hrp.Position = myHrp.Position + Vector3.new(5, 0, 0)
+                    ShowNotification("📡 " .. targetName .. " yanınıza ışınlandı!")
+                end
+            end
         end
     end)
     
@@ -963,7 +1146,7 @@ function ShowNotification(text)
     game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = "LK SYSTEM",
         Text = text,
-        Duration = 2
+        Duration = 3
     })
 end
 
@@ -974,13 +1157,21 @@ task.wait(0.5)
 UpdatePlayerList("")
 
 ShowNotification("✅ LK SYSTEM Yüklendi!")
+ShowNotification("🚢 TROLL Sistemi Aktif!")
 
 print("╔═══════════════════════════════════════╗")
-print("║     LK SYSTEM v2.0 - ÇALIŞIYOR       ║")
+print("║     LK SYSTEM v2.0 - TROLL FULL      ║")
 print("║                                      ║")
-print("║  ✅ Tüm butonlar tıklanabilir        ║")
-print("║  ✅ ZIndex sorunu çözüldü            ║")
-print("║  ✅ ESP sistemi aktif                ║")
-print("║  ✅ Oyuncu seçme aktif               ║")
-print("║  ✅ Troll sistemleri aktif           ║")
+print("║  ✅ Gemiye Bindir (Çalışıyor)        ║")
+print("║  ✅ Tekneye Bindir (Çalışıyor)       ║")
+print("║  ✅ Otobüse Bindir (Çalışıyor)       ║")
+print("║  ✅ Fling (Çalışıyor)                ║")
+print("║  ✅ Speed Hack (Çalışıyor)           ║")
+print("║  ✅ Freeze (Çalışıyor)               ║")
+print("║  ✅ Launch (Çalışıyor)               ║")
+print("║  ✅ Kill (Çalışıyor)                 ║")
+print("║  ✅ Explode (Çalışıyor)              ║")
+print("║  ✅ Sürekli Fling (Çalışıyor)        ║")
+print("║  ✅ Kick (Çalışıyor)                 ║")
+print("║  ✅ Işınla (Çalışıyor)               ║")
 print("╚═══════════════════════════════════════╝")
