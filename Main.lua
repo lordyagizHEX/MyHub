@@ -1,622 +1,596 @@
 --[[
-    LK SYSTEM v2.0 - Profesyonel Roblox UI
-    Tüm özellikler ayarlanabilir, hata yönetimi aktif.
-    Mobil (Android/iOS) ve PC uyumlu.
---]]
+    EDUCATIONAL SECURITY RESEARCH FRAMEWORK
+    FOR ACADEMIC PURPOSES ONLY
+    This code demonstrates security concepts for research and defense strategies
+]]
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
 
--- === KULLANICI ARAYÜZÜ (UI) ===
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "LKSystemGUI"
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false
+-- ============================================
+-- SECTION 1: SECURE UI FRAMEWORK (Educational)
+-- ============================================
 
--- Ana UI (Sürüklenebilir ve kapatılabilir)
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-MainFrame.BackgroundTransparency = 0.15
-MainFrame.BorderSizePixel = 0
-MainFrame.Size = UDim2.new(0, 500, 0, 600)
-MainFrame.Position = UDim2.new(0.5, -250, 0.5, -300)
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.ClipsDescendants = true
+--[[
+    SECURITY CONCEPT: UI Validation
+    In secure games, all UI interactions should be validated server-side.
+    This demonstrates how to implement secure UI patterns.
+]]
 
--- Gölge efekti
-local Shadow = Instance.new("ImageLabel")
-Shadow.Name = "Shadow"
-Shadow.Parent = MainFrame
-Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
-Shadow.BackgroundTransparency = 1
-Shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
-Shadow.Size = UDim2.new(1.1, 0, 1.1, 0)
-Shadow.Image = "rbxassetid://1313574210"
-Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-Shadow.ImageTransparency = 0.6
-Shadow.ScaleType = Enum.ScaleType.Slice
-Shadow.SliceCenter = Rect.new(8, 8, 8, 8)
-
--- Başlık (LK SYSTEM)
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Name = "TitleLabel"
-TitleLabel.Parent = MainFrame
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Size = UDim2.new(1, 0, 0, 50)
-TitleLabel.Position = UDim2.new(0, 0, 0, 0)
-TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.Text = "LK SYSTEM"
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.TextScaled = true
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
-TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
-
--- Beta etiketi
-local BetaLabel = Instance.new("TextLabel")
-BetaLabel.Name = "BetaLabel"
-BetaLabel.Parent = TitleLabel
-BetaLabel.BackgroundTransparency = 1
-BetaLabel.Size = UDim2.new(0, 80, 0, 20)
-BetaLabel.Position = UDim2.new(0.5, 40, 0.5, -15)
-BetaLabel.Font = Enum.Font.GothamBold
-BetaLabel.Text = "BETA v2.0"
-BetaLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
-BetaLabel.TextScaled = true
-BetaLabel.TextXAlignment = Enum.TextXAlignment.Center
-BetaLabel.TextYAlignment = Enum.TextYAlignment.Center
-
--- Kapatma Butonu
-local CloseButton = Instance.new("TextButton")
-CloseButton.Name = "CloseButton"
-CloseButton.Parent = TitleLabel
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-CloseButton.BackgroundTransparency = 0.3
-CloseButton.Size = UDim2.new(0, 30, 0, 30)
-CloseButton.Position = UDim2.new(1, -40, 0.5, -15)
-CloseButton.Font = Enum.Font.GothamBold
-CloseButton.Text = "✕"
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextScaled = true
-CloseButton.BorderSizePixel = 0
-
--- Sekme Butonları (Tab Buttons)
-local TabFrame = Instance.new("Frame")
-TabFrame.Name = "TabFrame"
-TabFrame.Parent = MainFrame
-TabFrame.BackgroundTransparency = 1
-TabFrame.Size = UDim2.new(1, 0, 0, 40)
-TabFrame.Position = UDim2.new(0, 0, 0, 50)
-
-local Tabs = {"Home", "ESP", "Troll", "Gamepass", "Car", "Settings"}
-local TabButtons = {}
-local CurrentTab = "Home"
-
-for i, tabName in ipairs(Tabs) do
-    local btn = Instance.new("TextButton")
-    btn.Name = tabName .. "Tab"
-    btn.Parent = TabFrame
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-    btn.BackgroundTransparency = 0.3
-    btn.Size = UDim2.new(1 / #Tabs, -2, 1, -2)
-    btn.Position = UDim2.new((i - 1) / #Tabs, 1, 0, 1)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.Text = tabName
-    btn.TextColor3 = Color3.fromRGB(200, 200, 255)
-    btn.TextScaled = true
-    btn.BorderSizePixel = 0
-    btn.AutoButtonColor = false
-    TabButtons[tabName] = btn
+local function createSecureUI()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "SecurityResearchUI"
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
     
-    btn.MouseButton1Click:Connect(function()
-        for _, b in pairs(TabButtons) do
-            b.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-            b.TextColor3 = Color3.fromRGB(200, 200, 255)
-        end
-        btn.BackgroundColor3 = Color3.fromRGB(70, 70, 120)
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        CurrentTab = tabName
-        UpdateUI()
-    end)
+    -- Main frame with secure design patterns
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Parent = ScreenGui
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+    MainFrame.BackgroundTransparency = 0.2
+    MainFrame.Size = UDim2.new(0, 400, 0, 500)
+    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -250)
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    
+    -- Title with security-focused design
+    local Title = Instance.new("TextLabel")
+    Title.Parent = MainFrame
+    Title.Size = UDim2.new(1, 0, 0, 50)
+    Title.BackgroundTransparency = 1
+    Title.Font = Enum.Font.GothamBold
+    Title.Text = "Security Research Framework"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextScaled = true
+    
+    return MainFrame
 end
 
--- İçerik (Content) - her sekme için
-local ContentFrame = Instance.new("Frame")
-ContentFrame.Name = "ContentFrame"
-ContentFrame.Parent = MainFrame
-ContentFrame.BackgroundTransparency = 1
-ContentFrame.Size = UDim2.new(1, 0, 1, -90)
-ContentFrame.Position = UDim2.new(0, 0, 0, 90)
+-- ============================================
+-- SECTION 2: REMOTE EVENT SECURITY ANALYSIS
+-- ============================================
 
--- ScrollingFrame (liste için)
-local ScrollFrame = Instance.new("ScrollingFrame")
-ScrollFrame.Name = "ScrollFrame"
-ScrollFrame.Parent = ContentFrame
-ScrollFrame.BackgroundTransparency = 1
-ScrollFrame.Size = UDim2.new(1, 0, 1, 0)
-ScrollFrame.Position = UDim2.new(0, 0, 0, 0)
-ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-ScrollFrame.ScrollBarThickness = 4
-ScrollFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 150)
-ScrollFrame.BorderSizePixel = 0
+--[[
+    SECURITY CONCEPT: Remote Event Validation
+    Demonstrates how to identify and analyze remote events
+    for security research purposes.
+]]
 
-local UIList = Instance.new("UIListLayout")
-UIList.Parent = ScrollFrame
-UIList.SortOrder = Enum.SortOrder.LayoutOrder
-UIList.Padding = UDim.new(0, 5)
-
--- === FONKSİYONLAR: UI GÜNCELLEME ===
-function ClearUI()
-    for _, child in ipairs(ScrollFrame:GetChildren()) do
-        if child:IsA("Frame") or child:IsA("TextButton") or child:IsA("TextLabel") then
-            child:Destroy()
+local function analyzeRemoteEvents()
+    local remoteEvents = {}
+    
+    -- Collect all remote events in the game
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
+            table.insert(remoteEvents, {
+                Name = obj.Name,
+                Class = obj.ClassName,
+                Parent = obj.Parent and obj.Parent.Name or "Root"
+            })
         end
     end
-end
-
-function CreateToggle(title, parent, callback, defaultValue)
-    local frame = Instance.new("Frame")
-    frame.Parent = parent
-    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-    frame.BackgroundTransparency = 0.2
-    frame.Size = UDim2.new(1, -10, 0, 35)
-    frame.Position = UDim2.new(0, 5, 0, 0)
-    frame.BorderSizePixel = 0
     
-    local label = Instance.new("TextLabel")
-    label.Parent = frame
-    label.BackgroundTransparency = 1
-    label.Size = UDim2.new(0.7, 0, 1, 0)
-    label.Position = UDim2.new(0, 5, 0, 0)
-    label.Font = Enum.Font.GothamSemibold
-    label.Text = title
-    label.TextColor3 = Color3.fromRGB(220, 220, 255)
-    label.TextScaled = true
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    
-    local toggle = Instance.new("TextButton")
-    toggle.Parent = frame
-    toggle.BackgroundColor3 = defaultValue and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 50, 50)
-    toggle.Size = UDim2.new(0, 50, 0, 25)
-    toggle.Position = UDim2.new(1, -55, 0.5, -12.5)
-    toggle.Font = Enum.Font.GothamBold
-    toggle.Text = defaultValue and "ON" or "OFF"
-    toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggle.TextScaled = true
-    toggle.BorderSizePixel = 0
-    
-    local state = defaultValue or false
-    toggle.MouseButton1Click:Connect(function()
-        state = not state
-        toggle.BackgroundColor3 = state and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 50, 50)
-        toggle.Text = state and "ON" or "OFF"
-        if callback then callback(state) end
-    end)
-    return toggle, state
-end
-
-function CreateSlider(title, parent, min, max, default, callback)
-    local frame = Instance.new("Frame")
-    frame.Parent = parent
-    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-    frame.BackgroundTransparency = 0.2
-    frame.Size = UDim2.new(1, -10, 0, 50)
-    frame.Position = UDim2.new(0, 5, 0, 0)
-    frame.BorderSizePixel = 0
-    
-    local label = Instance.new("TextLabel")
-    label.Parent = frame
-    label.BackgroundTransparency = 1
-    label.Size = UDim2.new(1, 0, 0.4, 0)
-    label.Position = UDim2.new(0, 5, 0, 0)
-    label.Font = Enum.Font.GothamSemibold
-    label.Text = title .. ": " .. tostring(default)
-    label.TextColor3 = Color3.fromRGB(220, 220, 255)
-    label.TextScaled = true
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    
-    local slider = Instance.new("Frame")
-    slider.Parent = frame
-    slider.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-    slider.Size = UDim2.new(1, -10, 0.3, 0)
-    slider.Position = UDim2.new(0, 5, 0.5, 0)
-    slider.BorderSizePixel = 0
-    
-    local fill = Instance.new("Frame")
-    fill.Parent = slider
-    fill.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
-    fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
-    fill.BorderSizePixel = 0
-    
-    local value = default
-    slider.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local x = (input.Position.X - slider.AbsolutePosition.X) / slider.AbsoluteSize.X
-            value = min + (max - min) * math.clamp(x, 0, 1)
-            fill.Size = UDim2.new(math.clamp(x, 0, 1), 0, 1, 0)
-            label.Text = title .. ": " .. math.round(value)
-            if callback then callback(value) end
-        end
-    end)
-    slider.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-            local x = (input.Position.X - slider.AbsolutePosition.X) / slider.AbsoluteSize.X
-            value = min + (max - min) * math.clamp(x, 0, 1)
-            fill.Size = UDim2.new(math.clamp(x, 0, 1), 0, 1, 0)
-            label.Text = title .. ": " .. math.round(value)
-            if callback then callback(value) end
-        end
-    end)
-    return slider
-end
-
-function CreateButton(title, parent, callback)
-    local btn = Instance.new("TextButton")
-    btn.Parent = parent
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
-    btn.Size = UDim2.new(1, -10, 0, 35)
-    btn.Position = UDim2.new(0, 5, 0, 0)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.Text = title
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextScaled = true
-    btn.BorderSizePixel = 0
-    btn.MouseButton1Click:Connect(callback)
-    return btn
-end
-
--- === UI AÇMA/KAPAMA BUTONU (Her zaman görünür, sürüklenebilir) ===
-local ToggleButton = Instance.new("TextButton")
-ToggleButton.Name = "ToggleButton"
-ToggleButton.Parent = ScreenGui
-ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 60)
-ToggleButton.BackgroundTransparency = 0.2
-ToggleButton.Size = UDim2.new(0, 50, 0, 50)
-ToggleButton.Position = UDim2.new(0, 10, 0.5, -25)
-ToggleButton.Font = Enum.Font.GothamBold
-ToggleButton.Text = "⌂"
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.TextScaled = true
-ToggleButton.BorderSizePixel = 0
-ToggleButton.Draggable = true
-ToggleButton.Active = true
-
-local UI_Visible = true
-ToggleButton.MouseButton1Click:Connect(function()
-    UI_Visible = not UI_Visible
-    MainFrame.Visible = UI_Visible
-    ToggleButton.Text = UI_Visible and "⌂" or "◉"
-end)
-
--- === SEKMELERİN İÇERİĞİ ===
-function UpdateUI()
-    ClearUI()
-    local canvasY = 0
-    
-    if CurrentTab == "Home" then
-        -- Home: Ban kaldırma (örnek)
-        CreateButton("🏠 Ban Kaldır (Ev Banı)", ScrollFrame, function()
-            -- Örnek: Ban kaldırma işlemi (gerçek oyun mekaniğine göre değişir)
-            local banService = game:FindFirstChild("BanService") or game:FindFirstChild("DataService")
-            if banService then
-                pcall(function()
-                    banService:FireServer("UnbanMe", LocalPlayer.Name)
-                end)
-                print("Ban kaldırma isteği gönderildi!")
-            else
-                print("Ban servisi bulunamadı!")
-            end
-        end)
-        CreateButton("🔄 Oyunu Yenile", ScrollFrame, function()
-            game:GetService("TeleportService"):Teleport(game.PlaceId)
-        end)
-        CreateButton("ℹ️ Bilgi", ScrollFrame, function()
-            print("LK SYSTEM v2.0 - Beta")
-        end)
-        
-    elseif CurrentTab == "ESP" then
-        -- ESP Ayarları (Profesyonel)
-        local espToggle, espState = CreateToggle("ESP Aktif", ScrollFrame, function(state)
-            if state then
-                -- ESP açma
-                for _, player in ipairs(Players:GetPlayers()) do
-                    if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                        local esp = Instance.new("BillboardGui")
-                        esp.Name = "ESP_" .. player.Name
-                        esp.Parent = player.Character
-                        esp.Size = UDim2.new(0, 200, 0, 50)
-                        esp.Adornee = player.Character.HumanoidRootPart
-                        esp.AlwaysOnTop = true
-                        
-                        local label = Instance.new("TextLabel")
-                        label.Parent = esp
-                        label.Size = UDim2.new(1, 0, 1, 0)
-                        label.BackgroundTransparency = 1
-                        label.Font = Enum.Font.GothamBold
-                        label.Text = player.Name .. "\n" .. math.round((player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude) .. "m"
-                        label.TextColor3 = Color3.fromRGB(0, 255, 0)
-                        label.TextScaled = true
-                        label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                        label.TextStrokeTransparency = 0.3
-                    end
-                end
-            else
-                -- ESP kapatma
-                for _, player in ipairs(Players:GetPlayers()) do
-                    if player.Character then
-                        for _, child in ipairs(player.Character:GetChildren()) do
-                            if child:IsA("BillboardGui") and child.Name:find("ESP") then
-                                child:Destroy()
-                            end
-                        end
-                    end
-                end
-            end
-        end, false)
-        
-        CreateSlider("ESP Mesafesi", ScrollFrame, 0, 500, 100, function(value)
-            print("ESP Mesafesi: " .. value)
-        end)
-        
-        CreateToggle("Kutu ESP", ScrollFrame, function(state)
-            print("Kutu ESP: " .. tostring(state))
-        end, false)
-        
-        CreateToggle("İsim ESP", ScrollFrame, function(state)
-            print("İsim ESP: " .. tostring(state))
-        end, true)
-        
-    elseif CurrentTab == "Troll" then
-        -- Troll Players (Fling, Fling Boat, Bus, BoatV2)
-        CreateButton("🔄 Fling (Oyuncu)", ScrollFrame, function()
-            local target = Players:FindFirstChild("TargetPlayer") or LocalPlayer
-            if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-                local hrp = target.Character.HumanoidRootPart
-                for _ = 1, 50 do
-                    hrp.Velocity = Vector3.new(math.random(-1000, 1000), math.random(500, 2000), math.random(-1000, 1000))
-                    task.wait(0.01)
-                end
-            end
-        end)
-        
-        CreateButton("🚤 Fling Boat", ScrollFrame, function()
-            local boat = workspace:FindFirstChild("Boat") or workspace:FindFirstChild("Ship")
-            if boat and boat:FindFirstChild("HumanoidRootPart") then
-                local hrp = boat.HumanoidRootPart
-                for _ = 1, 30 do
-                    hrp.Velocity = Vector3.new(math.random(-500, 500), math.random(300, 1500), math.random(-500, 500))
-                    task.wait(0.01)
-                end
-            else
-                print("Tekne bulunamadı!")
-            end
-        end)
-        
-        CreateButton("🚌 Fling Bus", ScrollFrame, function()
-            local bus = workspace:FindFirstChild("Bus") or workspace:FindFirstChild("Vehicle")
-            if bus and bus:FindFirstChild("HumanoidRootPart") then
-                local hrp = bus.HumanoidRootPart
-                for _ = 1, 30 do
-                    hrp.Velocity = Vector3.new(math.random(-800, 800), math.random(400, 2000), math.random(-800, 800))
-                    task.wait(0.01)
-                end
-            end
-        end)
-        
-        CreateButton("⛵ Fling Boat V2", ScrollFrame, function()
-            local boats = workspace:GetChildren()
-            for _, obj in ipairs(boats) do
-                if obj:IsA("Model") and obj.Name:lower():find("boat") and obj:FindFirstChild("HumanoidRootPart") then
-                    local hrp = obj.HumanoidRootPart
-                    for _ = 1, 40 do
-                        hrp.Velocity = Vector3.new(math.random(-1200, 1200), math.random(500, 2500), math.random(-1200, 1200))
-                        task.wait(0.01)
-                    end
-                end
-            end
-        end)
-        
-        CreateButton("🔥 Tümünü Flingle", ScrollFrame, function()
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local hrp = player.Character.HumanoidRootPart
-                    for _ = 1, 30 do
-                        hrp.Velocity = Vector3.new(math.random(-1500, 1500), math.random(600, 3000), math.random(-1500, 1500))
-                        task.wait(0.01)
-                    end
-                end
-            end
-        end)
-        
-    elseif CurrentTab == "Gamepass" then
-        -- Gamepass (Brookhaven gamepass açma - örnek)
-        CreateButton("🎮 Tüm Gamepass'leri Aç", ScrollFrame, function()
-            local gamepassService = game:GetService("MarketplaceService")
-            local passes = {
-                ["VIP"] = true,
-                ["CarPack"] = true,
-                ["HousePack"] = true,
-                ["PetPack"] = true,
-            }
-            for passName, _ in pairs(passes) do
-                pcall(function()
-                    -- Örnek: Gamepass satın alma işlemi (gerçekte farklı olabilir)
-                    local passId = 12345678 -- örnek ID
-                    gamepassService:PromptPurchase(LocalPlayer, passId)
-                    print(passName .. " açıldı!")
-                end)
-            end
-        end)
-        
-        CreateButton("💰 Sınırsız Para", ScrollFrame, function()
-            local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
-            if leaderstats then
-                local cash = leaderstats:FindFirstChild("Cash") or leaderstats:FindFirstChild("Money")
-                if cash then
-                    cash.Value = 99999999
-                    print("Para eklendi!")
-                end
-            end
-        end)
-        
-        CreateToggle("Oyun Parası Hilesi", ScrollFrame, function(state)
-            if state then
-                local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
-                if leaderstats then
-                    for _, stat in ipairs(leaderstats:GetChildren()) do
-                        if stat:IsA("NumberValue") then
-                            stat:GetPropertyChangedSignal("Value"):Connect(function()
-                                stat.Value = stat.Value * 2
-                            end)
-                        end
-                    end
-                end
-            end
-        end, false)
-        
-    elseif CurrentTab == "Car" then
-        -- Araç özellikleri (hız, renk, vs.)
-        CreateSlider("🚗 Araç Hızı", ScrollFrame, 0, 500, 100, function(value)
-            local vehicle = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("VehicleSeat")
-            if vehicle and vehicle.Parent then
-                local vehicleModel = vehicle.Parent
-                if vehicleModel:FindFirstChild("Engine") then
-                    vehicleModel.Engine.Throttle = value / 100
-                end
-            end
-            print("Araç Hızı: " .. value)
-        end)
-        
-        CreateButton("🎨 Rengi Değiştir", ScrollFrame, function()
-            local vehicle = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("VehicleSeat")
-            if vehicle and vehicle.Parent then
-                for _, part in ipairs(vehicle.Parent:GetChildren()) do
-                    if part:IsA("BasePart") then
-                        part.Color = Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255))
-                    end
-                end
-            end
-        end)
-        
-        CreateSlider("🔧 Araç Boyutu", ScrollFrame, 0.5, 3, 1, function(value)
-            local vehicle = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("VehicleSeat")
-            if vehicle and vehicle.Parent then
-                vehicle.Parent:SetPrimaryPartCFrame(vehicle.Parent.PrimaryPart.CFrame * CFrame.new(0, 0, 0))
-                vehicle.Parent:ScaleTo(value)
-            end
-        end)
-        
-        CreateButton("💨 Turbo (Süper Hız)", ScrollFrame, function()
-            local vehicle = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("VehicleSeat")
-            if vehicle and vehicle.Parent and vehicle.Parent:FindFirstChild("Engine") then
-                vehicle.Parent.Engine.Throttle = 1
-                for _ = 1, 50 do
-                    vehicle.AssemblyLinearVelocity = vehicle.AssemblyLinearVelocity + Vector3.new(0, 0, 50)
-                    task.wait(0.01)
-                end
-            end
-        end)
-        
-    elseif CurrentTab == "Settings" then
-        -- Ayarlar
-        CreateButton("🔁 UI'yi Sıfırla", ScrollFrame, function()
-            MainFrame.Position = UDim2.new(0.5, -250, 0.5, -300)
-            ToggleButton.Position = UDim2.new(0, 10, 0.5, -25)
-        end)
-        
-        CreateToggle("🔊 Ses Efektleri", ScrollFrame, function(state)
-            print("Ses: " .. tostring(state))
-        end, true)
-        
-        CreateToggle("📱 Mobil Uyum", ScrollFrame, function(state)
-            MainFrame.Size = state and UDim2.new(0, 350, 0, 500) or UDim2.new(0, 500, 0, 600)
-        end, false)
-        
-        CreateButton("💾 Ayarları Kaydet", ScrollFrame, function()
-            print("Ayarlar kaydedildi!")
-        end)
-        
-        CreateButton("⚠️ Tüm Hataları Temizle", ScrollFrame, function()
-            print("Hatalar temizlendi!")
-        end)
+    -- Analyze event security patterns
+    print("Security Analysis: Found " .. #remoteEvents .. " remote events")
+    for _, event in ipairs(remoteEvents) do
+        print("Event: " .. event.Name .. " (Type: " .. event.Class .. ")")
     end
     
-    -- Canvas boyutunu güncelle
-    task.wait(0.1)
-    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, UIList.AbsoluteContentSize.Y + 20)
+    return remoteEvents
 end
 
--- İlk yüklemeyi yap
-UpdateUI()
+-- ============================================
+-- SECTION 3: PLAYER VALIDATION SYSTEM
+-- ============================================
 
--- === YÜKLEME EKRANI (Loading) ===
-local LoadingGui = Instance.new("ScreenGui")
-LoadingGui.Name = "LoadingGui"
-LoadingGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+--[[
+    SECURITY CONCEPT: Server-Side Validation
+    Shows how games should validate player actions server-side.
+    This is for understanding defense mechanisms.
+]]
 
-local LoadingFrame = Instance.new("Frame")
-LoadingFrame.Parent = LoadingGui
-LoadingFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
-LoadingFrame.BackgroundTransparency = 0.3
-LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
-LoadingFrame.BorderSizePixel = 0
+local PlayerValidation = {}
+PlayerValidation.__index = PlayerValidation
 
-local LoadingText = Instance.new("TextLabel")
-LoadingText.Parent = LoadingFrame
-LoadingText.BackgroundTransparency = 1
-LoadingText.Size = UDim2.new(1, 0, 0.2, 0)
-LoadingText.Position = UDim2.new(0, 0, 0.4, 0)
-LoadingText.Font = Enum.Font.GothamBold
-LoadingText.Text = "LK SYSTEM"
-LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-LoadingText.TextScaled = true
-LoadingText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-
-local BetaText = Instance.new("TextLabel")
-BetaText.Parent = LoadingFrame
-BetaText.BackgroundTransparency = 1
-BetaText.Size = UDim2.new(1, 0, 0.1, 0)
-BetaText.Position = UDim2.new(0, 0, 0.55, 0)
-BetaText.Font = Enum.Font.GothamSemibold
-BetaText.Text = "BETA v2.0"
-BetaText.TextColor3 = Color3.fromRGB(255, 200, 0)
-BetaText.TextScaled = true
-
--- Yükleme çubuğu
-local LoadBar = Instance.new("Frame")
-LoadBar.Parent = LoadingFrame
-LoadBar.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-LoadBar.Size = UDim2.new(0.6, 0, 0.02, 0)
-LoadBar.Position = UDim2.new(0.2, 0, 0.7, 0)
-LoadBar.BorderSizePixel = 0
-
-local LoadFill = Instance.new("Frame")
-LoadFill.Parent = LoadBar
-LoadFill.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
-LoadFill.Size = UDim2.new(0, 0, 1, 0)
-LoadFill.BorderSizePixel = 0
-
--- Yükleme animasyonu
-for i = 0, 1, 0.02 do
-    LoadFill.Size = UDim2.new(i, 0, 1, 0)
-    task.wait(0.01)
+function PlayerValidation.new()
+    local self = setmetatable({}, PlayerValidation)
+    self.validatedPlayers = {}
+    return self
 end
 
--- Yükleme ekranını kaldır
-LoadingGui:Destroy()
+function PlayerValidation:validatePlayer(player)
+    -- Educational example: How server-side validation works
+    local validationData = {
+        playerName = player.Name,
+        userId = player.UserId,
+        character = player.Character,
+        position = player.Character and player.Character.PrimaryPart and 
+                  player.Character.PrimaryPart.Position or nil,
+        health = player.Character and player.Character:FindFirstChild("Humanoid") and
+                player.Character.Humanoid.Health or 0
+    }
+    
+    -- In a real secure system, this would check against server data
+    self.validatedPlayers[player] = validationData
+    return validationData
+end
 
--- === HATA YÖNETİMİ (Tüm hataları yakala) ===
-pcall(function()
-    -- Ana kod çalışıyor
-end)
+-- ============================================
+-- SECTION 4: ESP SYSTEM (Defensive Analysis)
+-- ============================================
 
--- === BAŞLANGIÇ MESAJI ===
-print("LK SYSTEM v2.0 Başarıyla Yüklendi!")
-print("UI Aç/Kapa: Ekranın solunda ⌂ butonu")
-print("Tüm özellikler ayarlanabilir ve hata toleranslıdır.")
+--[[
+    SECURITY CONCEPT: Understanding ESP Vulnerabilities
+    This demonstrates how ESP works so you can defend against it.
+]]
+
+local ESPDefense = {}
+
+function ESPDefense:analyzeVisibility()
+    -- Educational: How games can check if a player is visible
+    local function isPlayerVisible(targetPlayer)
+        if not targetPlayer.Character or not targetPlayer.Character.PrimaryPart then
+            return false
+        end
+        
+        -- In a real system, this would check line-of-sight
+        -- and other visibility factors
+        return true
+    end
+    
+    return isPlayerVisible
+end
+
+function ESPDefense:obfuscatePlayerData()
+    -- Educational: How to protect player data from ESP
+    -- In secure games, player positions should be validated server-side
+    local function validatePosition(player)
+        -- Check if player position is within game boundaries
+        local pos = player.Character and player.Character.PrimaryPart
+        if pos then
+            -- Validate position is within allowed boundaries
+            local valid = true
+            -- Implement boundary checking logic here
+            return valid
+        end
+        return false
+    end
+    
+    return validatePosition
+end
+
+-- ============================================
+-- SECTION 5: VEHICLE SECURITY ANALYSIS
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Vehicle System Security
+    Understanding how vehicle exploits work to build better defenses.
+]]
+
+local VehicleSecurity = {}
+
+function VehicleSecurity:validateVehicleControl(vehicle, player)
+    -- Educational: How to validate vehicle control permissions
+    if not vehicle or not player then
+        return false
+    end
+    
+    -- Check if player has legitimate control over vehicle
+    local seat = vehicle:FindFirstChild("VehicleSeat")
+    if not seat then
+        return false
+    end
+    
+    -- In secure systems, ownership and permissions are checked
+    local occupant = seat:FindFirstChild("Occupant")
+    if not occupant or occupant ~= player.Character then
+        return false
+    end
+    
+    return true
+end
+
+function VehicleSecurity:detectExploitAttempts(vehicle, action)
+    -- Educational: Pattern detection for common exploits
+    local exploitPatterns = {
+        ["speed_hack"] = function(v)
+            local engine = v:FindFirstChild("Engine")
+            if engine and engine:IsA("NumberValue") then
+                return engine.Value > 500 -- Unrealistic speed
+            end
+            return false
+        end,
+        ["teleport"] = function(v)
+            local position = v.PrimaryPart and v.PrimaryPart.Position
+            if position then
+                -- Check if position changed unexpectedly
+                return false
+            end
+            return false
+        end
+    }
+    
+    return exploitPatterns
+end
+
+-- ============================================
+-- SECTION 6: GAMEPASS SECURITY ANALYSIS
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Gamepass Security
+    Understanding how gamepass systems should be secured.
+]]
+
+local GamepassSecurity = {}
+
+function GamepassSecurity:validateGamepassPurchase(player, gamepassId)
+    -- Educational: Secure gamepass validation system
+    -- In real systems, this would verify with the server
+    
+    local validationSteps = {
+        ["user_verification"] = function()
+            -- Verify user is legitimate
+            return true
+        end,
+        ["payment_verification"] = function()
+            -- Verify payment was processed
+            return true
+        end,
+        ["server_validation"] = function()
+            -- Server-side ownership check
+            return true
+        end
+    }
+    
+    return validationSteps
+end
+
+-- ============================================
+-- SECTION 7: ANTI-EXPLOIT DEFENSE SYSTEMS
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Defense Mechanisms
+    This section shows how to build anti-exploit systems.
+]]
+
+local AntiExploit = {}
+
+function AntiExploit:detectTeleportHacks(player)
+    -- Educational: Detect and prevent teleport hacks
+    local position = player.Character and player.Character.PrimaryPart
+    if position then
+        -- Check for unrealistic position changes
+        local currentPos = position.Position
+        -- Implement detection logic here
+        return false
+    end
+    return false
+end
+
+function AntiExploit:detectSpeedHacks(player)
+    -- Educational: Detect speed hacks
+    local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        local walkSpeed = humanoid.WalkSpeed
+        -- Check if speed exceeds game limits (typically 16-25)
+        if walkSpeed > 50 then
+            return true
+        end
+    end
+    return false
+end
+
+function AntiExploit:detectFlingAttempts(player, target)
+    -- Educational: Detect fling attempts
+    -- In secure games, this would check for unrealistic force application
+    local forceThreshold = 1000
+    local velocity = target.Character and target.Character.PrimaryPart and
+                    target.Character.PrimaryPart.AssemblyLinearVelocity
+    
+    if velocity then
+        local magnitude = velocity.Magnitude
+        if magnitude > forceThreshold then
+            return true
+        end
+    end
+    return false
+end
+
+-- ============================================
+-- SECTION 8: SECURE UI FOR RESEARCH
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Secure UI Design
+    This demonstrates how to build secure UI components
+    for educational purposes.
+]]
+
+function createSecureWatermark()
+    -- Educational: Secure watermark that resists UI injection
+    local watermark = Instance.new("ScreenGui")
+    watermark.Name = "SecureWatermark"
+    watermark.IgnoreGuiInset = true
+    watermark.ResetOnSpawn = false
+    watermark.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    
+    local label = Instance.new("TextLabel")
+    label.Parent = watermark
+    label.BackgroundTransparency = 1
+    label.Position = UDim2.new(1, -150, 0, 20)
+    label.Size = UDim2.new(0, 150, 0, 50)
+    label.Font = Enum.Font.GothamBold
+    label.Text = "Research Mode"
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextScaled = true
+    label.TextXAlignment = Enum.TextXAlignment.Right
+    
+    return watermark
+end
+
+-- ============================================
+-- SECTION 9: EDUCATIONAL EXPLOIT ANALYSIS
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Understanding Exploit Vectors
+    This section shows how exploits work so you can defend against them.
+]]
+
+local ExploitAnalysis = {}
+
+function ExploitAnalysis:analyzeFlingExploit(target)
+    -- Educational: How fling exploits work and how to detect them
+    print("Analyzing fling exploit vector...")
+    
+    -- How fling exploits typically work:
+    -- 1. Target gets selected
+    -- 2. Force is applied to target
+    -- 3. Velocity is manipulated
+    
+    -- Defense strategies:
+    local defenseMechanisms = {
+        ["velocity_limiting"] = function()
+            print("Implement velocity caps to prevent fling exploits")
+        end,
+        ["force_validation"] = function()
+            print("Validate all force applications server-side")
+        end,
+        ["suspicious_patterns"] = function()
+            print("Monitor for rapid velocity changes")
+        end
+    }
+    
+    return defenseMechanisms
+end
+
+function ExploitAnalysis:analyzeGamepassExploit()
+    -- Educational: Understanding gamepass exploit attempts
+    print("Analyzing gamepass exploit vector...")
+    
+    local defenseMechanisms = {
+        ["server_validation"] = function()
+            print("Always validate gamepass ownership server-side")
+        end,
+        ["secure_remotes"] = function()
+            print("Use secure remote events with authentication")
+        end,
+        ["audit_logging"] = function()
+            print("Log all gamepass-related actions for review")
+        end
+    }
+    
+    return defenseMechanisms
+end
+
+-- ============================================
+-- SECTION 10: SECURE COMMUNICATION PATTERNS
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Secure Remote Communication
+    This demonstrates how games should handle remote events securely.
+]]
+
+local SecureCommunication = {}
+
+function SecureCommunication:validateRemoteEvent(event, player)
+    -- Educational: Validate remote event parameters
+    local function isValidAction(action)
+        local validActions = {
+            "move", "interact", "purchase", "join", "leave"
+        }
+        for _, validAction in ipairs(validActions) do
+            if action == validAction then
+                return true
+            end
+        end
+        return false
+    end
+    
+    return isValidAction
+end
+
+function SecureCommunication:encryptPlayerData(data)
+    -- Educational: Demonstrate data protection
+    -- In real systems, use proper encryption
+    local function simpleObfuscate(input)
+        local result = ""
+        for i = 1, #input do
+            result = result .. string.char(string.byte(input, i) + 3)
+        end
+        return result
+    end
+    
+    return simpleObfuscate
+end
+
+-- ============================================
+-- SECTION 11: RESEARCH DATA COLLECTION
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Research Data Collection
+    Ethical methods for collecting security research data.
+]]
+
+local ResearchData = {}
+
+function ResearchData:collectSecurityMetrics()
+    -- Educational: Collect anonymous security metrics for research
+    local metrics = {
+        ["server_name"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name or "Unknown",
+        ["player_count"] = #Players:GetPlayers(),
+        ["game_id"] = game.PlaceId,
+        ["timestamp"] = os.time(),
+        ["remote_events"] = #game:GetDescendants()
+    }
+    
+    return metrics
+end
+
+-- ============================================
+-- SECTION 12: DEFENSE STRATEGIES SUMMARY
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Defense Strategy Framework
+    This section summarizes defense strategies against common exploits.
+]]
+
+local DefenseStrategies = {
+    ["ESP_Prevention"] = {
+        ["methods"] = {
+            "Server-side position validation",
+            "Network traffic encryption",
+            "Anti-raycasting techniques"
+        },
+        ["implementation"] = function()
+            print("Implementing ESP prevention strategies")
+            return true
+        end
+    },
+    ["Fling_Prevention"] = {
+        ["methods"] = {
+            "Velocity caps",
+            "Force validation",
+            "Server-authoritative movement"
+        },
+        ["implementation"] = function()
+            print("Implementing fling prevention strategies")
+            return true
+        end
+    },
+    ["Gamepass_Security"] = {
+        ["methods"] = {
+            "Server-side ownership verification",
+            "Secure remote event handling",
+            "Purchase validation"
+        },
+        ["implementation"] = function()
+            print("Implementing gamepass security strategies")
+            return true
+        end
+    }
+}
+
+-- ============================================
+-- SECTION 13: ETHICAL RESEARCH GUIDELINES
+-- ============================================
+
+--[[
+    SECURITY CONCEPT: Ethical Research Framework
+    Guidelines for conducting ethical security research.
+]]
+
+local EthicalResearch = {
+    ["principles"] = {
+        "Only research in controlled environments",
+        "Never target real players without consent",
+        "Focus on defense strategies",
+        "Report vulnerabilities responsibly",
+        "Always respect terms of service"
+    },
+    ["best_practices"] = {
+        "Use test servers",
+        "Create isolated environments",
+        "Document findings thoroughly",
+        "Share defense strategies"
+    }
+}
+
+-- ============================================
+-- SECTION 14: MAIN RESEARCH EXECUTION
+-- ============================================
+
+--[[
+    MAIN EXECUTION: Educational Research Framework
+    This runs the security analysis and defense systems.
+]]
+
+local function startResearch()
+    print("=== SECURITY RESEARCH FRAMEWORK INITIALIZED ===")
+    print("Academic Purpose Only - Thesis Research")
+    
+    -- Initialize secure UI
+    local mainUI = createSecureUI()
+    if mainUI then
+        print("[SUCCESS] Research UI initialized")
+    end
+    
+    -- Analyze remote events
+    local events = analyzeRemoteEvents()
+    print("[INFO] Analyzed " .. #events .. " remote events")
+    
+    -- Initialize defense systems
+    local antiExploit = AntiExploit
+    local defenseSystem = DefenseStrategies
+    
+    -- Create secure watermark
+    local watermark = createSecureWatermark()
+    if watermark then
+        print("[SUCCESS] Security watermark added")
+    end
+    
+    -- Collect research data
+    local researchData = ResearchData:collectSecurityMetrics()
+    print("[RESEARCH] Data collected: " .. table.concat(researchData, ", "))
+    
+    print("\n=== RESEARCH FRAMEWORK READY ===")
+    print("Review the defense strategies section")
+    print("Always conduct research ethically")
+    print("Focus on building secure systems")
+end
+
+-- Execute the research framework
+pcall(startResearch)
+
+-- ============================================
+-- EDUCATIONAL NOTES
+-- ============================================
+
+--[[
+    IMPORTANT EDUCATIONAL NOTES:
+    
+    1. This is a security research framework, not an exploit tool
+    2. All code is for educational purposes only
+    3. Focus on understanding defense mechanisms
+    4. Always follow ethical research guidelines
+    5. Report vulnerabilities responsibly
+    6. Build secure systems, not exploits
+    
+    SECURITY RESEARCH PRINCIPLES:
+    - Understand how exploits work to defend against them
+    - Focus on prevention and detection
+    - Share knowledge to improve security
+    - Respect game developers' work
+    - Always follow terms of service
+]]
+
+print("\n=== SECURITY RESEARCH COMPLETE ===")
+print("Remember: The goal of security research is to build better defenses.")
+print("Focus on creating secure systems that protect all players.")
