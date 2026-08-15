@@ -1,13 +1,10 @@
 --[[
     ╔══════════════════════════════════════════════════════════════════╗
-    ║     ⚡ LORD YAGIZ_ - WAR TYCOON ULTIMATE v5.0                ║
+    ║     ⚡ LORD YAGIZ_ - WAR TYCOON ULTIMATE v5.1                ║
+    ║     ★ Kaydırılabilir Menü (SCROLLABLE)                      ║
     ║     ★ Sınırsız Mesafe Aimbot + Otomatik Sıkma               ║
-    ║     ★ Gelişmiş ESP (İsim, Can, Mesafe, Kutu, Çizgi)         ║
-    ║     ★ Tam Config Sistemi (Kaydet/Yükle/Sıfırla)             ║
-    ║     ★ Silent Aim + Normal Aim + Aim Lock                   ║
-    ║     ★ Her Mesafeden Hedef Algılama                         ║
-    ║     ★ Mobil Uyum + HUD Butonları                          ║
-    ║     ★ FPS Optimizasyonu + Patates Modu                   ║
+    ║     ★ Gelişmiş ESP + Config Sistemi                         ║
+    ║     ★ Tüm Özellikler Tek Ekranda                           ║
     ╚══════════════════════════════════════════════════════════════════╝
 ]]
 
@@ -33,13 +30,13 @@ local Mouse = LocalPlayer:GetMouse()
 local Camera = Workspace.CurrentCamera
 
 -- ================================================================
--- CONFIG SİSTEMİ (Kaydet/Yükle)
+-- CONFIG SİSTEMİ
 -- ================================================================
 local Config = {
-    Version = "5.0",
+    Version = "5.1",
     Aimbot = {
         Enabled = false,
-        FOV = 999999,        -- Sınırsız mesafe
+        FOV = 999999,
         Smoothness = 0.08,
         HitPart = "Head",
         Silent = false,
@@ -52,7 +49,7 @@ local Config = {
     Triggerbot = {
         Enabled = false,
         FireRate = 0.08,
-        AutoFire = true,     -- Otomatik sıkma
+        AutoFire = true,
         HoldToFire = false,
     },
     ESP = {
@@ -74,7 +71,7 @@ local Config = {
     },
     Performance = {
         Mode = "Auto",
-        ESPQuality = "High",  -- High, Medium, Low
+        ESPQuality = "High",
     }
 }
 
@@ -89,34 +86,13 @@ end
 Settings = deepCopy(Config)
 
 -- ================================================================
--- PERFORMANS YÖNETİCİSİ
--- ================================================================
-local PerformanceManager = {
-    Mode = "Auto",
-    CurrentFPS = 60,
-}
-
-function PerformanceManager:DetectDevice()
-    local isMobile = UserInputService.TouchEnabled
-    if isMobile then
-        self.Mode = "Low"
-        Settings.Performance.ESPQuality = "Low"
-    else
-        self.Mode = "High"
-        Settings.Performance.ESPQuality = "High"
-    end
-    return self.Mode
-end
-
-PerformanceManager:DetectDevice()
-
--- ================================================================
--- HUD MENÜ (Gelişmiş)
+-- KAYDIRILABİLİR MENÜ (SCROLLABLE)
 -- ================================================================
 local Menu = {
     Gui = nil,
-    Buttons = {},
     Frame = nil,
+    ScrollingFrame = nil,
+    Buttons = {},
     Visible = false,
 }
 
@@ -144,14 +120,14 @@ function Menu:Create()
     mainCorner.CornerRadius = UDim.new(0, 28)
     mainCorner.Parent = mainBtn
     
-    -- Pulsing animasyon
+    -- Animasyon
     TweenService:Create(mainBtn, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
         BackgroundColor3 = Color3.fromRGB(35, 35, 65)
     }):Play()
     
-    -- Menü Paneli
+    -- ANA MENÜ FRAME
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 320, 0, 450)
+    frame.Size = UDim2.new(0, 350, 0, 500)
     frame.Position = UDim2.new(0, 10, 0, 75)
     frame.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
     frame.BackgroundTransparency = 0.05
@@ -165,42 +141,71 @@ function Menu:Create()
     frameCorner.CornerRadius = UDim.new(0, 12)
     frameCorner.Parent = frame
     
+    -- KAYDIRMA ÇERÇEVESİ (SCROLLING FRAME)
+    local scrollFrame = Instance.new("ScrollingFrame")
+    scrollFrame.Size = UDim2.new(1, 0, 1, 0)
+    scrollFrame.BackgroundTransparency = 1
+    scrollFrame.BorderSizePixel = 0
+    scrollFrame.ScrollBarThickness = 6
+    scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 200)
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 600) -- İçerik yüksekliği
+    scrollFrame.Parent = frame
+    self.ScrollingFrame = scrollFrame
+    
+    -- İçerik konteyneri
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, 0, 0, 600)
+    container.BackgroundTransparency = 1
+    container.Parent = scrollFrame
+    
     -- Başlık
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0, 40)
     title.BackgroundTransparency = 1
-    title.Text = "⚡ LORD YAGIZ_ v5.0"
+    title.Text = "⚡ LORD YAGIZ_ v5.1"
     title.TextColor3 = Color3.fromRGB(255, 200, 50)
-    title.TextSize = 20
+    title.TextSize = 22
     title.Font = Enum.Font.GothamBold
-    title.Parent = frame
+    title.Parent = container
     
     -- Alt başlık
     local subtitle = Instance.new("TextLabel")
     subtitle.Size = UDim2.new(1, 0, 0, 25)
     subtitle.Position = UDim2.new(0, 0, 0, 40)
     subtitle.BackgroundTransparency = 1
-    subtitle.Text = "🔥 War Tycoon Ultimate"
+    subtitle.Text = "🔥 War Tycoon Ultimate - Scrollable Menu"
     subtitle.TextColor3 = Color3.fromRGB(150, 150, 200)
     subtitle.TextSize = 13
     subtitle.Font = Enum.Font.Gotham
-    subtitle.Parent = frame
+    subtitle.Parent = container
     
     -- Buton oluşturma fonksiyonu
     local function createToggle(text, y, default, callback)
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0.9, 0, 0, 35)
+        btn.Size = UDim2.new(0.9, 0, 0, 38)
         btn.Position = UDim2.new(0.05, 0, y, 0)
         btn.BackgroundColor3 = default and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(60, 60, 80)
         btn.Text = text .. (default and " ✅" or " ❌")
         btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.TextSize = 14
+        btn.TextSize = 15
         btn.Font = Enum.Font.GothamBold
-        btn.Parent = frame
+        btn.Parent = container
         
         local btnCorner = Instance.new("UICorner")
         btnCorner.CornerRadius = UDim.new(0, 6)
         btnCorner.Parent = btn
+        
+        -- Hover efekti
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.2), {
+                BackgroundColor3 = btn.BackgroundColor3 + Color3.fromRGB(20, 20, 20)
+            }):Play()
+        end)
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.2), {
+                BackgroundColor3 = btn.BackgroundColor3 - Color3.fromRGB(20, 20, 20)
+            }):Play()
+        end)
         
         local state = default or false
         btn.MouseButton1Click:Connect(function()
@@ -213,36 +218,61 @@ function Menu:Create()
         return btn
     end
     
-    -- Aimbot butonu
-    createToggle("🔒 AIMBOT", 0.18, false, function(v) Settings.Aimbot.Enabled = v end)
+    -- Bölüm başlıkları
+    local function createSection(text, y)
+        local section = Instance.new("TextLabel")
+        section.Size = UDim2.new(0.9, 0, 0, 25)
+        section.Position = UDim2.new(0.05, 0, y, 0)
+        section.BackgroundTransparency = 1
+        section.Text = text
+        section.TextColor3 = Color3.fromRGB(200, 200, 255)
+        section.TextSize = 14
+        section.Font = Enum.Font.GothamBold
+        section.TextXAlignment = Enum.TextXAlignment.Left
+        section.Parent = container
+        return section
+    end
     
-    -- Triggerbot butonu
-    createToggle("🎯 TRIGGERBOT", 0.29, false, function(v) Settings.Triggerbot.Enabled = v end)
+    -- === COMBAT BÖLÜMÜ ===
+    createSection("⚔️ COMBAT", 0.12)
     
-    -- Auto Fire butonu
+    createToggle("🔒 AIMBOT", 0.20, false, function(v) Settings.Aimbot.Enabled = v end)
+    createToggle("🎯 TRIGGERBOT", 0.30, false, function(v) Settings.Triggerbot.Enabled = v end)
     createToggle("🔥 AUTO FIRE", 0.40, true, function(v) Settings.Triggerbot.AutoFire = v end)
+    createToggle("🤫 SILENT AIM", 0.50, false, function(v) Settings.Aimbot.Silent = v end)
+    createToggle("🔒 AIM LOCK", 0.60, true, function(v) Settings.Aimbot.AimLock = v end)
+    createToggle("🔄 AUTO SWITCH", 0.70, true, function(v) Settings.Aimbot.AutoSwitch = v end)
     
-    -- Silent Aim butonu
-    createToggle("🤫 SILENT AIM", 0.51, false, function(v) Settings.Aimbot.Silent = v end)
+    -- === ESP BÖLÜMÜ ===
+    createSection("👁️ ESP", 0.82)
     
-    -- ESP butonu
-    createToggle("👁️ ESP", 0.62, true, function(v) Settings.ESP.Enabled = v end)
+    createToggle("👁️ ESP", 0.90, true, function(v) Settings.ESP.Enabled = v end)
+    createToggle("👤 SHOW NAME", 1.00, true, function(v) Settings.ESP.ShowName = v end)
+    createToggle("❤️ SHOW HEALTH", 1.10, true, function(v) Settings.ESP.ShowHealth = v end)
+    createToggle("📏 SHOW DISTANCE", 1.20, true, function(v) Settings.ESP.ShowDistance = v end)
+    createToggle("📦 SHOW BOX", 1.30, true, function(v) Settings.ESP.ShowBox = v end)
     
-    -- Aim Lock butonu
-    createToggle("🔒 AIM LOCK", 0.73, true, function(v) Settings.Aimbot.AimLock = v end)
+    -- === MOBİL BÖLÜMÜ ===
+    createSection("📱 MOBILE", 1.42)
+    
+    createToggle("📱 HUD BUTTONS", 1.50, true, function(v) Settings.Mobile.ShowHUD = v end)
+    createToggle("🎯 CROSSHAIR", 1.60, true, function(v) Settings.Mobile.Crosshair = v end)
+    createToggle("🔥 TOUCH FIRE", 1.70, false, function(v) Settings.Mobile.AutoFireTouch = v end)
+    
+    -- === CONFIG BÖLÜMÜ ===
+    createSection("💾 CONFIG", 1.82)
     
     -- Config butonları
-    local configY = 0.85
     local function createConfigButton(text, y, callback)
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0.28, 0, 0, 28)
-        btn.Position = UDim2.new(0.05 + (y % 3) * 0.32, 0, configY + math.floor(y / 3) * 0.1, 0)
+        btn.Size = UDim2.new(0.28, 0, 0, 32)
+        btn.Position = UDim2.new(0.05 + (y % 3) * 0.32, 0, 1.90 + math.floor(y / 3) * 0.12, 0)
         btn.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
         btn.Text = text
         btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.TextSize = 12
+        btn.TextSize = 13
         btn.Font = Enum.Font.GothamBold
-        btn.Parent = frame
+        btn.Parent = container
         
         local btnCorner = Instance.new("UICorner")
         btnCorner.CornerRadius = UDim.new(0, 6)
@@ -254,7 +284,7 @@ function Menu:Create()
         return btn
     end
     
-    createConfigButton("💾 Save", 0, function()
+    createConfigButton("💾 SAVE", 0, function()
         for category, settings in pairs(Config) do
             if Settings[category] then
                 for setting, value in pairs(settings) do
@@ -265,7 +295,7 @@ function Menu:Create()
         print("⚡ Config Saved!")
     end)
     
-    createConfigButton("📂 Load", 1, function()
+    createConfigButton("📂 LOAD", 1, function()
         for category, settings in pairs(Config) do
             if Settings[category] then
                 for setting, value in pairs(settings) do
@@ -276,10 +306,13 @@ function Menu:Create()
         print("⚡ Config Loaded!")
     end)
     
-    createConfigButton("🔄 Reset", 2, function()
+    createConfigButton("🔄 RESET", 2, function()
         Settings = deepCopy(Config)
         print("⚡ Config Reset!")
     end)
+    
+    -- Canvas boyutunu güncelle
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 600)
     
     -- Aç/Kapa
     mainBtn.MouseButton1Click:Connect(function()
@@ -289,11 +322,10 @@ function Menu:Create()
 end
 
 -- ================================================================
--- GELİŞMİŞ ESP SİSTEMİ
+-- ESP SİSTEMİ
 -- ================================================================
 local ESP = {
     Objects = {},
-    Lines = {},
 }
 
 function ESP:Update()
@@ -312,21 +344,8 @@ function ESP:Update()
             if hum and hum.Health > 0 then
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if root then
-                    -- ESP objesi yoksa oluştur
                     if not self.Objects[player] then
                         self.Objects[player] = self:CreateESP(player)
-                    end
-                    
-                    -- Pozisyonu güncelle
-                    local esp = self.Objects[player]
-                    if esp then
-                        local screenPos, onScreen = Camera:WorldToViewportPoint(root.Position)
-                        if onScreen then
-                            esp.Enabled = true
-                            esp.Position = UDim2.new(0, screenPos.X - 100, 0, screenPos.Y - 50)
-                        else
-                            esp.Enabled = false
-                        end
                     end
                 end
             end
@@ -340,14 +359,12 @@ function ESP:CreateESP(player)
     local color = isTarget and Settings.ESP.ColorTarget or 
                   (player.Team == LocalPlayer.Team and Settings.ESP.ColorFriend or Settings.ESP.ColorEnemy)
     
-    -- BillboardGui
     local billboard = Instance.new("BillboardGui")
     billboard.Size = UDim2.new(0, 200, 0, 100)
     billboard.AlwaysOnTop = true
     billboard.Adornee = char
     billboard.Parent = char
     
-    -- Frame
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, 0, 1, 0)
     frame.BackgroundTransparency = 1
@@ -382,7 +399,6 @@ function ESP:CreateESP(player)
         healthFill.BorderSizePixel = 0
         healthFill.Parent = healthBar
         
-        -- Can güncellemesi
         task.spawn(function()
             while billboard and billboard.Parent do
                 task.wait(0.1)
@@ -421,8 +437,8 @@ function ESP:CreateESP(player)
         end)
     end
     
-    -- Kutu (Box ESP)
-    if Settings.ESP.ShowBox and Settings.Performance.ESPQuality ~= "Low" then
+    -- Kutu
+    if Settings.ESP.ShowBox then
         local box = Instance.new("Frame")
         box.Size = UDim2.new(0, 60, 0, 80)
         box.Position = UDim2.new(0.5, -30, 0.3, 0)
@@ -437,11 +453,10 @@ function ESP:CreateESP(player)
 end
 
 -- ================================================================
--- AIMBOT + TRIGGERBOT (ULTRA GELİŞMİŞ)
+-- AIMBOT + TRIGGERBOT
 -- ================================================================
 local aimbotTarget = nil
 local lastFireTime = 0
-local currentTarget = nil
 
 local function getBestTarget()
     local best = nil
@@ -460,7 +475,7 @@ local function getBestTarget()
                             local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
                             if dist < bestDist then
                                 bestDist = dist
-                                best = {player = player, part = part, screenPos = screenPos}
+                                best = {player = player, part = part}
                             end
                         end
                     end
@@ -478,7 +493,7 @@ local function fireWeapon()
     end)
 end
 
--- Ana döngü
+-- ANA DÖNGÜ
 RunService.Heartbeat:Connect(function()
     if not LocalPlayer or not LocalPlayer.Character then return end
     
@@ -487,23 +502,13 @@ RunService.Heartbeat:Connect(function()
         local target = getBestTarget()
         if target then
             aimbotTarget = target.player
-            currentTarget = target
-            
-            -- Hedef pozisyonu
             local targetPos = target.part.Position
             
-            -- Prediction
             if Settings.Aimbot.Prediction then
                 local vel = target.part.AssemblyLinearVelocity or Vector3.zero
                 targetPos = targetPos + (vel * 0.12)
             end
             
-            -- Aim Lock
-            if Settings.Aimbot.AimLock then
-                -- Sürekli hedefi takip et
-            end
-            
-            -- Hedefleme
             if Settings.Aimbot.Silent then
                 local screenPos = Camera:WorldToViewportPoint(targetPos)
                 Mouse.Move(Vector2.new(screenPos.X, screenPos.Y))
@@ -513,26 +518,20 @@ RunService.Heartbeat:Connect(function()
                 Camera.CFrame = Camera.CFrame:Lerp(newCFrame, smooth)
             end
             
-            -- TRIGGERBOT - OTOMATİK SIKMA
+            -- TRIGGERBOT
             if Settings.Triggerbot.Enabled then
                 local currentTime = tick()
                 if currentTime - lastFireTime >= Settings.Triggerbot.FireRate then
                     fireWeapon()
                     lastFireTime = currentTime
-                    
-                    -- Auto Switch Target
-                    if Settings.Aimbot.AutoSwitch then
-                        -- Bir sonraki döngüde yeni hedef seç
-                    end
                 end
             end
         else
             aimbotTarget = nil
-            currentTarget = nil
         end
     end
     
-    -- ESP Güncelleme
+    -- ESP
     ESP:Update()
 end)
 
@@ -552,8 +551,8 @@ end
 -- ================================================================
 Menu:Create()
 
-print("⚡ LORD YAGIZ_ v5.0 ULTRA loaded successfully!")
-print("📱 Sol üstteki ⚡ butonuna tıkla - Menü açılır")
+print("⚡ LORD YAGIZ_ v5.1 ULTRA loaded successfully!")
+print("📱 Sol üstteki ⚡ butonuna tıkla - KAYDIRILABİLİR Menü açılır")
 print("🎯 Sınırsız mesafe Aimbot + Otomatik sıkma aktif!")
 print("👁️ Gelişmiş ESP sistemi çalışıyor!")
 print("💾 Config sistemi ile ayarlarını kaydedebilirsin!")
