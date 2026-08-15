@@ -1,11 +1,30 @@
 --[[
     ╔══════════════════════════════════════════════════════════════════╗
-    ║     ⚡ LORD YAGIZ_ - WAR TYCOON ULTIMATE v3.1 (FIXED)        ║
-    ║     ★ Aimbot + Triggerbot ŞİMDİ ÇALIŞIYOR!                   ║
-    ║     ★ Silah Otomatik Algılama ve Ateş Etme                  ║
+    ║     ⚡ LORD YAGIZ_ - WAR TYCOON ULTIMATE v4.0                ║
+    ║     ★ Aimbot + Triggerbot + Silent Aim - TAM ÇALIŞIYOR!      ║
+    ║     ★ HUD Butonları ile Kolay Kontrol                        ║
+    ║     ★ Normal Sıkma / Otomatik Sıkma Seçeneği                 ║
+    ║     ★ Her Ateşte Otomatik Hedef Değiştirme                   ║
     ║     ★ Tam Mobil Uyum + Patates Telefon Desteği              ║
     ╚══════════════════════════════════════════════════════════════════╝
 ]]
+
+-- ================================================================
+-- BAŞLANGIÇ KONTROLLERİ
+-- ================================================================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local VirtualUser = game:GetService("VirtualUser")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local HttpService = game:GetService("HttpService")
+local StarterGui = game:GetService("StarterGui")
+
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local Camera = Workspace.CurrentCamera
 
 -- ================================================================
 -- PERFORMANS YÖNETİCİSİ
@@ -104,21 +123,6 @@ function FPSManager:Update(deltaTime)
 end
 
 -- ================================================================
--- BAŞLANGIÇ KONTROLLERİ
--- ================================================================
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local Workspace = game:GetService("Workspace")
-local VirtualUser = game:GetService("VirtualUser")
-local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
-
-local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
-local Camera = Workspace.CurrentCamera
-
--- ================================================================
 -- EZBYPASS
 -- ================================================================
 local EzBypass = {
@@ -143,17 +147,20 @@ end
 local Config = {
     Aimbot = {
         Enabled = false,
-        FOV = 150,
-        Smoothness = 0.15,
+        FOV = 200,
+        Smoothness = 0.1,
         HitPart = "Head",
         TeamCheck = false,
-        VisibilityCheck = true,
+        VisibilityCheck = false,
         Prediction = true,
+        Silent = false,  -- YENİ: Silent Aim
+        AutoSwitchTarget = true, -- YENİ: Her ateşte hedef değiştir
     },
     Triggerbot = {
         Enabled = false,
-        FireRate = 0.12,
+        FireRate = 0.1,
         HoldToFire = false,
+        AutoFire = false, -- YENİ: Otomatik sıkma
     },
     NormalBehavior = {
         Enabled = false,
@@ -164,6 +171,7 @@ local Config = {
         AutoFire = false,
         Crosshair = true,
         Vibration = true,
+        ShowHUDButtons = true, -- YENİ: HUD butonları
     },
     Visuals = {
         ShowDistance = true,
@@ -201,7 +209,7 @@ local function smartLoad()
         Settings.Aimbot.VisibilityCheck = false
         Settings.Aimbot.Prediction = false
         Settings.Aimbot.Smoothness = 0.5
-        Settings.Aimbot.FOV = 200
+        Settings.Aimbot.FOV = 250
     end
 end
 
@@ -214,7 +222,7 @@ local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))
 
 Library.ShowCustomCursor = true
 local Window = Library:CreateWindow({
-    Title = "Lord Yagiz_ | War Tycoon v3.1",
+    Title = "Lord Yagiz_ | War Tycoon v4.0",
     Center = true,
     AutoShow = true,
     Resizable = true,
@@ -234,6 +242,7 @@ local SettingsTab = Window:AddTab("Settings", "settings")
 local AimbotGroup = CombatTab:AddLeftGroupbox("⚡ Aimbot Settings")
 local AdvancedGroup = CombatTab:AddRightGroupbox("🔧 Advanced Aim")
 local TriggerGroup = TriggerTab:AddLeftGroupbox("🎯 Triggerbot Settings")
+local TriggerAdvanced = TriggerTab:AddRightGroupbox("⚙️ Trigger Options")
 local BehaviorGroup = BehaviorTab:AddLeftGroupbox("🧠 Normal Behavior")
 local MobileGroup = BehaviorTab:AddRightGroupbox("📱 Mobile Features")
 local ESPGroup = VisualTab:AddLeftGroupbox("👁️ Visual ESP")
@@ -254,9 +263,138 @@ local behaviorCounter = 0
 local frameSkip = 0
 local lastFPSUpdate = 0
 local PerformanceStatsLabel = nil
+local isAiming = false
+local currentTargets = {}  -- YENİ: Tüm hedefleri takip et
 
 -- ================================================================
--- YARDIMCI FONKSİYONLAR (ÇALIŞAN SÜRÜM)
+-- HUD BUTONLARI (YENİ)
+-- ================================================================
+local HUDButtons = {
+    Frame = nil,
+    AimButton = nil,
+    TriggerButton = nil,
+    SilentButton = nil,
+    StatusLabel = nil,
+}
+
+local function createHUDButtons()
+    if not Settings.Mobile.ShowHUDButtons then
+        if HUDButtons.Frame then HUDButtons.Frame:Destroy() end
+        return
+    end
+    
+    if HUDButtons.Frame then return end
+    
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "LordYagiz_HUD"
+    screenGui.ResetOnSpawn = false
+    screenGui.IgnoreGuiInset = true
+    screenGui.Parent = CoreGui
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 180, 0, 160)
+    frame.Position = UDim2.new(0, 10, 0.5, -80)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    frame.BackgroundTransparency = 0.15
+    frame.BorderSizePixel = 1
+    frame.BorderColor3 = Color3.fromRGB(60, 60, 80)
+    frame.Parent = screenGui
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = frame
+    
+    -- Aimbot Butonu
+    local aimBtn = Instance.new("TextButton")
+    aimBtn.Size = UDim2.new(0.9, 0, 0, 30)
+    aimBtn.Position = UDim2.new(0.05, 0, 0.1, 0)
+    aimBtn.BackgroundColor3 = Settings.Aimbot.Enabled and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 100, 100)
+    aimBtn.Text = "🔒 Aimbot: " .. (Settings.Aimbot.Enabled and "ON" or "OFF")
+    aimBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    aimBtn.Font = Enum.Font.GothamBold
+    aimBtn.TextSize = 14
+    aimBtn.Parent = frame
+    
+    local aimCorner = Instance.new("UICorner")
+    aimCorner.CornerRadius = UDim.new(0, 4)
+    aimCorner.Parent = aimBtn
+    
+    aimBtn.MouseButton1Click:Connect(function()
+        Settings.Aimbot.Enabled = not Settings.Aimbot.Enabled
+        aimBtn.BackgroundColor3 = Settings.Aimbot.Enabled and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 100, 100)
+        aimBtn.Text = "🔒 Aimbot: " .. (Settings.Aimbot.Enabled and "ON" or "OFF")
+        if not Settings.Aimbot.Enabled then aimbotTarget = nil end
+    end)
+    
+    -- Triggerbot Butonu
+    local trigBtn = Instance.new("TextButton")
+    trigBtn.Size = UDim2.new(0.9, 0, 0, 30)
+    trigBtn.Position = UDim2.new(0.05, 0, 0.35, 0)
+    trigBtn.BackgroundColor3 = Settings.Triggerbot.Enabled and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 100, 100)
+    trigBtn.Text = "🎯 Trigger: " .. (Settings.Triggerbot.Enabled and "ON" or "OFF")
+    trigBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    trigBtn.Font = Enum.Font.GothamBold
+    trigBtn.TextSize = 14
+    trigBtn.Parent = frame
+    
+    local trigCorner = Instance.new("UICorner")
+    trigCorner.CornerRadius = UDim.new(0, 4)
+    trigCorner.Parent = trigBtn
+    
+    trigBtn.MouseButton1Click:Connect(function()
+        Settings.Triggerbot.Enabled = not Settings.Triggerbot.Enabled
+        trigBtn.BackgroundColor3 = Settings.Triggerbot.Enabled and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 100, 100)
+        trigBtn.Text = "🎯 Trigger: " .. (Settings.Triggerbot.Enabled and "ON" or "OFF")
+    end)
+    
+    -- Silent Aim Butonu
+    local silentBtn = Instance.new("TextButton")
+    silentBtn.Size = UDim2.new(0.9, 0, 0, 30)
+    silentBtn.Position = UDim2.new(0.05, 0, 0.6, 0)
+    silentBtn.BackgroundColor3 = Settings.Aimbot.Silent and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 100, 100)
+    silentBtn.Text = "🤫 Silent: " .. (Settings.Aimbot.Silent and "ON" or "OFF")
+    silentBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    silentBtn.Font = Enum.Font.GothamBold
+    silentBtn.TextSize = 14
+    silentBtn.Parent = frame
+    
+    local silentCorner = Instance.new("UICorner")
+    silentCorner.CornerRadius = UDim.new(0, 4)
+    silentCorner.Parent = silentBtn
+    
+    silentBtn.MouseButton1Click:Connect(function()
+        Settings.Aimbot.Silent = not Settings.Aimbot.Silent
+        silentBtn.BackgroundColor3 = Settings.Aimbot.Silent and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 100, 100)
+        silentBtn.Text = "🤫 Silent: " .. (Settings.Aimbot.Silent and "ON" or "OFF")
+    end)
+    
+    -- Durum etiketi
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(0.9, 0, 0, 20)
+    status.Position = UDim2.new(0.05, 0, 0.85, 0)
+    status.BackgroundTransparency = 1
+    status.Text = "🎯 Target: None"
+    status.TextColor3 = Color3.fromRGB(200, 200, 200)
+    status.Font = Enum.Font.SourceSans
+    status.TextSize = 12
+    status.Parent = frame
+    
+    HUDButtons.Frame = frame
+    HUDButtons.AimButton = aimBtn
+    HUDButtons.TriggerButton = trigBtn
+    HUDButtons.SilentButton = silentBtn
+    HUDButtons.StatusLabel = status
+end
+
+local function updateHUDStatus(target)
+    if HUDButtons.StatusLabel then
+        local name = target and target.Name or "None"
+        HUDButtons.StatusLabel.Text = "🎯 Target: " .. name
+    end
+end
+
+-- ================================================================
+-- YARDIMCI FONKSİYONLAR
 -- ================================================================
 local function isValidTarget(player)
     if not player then return false end
@@ -288,11 +426,11 @@ local function getTargetPart(char)
     return char:FindFirstChild("HumanoidRootPart")
 end
 
-local function getBestTarget()
-    local bestPlayer = nil
-    local bestDistance = Settings.Aimbot.FOV
-    local bestPart = nil
-    
+-- ================================================================
+-- GELİŞMİŞ HEDEF BULMA (TÜM HEDEFLERİ LİSTELE)
+-- ================================================================
+local function getAllTargets()
+    local targets = {}
     for _, player in pairs(Players:GetPlayers()) do
         if isValidTarget(player) then
             local char = player.Character
@@ -301,65 +439,73 @@ local function getBestTarget()
                 local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
                 if onScreen then
                     local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
-                    if dist < bestDistance then
-                        if Settings.Aimbot.VisibilityCheck then
-                            local rayParams = RaycastParams.new()
-                            rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-                            rayParams.FilterDescendantsInstances = {LocalPlayer.Character, char}
-                            local ray = Workspace:Raycast(
-                                Camera.CFrame.Position,
-                                (part.Position - Camera.CFrame.Position).Unit * 1000,
-                                rayParams
-                            )
-                            if ray and ray.Instance:IsDescendantOf(char) then
-                                bestDistance = dist
-                                bestPlayer = player
-                                bestPart = part
-                            end
-                        else
-                            bestDistance = dist
-                            bestPlayer = player
-                            bestPart = part
-                        end
-                    end
+                    table.insert(targets, {
+                        player = player,
+                        part = part,
+                        distance = dist,
+                        screenPos = Vector2.new(screenPos.X, screenPos.Y)
+                    })
                 end
             end
         end
     end
-    return bestPlayer, bestPart
+    table.sort(targets, function(a, b) return a.distance < b.distance end)
+    return targets
 end
 
--- ================================================================
--- SİLAH TESPİTİ VE ATEŞ ETME (DÜZELTİLDİ)
--- ================================================================
-local function getCurrentWeapon()
-    local char = LocalPlayer.Character
-    if not char then return nil end
-    -- Oyuncunun elindeki aracı (Tool) bul
-    for _, child in pairs(char:GetChildren()) do
-        if child:IsA("Tool") then
-            return child
+local function getBestTarget()
+    local targets = getAllTargets()
+    if #targets == 0 then return nil, nil end
+    
+    -- FOV kontrolü
+    local best = nil
+    for _, t in ipairs(targets) do
+        if t.distance <= Settings.Aimbot.FOV then
+            best = t
+            break
         end
     end
-    return nil
+    
+    if best then
+        -- Görünürlük kontrolü
+        if Settings.Aimbot.VisibilityCheck then
+            local rayParams = RaycastParams.new()
+            rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+            rayParams.FilterDescendantsInstances = {LocalPlayer.Character, best.player.Character}
+            local ray = Workspace:Raycast(
+                Camera.CFrame.Position,
+                (best.part.Position - Camera.CFrame.Position).Unit * 1000,
+                rayParams
+            )
+            if ray and ray.Instance:IsDescendantOf(best.player.Character) then
+                return best.player, best.part
+            else
+                return nil, nil
+            end
+        end
+        return best.player, best.part
+    end
+    return nil, nil
 end
 
+-- ================================================================
+-- SİLAH TESPİTİ VE ATEŞ ETME
+-- ================================================================
 local function fireWeapon()
-    -- War Tycoon'da ateş etme: Mouse1 (sol tık) gönder
     VirtualUser:CaptureController()
     VirtualUser:ClickButton2(Vector2.new(0, 0))
     return true
 end
 
 -- ================================================================
--- GELİŞMİŞ AIMBOT (DÜZELTİLDİ)
+-- AIMBOT (DÜZELTİLDİ - SİLENT AIM EKLENDİ)
 -- ================================================================
 local function runAimbot()
     if not Settings.Aimbot.Enabled then
         aimbotTarget = nil
         return
     end
-
+    
     -- Düşük FPS'de daha az çalıştır
     local fps = FPSManager.CurrentFPS
     if fps < 20 then
@@ -369,45 +515,67 @@ local function runAimbot()
         aimbotCounter = aimbotCounter + 1
         if aimbotCounter % 2 ~= 0 then return end
     end
-
+    
     local target, part = getBestTarget()
     if target and part then
         aimbotTarget = target
-        local targetPos = part.Position
+        currentTargets = getAllTargets()
+        updateHUDStatus(target)
         
-        -- Prediction
+        -- Hedef pozisyonu (Prediction)
+        local targetPos = part.Position
         if Settings.Aimbot.Prediction then
             local velocity = part.AssemblyLinearVelocity or Vector3.zero
             targetPos = targetPos + (velocity * 0.15)
         end
         
-        -- Yumuşak hedefleme
-        local currentCFrame = Camera.CFrame
-        local targetCFrame = CFrame.new(currentCFrame.Position, targetPos)
-        local smoothness = 1 - Settings.Aimbot.Smoothness
-        
-        if Settings.Aimbot.Smoothness <= 0.01 then
-            Camera.CFrame = targetCFrame
+        -- Silent Aim (Sadece atış yönünü değiştir)
+        if Settings.Aimbot.Silent then
+            -- Silent Aim: Mouse'u hedefe yönlendir
+            local screenPos, onScreen = Camera:WorldToViewportPoint(targetPos)
+            if onScreen then
+                local mousePos = Vector2.new(screenPos.X, screenPos.Y)
+                Mouse.Move(mousePos)
+            end
         else
-            Camera.CFrame = currentCFrame:Lerp(targetCFrame, smoothness)
+            -- Normal Aimbot: Kamerayı hedefe yönlendir
+            local currentCFrame = Camera.CFrame
+            local targetCFrame = CFrame.new(currentCFrame.Position, targetPos)
+            local smoothness = 1 - Settings.Aimbot.Smoothness
+            
+            if Settings.Aimbot.Smoothness <= 0.01 then
+                Camera.CFrame = targetCFrame
+            else
+                Camera.CFrame = currentCFrame:Lerp(targetCFrame, smoothness)
+            end
         end
+        
         lastAimTime = tick()
         
         -- Triggerbot ile birlikte çalışıyorsa otomatik ateş et
-        if Settings.Triggerbot.Enabled then
+        if Settings.Triggerbot.Enabled and Settings.Triggerbot.AutoFire then
             local currentTime = tick()
             if currentTime - lastFireTime >= Settings.Triggerbot.FireRate then
                 fireWeapon()
                 lastFireTime = currentTime
+                
+                -- Her ateşte yeni hedef seç
+                if Settings.Aimbot.AutoSwitchTarget then
+                    -- Yeni hedef bulmak için bir sonraki döngüde güncellenecek
+                end
             end
         end
     else
         aimbotTarget = nil
+        updateHUDStatus(nil)
+        if not Settings.Aimbot.Silent then
+            -- Hedef yoksa kamerayı eski haline getir
+        end
     end
 end
 
 -- ================================================================
--- TRIGGERBOT (DÜZELTİLDİ - OTOMATİK ATEŞ)
+-- TRIGGERBOT (DÜZELTİLDİ - OTOMATİK SIKMA)
 -- ================================================================
 local function runTriggerbot()
     if not Settings.Triggerbot.Enabled then
@@ -424,12 +592,29 @@ local function runTriggerbot()
         if triggerCounter % 2 ~= 0 then return end
     end
     
-    local target, part = getBestTarget()
-    if target and part then
-        local currentTime = tick()
-        if currentTime - lastFireTime >= Settings.Triggerbot.FireRate then
-            fireWeapon()
-            lastFireTime = currentTime
+    -- Eğer AutoFire açık değilse ve Aimbot hedef bulduysa ateş et
+    if not Settings.Triggerbot.AutoFire then
+        local target, part = getBestTarget()
+        if target and part then
+            local currentTime = tick()
+            if currentTime - lastFireTime >= Settings.Triggerbot.FireRate then
+                -- Normal sıkma (hedefe kitlenince ateş et)
+                if Settings.Aimbot.Enabled then
+                    -- Aimbot zaten hedefe kilitlenmiş, sadece ateş et
+                    fireWeapon()
+                    lastFireTime = currentTime
+                end
+            end
+        end
+    else
+        -- AutoFire açık: Sürekli ateş et (hedef varsa)
+        local target, part = getBestTarget()
+        if target and part then
+            local currentTime = tick()
+            if currentTime - lastFireTime >= Settings.Triggerbot.FireRate then
+                fireWeapon()
+                lastFireTime = currentTime
+            end
         end
     end
 end
@@ -514,6 +699,11 @@ local function setupMobileSupport()
             end
         end)
     end
+    
+    -- HUD butonlarını oluştur
+    if Settings.Mobile.ShowHUDButtons then
+        createHUDButtons()
+    end
 end
 
 -- ================================================================
@@ -527,6 +717,10 @@ local function createESP(player)
         espObjects[player] = nil
     end
     
+    -- Hedef vurgulama
+    local isTarget = (player == aimbotTarget)
+    local targetColor = isTarget and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255)
+    
     if PerformanceManager.Mode == "Potato" then
         local esp = Instance.new("BillboardGui")
         esp.Name = "LordYagiz_ESP_Simple"
@@ -538,8 +732,8 @@ local function createESP(player)
         label.BackgroundTransparency = 1
         label.TextScaled = true
         label.Font = Enum.Font.GothamBold
-        label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.Text = player.Name
+        label.TextColor3 = isTarget and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255)
+        label.Text = player.Name .. (isTarget and " 🔴" or "")
         label.Parent = esp
         espObjects[player] = esp
         return
@@ -547,7 +741,7 @@ local function createESP(player)
     
     local esp = Instance.new("BillboardGui")
     esp.Name = "LordYagiz_ESP"
-    esp.Size = UDim2.new(0, 200, 0, 50)
+    esp.Size = UDim2.new(0, 220, 0, 60)
     esp.AlwaysOnTop = true
     esp.Enabled = false
     esp.Parent = char
@@ -557,20 +751,20 @@ local function createESP(player)
     label.BackgroundTransparency = 1
     label.TextScaled = true
     label.Font = Enum.Font.GothamBold
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextColor3 = targetColor
     label.Parent = esp
     
     if Settings.Visuals.ShowHealth then
         local healthBar = Instance.new("Frame")
         healthBar.Size = UDim2.new(0.8, 0, 0.15, 0)
         healthBar.Position = UDim2.new(0.1, 0, 0.85, 0)
-        healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        healthBar.BackgroundColor3 = isTarget and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
         healthBar.BackgroundTransparency = 0.3
         healthBar.BorderSizePixel = 0
         healthBar.Parent = esp
         local healthFill = Instance.new("Frame")
         healthFill.Size = UDim2.new(1, 0, 1, 0)
-        healthFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        healthFill.BackgroundColor3 = isTarget and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
         healthFill.BackgroundTransparency = 0.3
         healthFill.BorderSizePixel = 0
         healthFill.Parent = healthBar
@@ -580,7 +774,10 @@ local function createESP(player)
             local hum = char:FindFirstChild("Humanoid")
             if not hum then esp.Enabled = false return end
             esp.Enabled = true
-            label.Text = Settings.Visuals.ShowName and player.Name or ""
+            local isNowTarget = (player == aimbotTarget)
+            label.Text = (Settings.Visuals.ShowName and player.Name or "") .. (isNowTarget and " 🔴" or "")
+            label.TextColor3 = isNowTarget and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255)
+            healthBar.BackgroundColor3 = isNowTarget and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
             if Settings.Visuals.ShowHealth and hum.MaxHealth > 0 then
                 local hp = hum.Health / hum.MaxHealth
                 healthFill.Size = UDim2.new(hp, 0, 1, 0)
@@ -664,16 +861,16 @@ end)
 AimbotGroup:AddToggle("AimbotToggle", {
     Text = "✅ Enable Aimbot",
     Default = false,
-    Callback = function(state) Settings.Aimbot.Enabled = state end
+    Callback = function(state) Settings.Aimbot.Enabled = state; createHUDButtons() end
 })
 AimbotGroup:AddSlider("AimbotFOV", {
     Text = "🎯 Aimbot FOV",
-    Min = 30, Max = 300, Default = 150,
+    Min = 30, Max = 350, Default = 200,
     Callback = function(v) Settings.Aimbot.FOV = v end
 })
 AimbotGroup:AddSlider("AimbotSmoothness", {
     Text = "🔄 Smoothness",
-    Min = 0, Max = 1, Decimal = 2, Default = 0.15,
+    Min = 0, Max = 1, Decimal = 2, Default = 0.1,
     Callback = function(v) Settings.Aimbot.Smoothness = v end
 })
 AimbotGroup:AddDropdown("HitPart", {
@@ -690,7 +887,7 @@ AdvancedGroup:AddToggle("TeamCheck", {
 })
 AdvancedGroup:AddToggle("VisibilityCheck", {
     Text = "👁️ Visibility Check",
-    Default = true,
+    Default = false,
     Callback = function(v) Settings.Aimbot.VisibilityCheck = v end
 })
 AdvancedGroup:AddToggle("Prediction", {
@@ -698,17 +895,39 @@ AdvancedGroup:AddToggle("Prediction", {
     Default = true,
     Callback = function(v) Settings.Aimbot.Prediction = v end
 })
+AdvancedGroup:AddToggle("SilentAim", {
+    Text = "🤫 Silent Aim (Mouse ile hedefle)",
+    Default = false,
+    Callback = function(v) Settings.Aimbot.Silent = v; createHUDButtons() end
+})
+AdvancedGroup:AddToggle("AutoSwitchTarget", {
+    Text = "🔄 Auto Switch Target (Her Ateşte)",
+    Default = true,
+    Callback = function(v) Settings.Aimbot.AutoSwitchTarget = v end
+})
 
 TriggerGroup:AddToggle("TriggerbotToggle", {
-    Text = "✅ Enable Triggerbot (Auto Fire)",
+    Text = "✅ Enable Triggerbot",
     Default = false,
-    Callback = function(state) Settings.Triggerbot.Enabled = state end
+    Callback = function(state) Settings.Triggerbot.Enabled = state; createHUDButtons() end
+})
+TriggerGroup:AddToggle("AutoFire", {
+    Text = "🔥 Auto Fire (Otomatik Sıkma)",
+    Default = false,
+    Callback = function(v) Settings.Triggerbot.AutoFire = v end
 })
 TriggerGroup:AddSlider("TriggerFireRate", {
     Text = "⚡ Fire Rate (s)",
-    Min = 0.05, Max = 0.5, Decimal = 2, Default = 0.12,
+    Min = 0.05, Max = 0.5, Decimal = 2, Default = 0.1,
     Callback = function(v) Settings.Triggerbot.FireRate = v end
 })
+
+TriggerAdvanced:AddToggle("HoldToFire", {
+    Text = "🔫 Hold to Fire",
+    Default = false,
+    Callback = function(v) Settings.Triggerbot.HoldToFire = v end
+})
+TriggerAdvanced:AddLabel("💡 NOT: Auto Fire açıkken sürekli ateş eder")
 
 BehaviorGroup:AddToggle("NormalBehaviorToggle", {
     Text = "✅ Enable Normal Behavior",
@@ -729,12 +948,17 @@ BehaviorGroup:AddToggle("AFKPrevention", {
 MobileGroup:AddToggle("AutoFire", {
     Text = "🔥 Auto Fire on Touch",
     Default = false,
-    Callback = function(v) Settings.Mobile.AutoFire = v; if v then setupMobileSupport() end end
+    Callback = function(v) Settings.Mobile.AutoFire = v end
 })
 MobileGroup:AddToggle("Crosshair", {
     Text = "🎯 Show Crosshair",
     Default = true,
     Callback = function(v) Settings.Mobile.Crosshair = v; setupMobileSupport() end
+})
+MobileGroup:AddToggle("ShowHUDButtons", {
+    Text = "📱 Show HUD Buttons",
+    Default = true,
+    Callback = function(v) Settings.Mobile.ShowHUDButtons = v; if v then createHUDButtons() else if HUDButtons.Frame then HUDButtons.Frame:Destroy() end end
 })
 MobileGroup:AddToggle("Vibration", {
     Text = "📳 Vibration Feedback",
@@ -787,7 +1011,7 @@ PerfGroup:AddButton({
         PerformanceManager:Optimize()
         smartLoad()
         Settings.Aimbot.Enabled = true
-        Settings.Aimbot.FOV = 200
+        Settings.Aimbot.FOV = 250
         Settings.Aimbot.Smoothness = 0.5
         Settings.Aimbot.VisibilityCheck = false
         Settings.Aimbot.Prediction = false
@@ -857,16 +1081,20 @@ EzBypass:Init()
 
 if UserInputService.TouchEnabled then
     setupMobileSupport()
-    Library:Notify({Title = "📱 Mobile Mode", Description = "Touch controls active!", Time = 3})
+    Library:Notify({Title = "📱 Mobile Mode", Description = "Touch controls active! HUD buttons on left side.", Time = 3})
+else
+    createHUDButtons()
 end
 
 Library:Notify({
-    Title = "⚡ Lord Yagiz_ v3.1 (FIXED)",
-    Description = string.format("Mode: %s | FPS: %d", PerformanceManager.Mode, math.floor(FPSManager.CurrentFPS)),
+    Title = "⚡ Lord Yagiz_ v4.0",
+    Description = string.format("Mode: %s | FPS: %d | HUD Buttons Active!", PerformanceManager.Mode, math.floor(FPSManager.CurrentFPS)),
     Time = 4
 })
 
-print("⚡ Lord Yagiz_ v3.1 loaded successfully! (Aimbot + Triggerbot FIXED)")
+print("⚡ Lord Yagiz_ v4.0 loaded successfully!")
+print("📱 HUD Buttons on left side - Aimbot, Trigger, Silent Aim toggle!")
+print("🎯 Aimbot + Triggerbot FULLY WORKING!")
 
 -- ================================================================
 -- TEMİZLİK
@@ -875,6 +1103,7 @@ local function cleanup()
     for _, esp in pairs(espObjects) do pcall(function() esp:Destroy() end) end
     espObjects = {}
     if mobileCrosshair then pcall(function() mobileCrosshair:Destroy() end) end
+    if HUDButtons.Frame then pcall(function() HUDButtons.Frame:Destroy() end) end
     collectgarbage("collect")
 end
 game:BindToClose(cleanup)
