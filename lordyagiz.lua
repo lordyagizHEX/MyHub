@@ -1,568 +1,589 @@
---[[
-    ╔══════════════════════════════════════════════════════════════════╗
-    ║     ⚡ LORD YAGIZ_ - WAR TYCOON ULTIMATE v5.1                ║
-    ║     ★ Kaydırılabilir Menü (SCROLLABLE)                      ║
-    ║     ★ Sınırsız Mesafe Aimbot + Otomatik Sıkma               ║
-    ║     ★ Gelişmiş ESP + Config Sistemi                         ║
-    ║     ★ Tüm Özellikler Tek Ekranda                           ║
-    ╚══════════════════════════════════════════════════════════════════╝
-]]
+-- DOLAROV HUB - THE RAKE REMASTERED (MOBİL UYUMLU)
+-- Ana Script
 
--- ================================================================
--- GÜVENLİ BAŞLANGIÇ
--- ================================================================
-if not game:IsLoaded() then game.Loaded:Wait() end
-task.wait(0.5)
+-- Rayfield UI Yükleme
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
--- ================================================================
--- SERVİSLER
--- ================================================================
+-- Değişkenler
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
-local CoreGui = game:GetService("CoreGui")
-local VirtualUser = game:GetService("VirtualUser")
-local TweenService = game:GetService("TweenService")
-
+local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
-local Camera = Workspace.CurrentCamera
+local VirtualUser = game:GetService("VirtualUser") -- Mobil için
 
--- ================================================================
--- CONFIG SİSTEMİ
--- ================================================================
-local Config = {
-    Version = "5.1",
-    Aimbot = {
-        Enabled = false,
-        FOV = 999999,
-        Smoothness = 0.08,
-        HitPart = "Head",
-        Silent = false,
-        AimLock = true,
-        AutoSwitch = true,
-        VisibleCheck = false,
-        TeamCheck = false,
-        Prediction = true,
-    },
-    Triggerbot = {
-        Enabled = false,
-        FireRate = 0.08,
-        AutoFire = true,
-        HoldToFire = false,
-    },
-    ESP = {
-        Enabled = true,
-        ShowName = true,
-        ShowHealth = true,
-        ShowDistance = true,
-        ShowBox = true,
-        ShowTracer = true,
-        ShowHeadDot = true,
-        ColorEnemy = Color3.fromRGB(255, 0, 0),
-        ColorFriend = Color3.fromRGB(0, 255, 0),
-        ColorTarget = Color3.fromRGB(255, 255, 0),
-    },
-    Mobile = {
-        ShowHUD = true,
-        Crosshair = true,
-        AutoFireTouch = false,
-    },
-    Performance = {
-        Mode = "Auto",
-        ESPQuality = "High",
-    }
+-- State değişkenleri
+local Toggles = {
+    AntiRake = false,
+    AutoStick = false,
+    GodMode = false,
+    AutoFarm = false,
+    ESPPlayers = false,
+    ESPRake = false,
+    ESPFlare = false,
+    ESPBox = false,
+    ESPScrap = false,
+    ESPTrap = false,
+    FullBright = false,
+    ThirdPerson = false,
+    Speed = false,
+    FallDamage = false,
+    InfiniteStamina = false,
+    MobileSpeed = false -- Mobil için yeni toggle
 }
 
-local Settings = {}
-local function deepCopy(t)
-    local copy = {}
-    for k, v in pairs(t) do
-        if type(v) == "table" then copy[k] = deepCopy(v) else copy[k] = v end
-    end
-    return copy
-end
-Settings = deepCopy(Config)
-
--- ================================================================
--- KAYDIRILABİLİR MENÜ (SCROLLABLE)
--- ================================================================
-local Menu = {
-    Gui = nil,
-    Frame = nil,
-    ScrollingFrame = nil,
-    Buttons = {},
-    Visible = false,
+local Settings = {
+    SpeedMultiplier = 5,
+    MobileSpeedDistance = 10 -- Mobil için ışınlanma mesafesi
 }
 
-function Menu:Create()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "LordYagiz_Ultimate"
-    screenGui.ResetOnSpawn = false
-    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    screenGui.Parent = CoreGui or LocalPlayer:WaitForChild("PlayerGui")
-    self.Gui = screenGui
-    
-    -- Ana Buton (sol üst)
-    local mainBtn = Instance.new("TextButton")
-    mainBtn.Size = UDim2.new(0, 55, 0, 55)
-    mainBtn.Position = UDim2.new(0, 10, 0, 10)
-    mainBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
-    mainBtn.BorderSizePixel = 2
-    mainBtn.BorderColor3 = Color3.fromRGB(100, 100, 200)
-    mainBtn.Text = "⚡"
-    mainBtn.TextSize = 28
-    mainBtn.TextColor3 = Color3.fromRGB(255, 200, 50)
-    mainBtn.Parent = screenGui
-    
-    local mainCorner = Instance.new("UICorner")
-    mainCorner.CornerRadius = UDim.new(0, 28)
-    mainCorner.Parent = mainBtn
-    
-    -- Animasyon
-    TweenService:Create(mainBtn, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
-        BackgroundColor3 = Color3.fromRGB(35, 35, 65)
-    }):Play()
-    
-    -- ANA MENÜ FRAME
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 350, 0, 500)
-    frame.Position = UDim2.new(0, 10, 0, 75)
-    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
-    frame.BackgroundTransparency = 0.05
-    frame.BorderSizePixel = 1
-    frame.BorderColor3 = Color3.fromRGB(60, 60, 120)
-    frame.Visible = false
-    frame.Parent = screenGui
-    self.Frame = frame
-    
-    local frameCorner = Instance.new("UICorner")
-    frameCorner.CornerRadius = UDim.new(0, 12)
-    frameCorner.Parent = frame
-    
-    -- KAYDIRMA ÇERÇEVESİ (SCROLLING FRAME)
-    local scrollFrame = Instance.new("ScrollingFrame")
-    scrollFrame.Size = UDim2.new(1, 0, 1, 0)
-    scrollFrame.BackgroundTransparency = 1
-    scrollFrame.BorderSizePixel = 0
-    scrollFrame.ScrollBarThickness = 6
-    scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 200)
-    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 600) -- İçerik yüksekliği
-    scrollFrame.Parent = frame
-    self.ScrollingFrame = scrollFrame
-    
-    -- İçerik konteyneri
-    local container = Instance.new("Frame")
-    container.Size = UDim2.new(1, 0, 0, 600)
-    container.BackgroundTransparency = 1
-    container.Parent = scrollFrame
-    
-    -- Başlık
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 40)
-    title.BackgroundTransparency = 1
-    title.Text = "⚡ LORD YAGIZ_ v5.1"
-    title.TextColor3 = Color3.fromRGB(255, 200, 50)
-    title.TextSize = 22
-    title.Font = Enum.Font.GothamBold
-    title.Parent = container
-    
-    -- Alt başlık
-    local subtitle = Instance.new("TextLabel")
-    subtitle.Size = UDim2.new(1, 0, 0, 25)
-    subtitle.Position = UDim2.new(0, 0, 0, 40)
-    subtitle.BackgroundTransparency = 1
-    subtitle.Text = "🔥 War Tycoon Ultimate - Scrollable Menu"
-    subtitle.TextColor3 = Color3.fromRGB(150, 150, 200)
-    subtitle.TextSize = 13
-    subtitle.Font = Enum.Font.Gotham
-    subtitle.Parent = container
-    
-    -- Buton oluşturma fonksiyonu
-    local function createToggle(text, y, default, callback)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0.9, 0, 0, 38)
-        btn.Position = UDim2.new(0.05, 0, y, 0)
-        btn.BackgroundColor3 = default and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(60, 60, 80)
-        btn.Text = text .. (default and " ✅" or " ❌")
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.TextSize = 15
-        btn.Font = Enum.Font.GothamBold
-        btn.Parent = container
-        
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 6)
-        btnCorner.Parent = btn
-        
-        -- Hover efekti
-        btn.MouseEnter:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.2), {
-                BackgroundColor3 = btn.BackgroundColor3 + Color3.fromRGB(20, 20, 20)
-            }):Play()
-        end)
-        btn.MouseLeave:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.2), {
-                BackgroundColor3 = btn.BackgroundColor3 - Color3.fromRGB(20, 20, 20)
-            }):Play()
-        end)
-        
-        local state = default or false
-        btn.MouseButton1Click:Connect(function()
-            state = not state
-            btn.BackgroundColor3 = state and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(60, 60, 80)
-            btn.Text = text .. (state and " ✅" or " ❌")
-            if callback then callback(state) end
-        end)
-        table.insert(self.Buttons, btn)
-        return btn
-    end
-    
-    -- Bölüm başlıkları
-    local function createSection(text, y)
-        local section = Instance.new("TextLabel")
-        section.Size = UDim2.new(0.9, 0, 0, 25)
-        section.Position = UDim2.new(0.05, 0, y, 0)
-        section.BackgroundTransparency = 1
-        section.Text = text
-        section.TextColor3 = Color3.fromRGB(200, 200, 255)
-        section.TextSize = 14
-        section.Font = Enum.Font.GothamBold
-        section.TextXAlignment = Enum.TextXAlignment.Left
-        section.Parent = container
-        return section
-    end
-    
-    -- === COMBAT BÖLÜMÜ ===
-    createSection("⚔️ COMBAT", 0.12)
-    
-    createToggle("🔒 AIMBOT", 0.20, false, function(v) Settings.Aimbot.Enabled = v end)
-    createToggle("🎯 TRIGGERBOT", 0.30, false, function(v) Settings.Triggerbot.Enabled = v end)
-    createToggle("🔥 AUTO FIRE", 0.40, true, function(v) Settings.Triggerbot.AutoFire = v end)
-    createToggle("🤫 SILENT AIM", 0.50, false, function(v) Settings.Aimbot.Silent = v end)
-    createToggle("🔒 AIM LOCK", 0.60, true, function(v) Settings.Aimbot.AimLock = v end)
-    createToggle("🔄 AUTO SWITCH", 0.70, true, function(v) Settings.Aimbot.AutoSwitch = v end)
-    
-    -- === ESP BÖLÜMÜ ===
-    createSection("👁️ ESP", 0.82)
-    
-    createToggle("👁️ ESP", 0.90, true, function(v) Settings.ESP.Enabled = v end)
-    createToggle("👤 SHOW NAME", 1.00, true, function(v) Settings.ESP.ShowName = v end)
-    createToggle("❤️ SHOW HEALTH", 1.10, true, function(v) Settings.ESP.ShowHealth = v end)
-    createToggle("📏 SHOW DISTANCE", 1.20, true, function(v) Settings.ESP.ShowDistance = v end)
-    createToggle("📦 SHOW BOX", 1.30, true, function(v) Settings.ESP.ShowBox = v end)
-    
-    -- === MOBİL BÖLÜMÜ ===
-    createSection("📱 MOBILE", 1.42)
-    
-    createToggle("📱 HUD BUTTONS", 1.50, true, function(v) Settings.Mobile.ShowHUD = v end)
-    createToggle("🎯 CROSSHAIR", 1.60, true, function(v) Settings.Mobile.Crosshair = v end)
-    createToggle("🔥 TOUCH FIRE", 1.70, false, function(v) Settings.Mobile.AutoFireTouch = v end)
-    
-    -- === CONFIG BÖLÜMÜ ===
-    createSection("💾 CONFIG", 1.82)
-    
-    -- Config butonları
-    local function createConfigButton(text, y, callback)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0.28, 0, 0, 32)
-        btn.Position = UDim2.new(0.05 + (y % 3) * 0.32, 0, 1.90 + math.floor(y / 3) * 0.12, 0)
-        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 70)
-        btn.Text = text
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.TextSize = 13
-        btn.Font = Enum.Font.GothamBold
-        btn.Parent = container
-        
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 6)
-        btnCorner.Parent = btn
-        
-        btn.MouseButton1Click:Connect(function()
-            if callback then callback() end
-        end)
-        return btn
-    end
-    
-    createConfigButton("💾 SAVE", 0, function()
-        for category, settings in pairs(Config) do
-            if Settings[category] then
-                for setting, value in pairs(settings) do
-                    Config[category][setting] = Settings[category][setting]
-                end
-            end
+local Character = nil
+local Humanoid = nil
+local RootPart = nil
+local Rake = nil
+local Items = {}
+local IsFarming = false
+local OriginalLighting = {}
+local MobileJoystick = nil -- Mobil joystick için
+
+-- Yardımcı Fonksiyonlar
+local function GetRake()
+    for _, v in pairs(Workspace:GetChildren()) do
+        if v:IsA("Model") and v.Name:lower():find("rake") then
+            return v
         end
-        print("⚡ Config Saved!")
-    end)
-    
-    createConfigButton("📂 LOAD", 1, function()
-        for category, settings in pairs(Config) do
-            if Settings[category] then
-                for setting, value in pairs(settings) do
-                    Settings[category][setting] = value
-                end
-            end
-        end
-        print("⚡ Config Loaded!")
-    end)
-    
-    createConfigButton("🔄 RESET", 2, function()
-        Settings = deepCopy(Config)
-        print("⚡ Config Reset!")
-    end)
-    
-    -- Canvas boyutunu güncelle
-    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 600)
-    
-    -- Aç/Kapa
-    mainBtn.MouseButton1Click:Connect(function()
-        self.Visible = not self.Visible
-        frame.Visible = self.Visible
-    end)
+    end
+    return nil
 end
 
--- ================================================================
--- ESP SİSTEMİ
--- ================================================================
-local ESP = {
-    Objects = {},
-}
-
-function ESP:Update()
-    if not Settings.ESP.Enabled then
-        for _, obj in pairs(self.Objects) do
-            if obj then pcall(function() obj:Destroy() end) end
-        end
-        self.Objects = {}
-        return
-    end
-    
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character then
-            local char = player.Character
-            local hum = char:FindFirstChild("Humanoid")
-            if hum and hum.Health > 0 then
-                local root = char:FindFirstChild("HumanoidRootPart")
-                if root then
-                    if not self.Objects[player] then
-                        self.Objects[player] = self:CreateESP(player)
-                    end
-                end
+local function GetItems()
+    local items = {}
+    for _, v in pairs(Workspace:GetChildren()) do
+        if v:IsA("Model") and v:FindFirstChild("Handle") then
+            local name = v.Name:lower()
+            if name:find("scrap") or name:find("metal") or name:find("flare") or 
+               name:find("supply") or name:find("box") or name:find("trap") then
+                table.insert(items, v)
             end
         end
+    end
+    return items
+end
+
+local function UpdateCharacter()
+    Character = LocalPlayer.Character
+    if Character then
+        Humanoid = Character:FindFirstChild("Humanoid")
+        RootPart = Character:FindFirstChild("HumanoidRootPart")
     end
 end
 
-function ESP:CreateESP(player)
-    local char = player.Character
-    local isTarget = (player == aimbotTarget)
-    local color = isTarget and Settings.ESP.ColorTarget or 
-                  (player.Team == LocalPlayer.Team and Settings.ESP.ColorFriend or Settings.ESP.ColorEnemy)
+-- Event dinleyicileri
+LocalPlayer.CharacterAdded:Connect(UpdateCharacter)
+LocalPlayer.CharacterRemoving:Connect(function()
+    Character = nil
+    Humanoid = nil
+    RootPart = nil
+end)
+
+-- 1. ANTI-RAKE CHASE
+local function AntiRakeChase()
+    if not Toggles.AntiRake or not Character or not RootPart or not Rake then return end
     
-    local billboard = Instance.new("BillboardGui")
-    billboard.Size = UDim2.new(0, 200, 0, 100)
-    billboard.AlwaysOnTop = true
-    billboard.Adornee = char
-    billboard.Parent = char
+    local rakePos = Rake:FindFirstChild("HumanoidRootPart")
+    if not rakePos then return end
     
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 1
-    frame.Parent = billboard
+    local distance = (RootPart.Position - rakePos.Position).Magnitude
     
-    -- İsim
-    if Settings.ESP.ShowName then
-        local nameLabel = Instance.new("TextLabel")
-        nameLabel.Size = UDim2.new(1, 0, 0, 25)
-        nameLabel.Position = UDim2.new(0, 0, 0, 0)
-        nameLabel.BackgroundTransparency = 1
-        nameLabel.Text = player.Name
-        nameLabel.TextColor3 = color
-        nameLabel.TextSize = 16
-        nameLabel.Font = Enum.Font.GothamBold
-        nameLabel.TextStrokeTransparency = 0.3
-        nameLabel.Parent = frame
+    if distance < 40 then
+        local direction = (RootPart.Position - rakePos.Position).Unit
+        local targetPos = RootPart.Position + direction * 50
+        RootPart.CFrame = CFrame.new(targetPos)
     end
-    
-    -- Can Barı
-    if Settings.ESP.ShowHealth then
-        local healthBar = Instance.new("Frame")
-        healthBar.Size = UDim2.new(0.8, 0, 0, 10)
-        healthBar.Position = UDim2.new(0.1, 0, 0.3, 0)
-        healthBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        healthBar.BorderSizePixel = 0
-        healthBar.Parent = frame
-        
-        local healthFill = Instance.new("Frame")
-        healthFill.Size = UDim2.new(1, 0, 1, 0)
-        healthFill.BackgroundColor3 = color
-        healthFill.BorderSizePixel = 0
-        healthFill.Parent = healthBar
-        
-        task.spawn(function()
-            while billboard and billboard.Parent do
-                task.wait(0.1)
-                local hum = char:FindFirstChild("Humanoid")
-                if hum and hum.MaxHealth > 0 then
-                    local hp = hum.Health / hum.MaxHealth
-                    healthFill.Size = UDim2.new(hp, 0, 1, 0)
-                    healthFill.BackgroundColor3 = Color3.fromRGB(255 * (1 - hp), 255 * hp, 0)
-                end
-            end
-        end)
-    end
-    
-    -- Mesafe
-    if Settings.ESP.ShowDistance then
-        local distLabel = Instance.new("TextLabel")
-        distLabel.Size = UDim2.new(1, 0, 0, 20)
-        distLabel.Position = UDim2.new(0, 0, 0.5, 0)
-        distLabel.BackgroundTransparency = 1
-        distLabel.Text = ""
-        distLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        distLabel.TextSize = 12
-        distLabel.Font = Enum.Font.Gotham
-        distLabel.Parent = frame
-        
-        task.spawn(function()
-            while billboard and billboard.Parent do
-                task.wait(0.2)
-                local root = char:FindFirstChild("HumanoidRootPart")
-                local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if root and myRoot then
-                    local dist = (root.Position - myRoot.Position).Magnitude
-                    distLabel.Text = math.floor(dist) .. "m"
-                end
-            end
-        end)
-    end
-    
-    -- Kutu
-    if Settings.ESP.ShowBox then
-        local box = Instance.new("Frame")
-        box.Size = UDim2.new(0, 60, 0, 80)
-        box.Position = UDim2.new(0.5, -30, 0.3, 0)
-        box.BackgroundTransparency = 0.8
-        box.BackgroundColor3 = color
-        box.BorderSizePixel = 1
-        box.BorderColor3 = color
-        box.Parent = frame
-    end
-    
-    return billboard
 end
 
--- ================================================================
--- AIMBOT + TRIGGERBOT
--- ================================================================
-local aimbotTarget = nil
-local lastFireTime = 0
-
-local function getBestTarget()
-    local best = nil
-    local bestDist = Settings.Aimbot.FOV
+-- 2. AUTO-STICK ATTACK
+local function AutoStickAttack()
+    if not Toggles.AutoStick or not Character or not RootPart or not Rake then return end
     
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character then
-            local hum = player.Character:FindFirstChild("Humanoid")
-            if hum and hum.Health > 0 then
-                if not Settings.Aimbot.TeamCheck or player.Team ~= LocalPlayer.Team then
-                    local part = player.Character:FindFirstChild(Settings.Aimbot.HitPart) or 
-                                 player.Character:FindFirstChild("HumanoidRootPart")
-                    if part then
-                        local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
-                        if onScreen then
-                            local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
-                            if dist < bestDist then
-                                bestDist = dist
-                                best = {player = player, part = part}
-                            end
+    local rakePos = Rake:FindFirstChild("HumanoidRootPart")
+    if not rakePos then return end
+    
+    local distance = (RootPart.Position - rakePos.Position).Magnitude
+    
+    if distance < 15 then
+        for _, tool in pairs(Character:GetChildren()) do
+            if tool:IsA("Tool") and tool.Name:lower():find("stick") then
+                tool:Activate()
+                break
+            end
+        end
+    end
+    
+    if distance < 8 then
+        local direction = (RootPart.Position - rakePos.Position).Unit
+        RootPart.CFrame = CFrame.new(RootPart.Position + direction * 60)
+    end
+end
+
+-- 3. GOD MODE
+local function SetupGodMode()
+    if not Toggles.GodMode or not Humanoid then return end
+    Humanoid.Health = Humanoid.MaxHealth
+end
+
+-- 4. EXPERIMENTAL AUTOFARM
+local function AutoFarm()
+    if not Toggles.AutoFarm or IsFarming or not Character or not RootPart then return end
+    
+    IsFarming = true
+    
+    task.spawn(function()
+        while Toggles.AutoFarm and Character and RootPart do
+            if Rake then
+                local rakePos = Rake:FindFirstChild("HumanoidRootPart")
+                if rakePos and (RootPart.Position - rakePos.Position).Magnitude < 30 then
+                    local direction = (RootPart.Position - rakePos.Position).Unit
+                    RootPart.CFrame = CFrame.new(RootPart.Position + direction * 50)
+                    task.wait(0.5)
+                end
+            end
+            
+            local items = GetItems()
+            if #items > 0 then
+                local closestItem = nil
+                local closestDist = math.huge
+                
+                for _, item in pairs(items) do
+                    local itemPos = item:FindFirstChild("Handle")
+                    if itemPos then
+                        local dist = (RootPart.Position - itemPos.Position).Magnitude
+                        if dist < closestDist then
+                            closestDist = dist
+                            closestItem = item
                         end
                     end
                 end
-            end
-        end
-    end
-    return best
-end
-
-local function fireWeapon()
-    pcall(function()
-        VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new(0, 0))
-    end)
-end
-
--- ANA DÖNGÜ
-RunService.Heartbeat:Connect(function()
-    if not LocalPlayer or not LocalPlayer.Character then return end
-    
-    -- AIMBOT
-    if Settings.Aimbot.Enabled then
-        local target = getBestTarget()
-        if target then
-            aimbotTarget = target.player
-            local targetPos = target.part.Position
-            
-            if Settings.Aimbot.Prediction then
-                local vel = target.part.AssemblyLinearVelocity or Vector3.zero
-                targetPos = targetPos + (vel * 0.12)
-            end
-            
-            if Settings.Aimbot.Silent then
-                local screenPos = Camera:WorldToViewportPoint(targetPos)
-                Mouse.Move(Vector2.new(screenPos.X, screenPos.Y))
-            else
-                local newCFrame = CFrame.new(Camera.CFrame.Position, targetPos)
-                local smooth = 1 - Settings.Aimbot.Smoothness
-                Camera.CFrame = Camera.CFrame:Lerp(newCFrame, smooth)
-            end
-            
-            -- TRIGGERBOT
-            if Settings.Triggerbot.Enabled then
-                local currentTime = tick()
-                if currentTime - lastFireTime >= Settings.Triggerbot.FireRate then
-                    fireWeapon()
-                    lastFireTime = currentTime
+                
+                if closestItem then
+                    local itemPos = closestItem:FindFirstChild("Handle")
+                    if itemPos then
+                        RootPart.CFrame = CFrame.new(itemPos.Position + Vector3.new(0, 2, 0))
+                        task.wait(0.3)
+                        RootPart.CFrame = CFrame.new(itemPos.Position)
+                        task.wait(0.1)
+                    end
                 end
             end
-        else
-            aimbotTarget = nil
+            
+            task.wait(0.2)
+        end
+        IsFarming = false
+    end)
+end
+
+-- 5. ESP 2.0 UI
+local ESPObjects = {}
+local function CreateESP(object, color, text)
+    if not object or not object:FindFirstChild("HumanoidRootPart") then return end
+    
+    local esp = Drawing.new("Box")
+    esp.Thickness = 2
+    esp.Color = color
+    esp.Transparency = 0.5
+    esp.Filled = false
+    
+    local label = Drawing.new("Text")
+    label.Text = text
+    label.Color = color
+    label.Size = 12
+    label.Center = true
+    
+    ESPObjects[object] = {box = esp, label = label}
+end
+
+local function UpdateESP()
+    for obj, data in pairs(ESPObjects) do
+        if not obj or not obj.Parent then
+            data.box:Remove()
+            data.label:Remove()
+            ESPObjects[obj] = nil
         end
     end
     
-    -- ESP
-    ESP:Update()
-end)
+    if Toggles.ESPRake and Rake then
+        if not ESPObjects[Rake] then
+            CreateESP(Rake, Color3.fromRGB(255, 0, 0), "RAKE")
+        end
+    end
+    
+    if Toggles.ESPPlayers then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                if not ESPObjects[player.Character] then
+                    CreateESP(player.Character, Color3.fromRGB(0, 255, 0), player.Name)
+                end
+            end
+        end
+    end
+    
+    local items = GetItems()
+    for _, item in pairs(items) do
+        local name = item.Name:lower()
+        local color = Color3.fromRGB(255, 255, 255)
+        local text = item.Name
+        
+        if name:find("flare") and Toggles.ESPFlare then
+            color = Color3.fromRGB(255, 165, 0)
+        elseif name:find("supply") and Toggles.ESPBox then
+            color = Color3.fromRGB(0, 0, 255)
+        elseif name:find("scrap") and Toggles.ESPScrap then
+            color = Color3.fromRGB(128, 128, 128)
+        elseif name:find("trap") and Toggles.ESPTrap then
+            color = Color3.fromRGB(128, 0, 128)
+        else
+            continue
+        end
+        
+        if not ESPObjects[item] then
+            CreateESP(item, color, text)
+        end
+    end
+end
 
--- ================================================================
--- MOBİL DESTEĞİ
--- ================================================================
-if UserInputService.TouchEnabled then
-    UserInputService.TouchEnded:Connect(function(touch)
-        if Settings.Mobile.AutoFireTouch then
-            fireWeapon()
+-- 6. FULL BRIGHTNESS
+local function ToggleFullBright()
+    if Toggles.FullBright then
+        OriginalLighting = {
+            Brightness = Lighting.Brightness,
+            Ambient = Lighting.Ambient,
+            OutdoorAmbient = Lighting.OutdoorAmbient,
+            FogEnd = Lighting.FogEnd
+        }
+        Lighting.Brightness = 10
+        Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+        Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+        Lighting.FogEnd = 10000
+    else
+        Lighting.Brightness = OriginalLighting.Brightness or 1
+        Lighting.Ambient = OriginalLighting.Ambient or Color3.fromRGB(127, 127, 127)
+        Lighting.OutdoorAmbient = OriginalLighting.OutdoorAmbient or Color3.fromRGB(127, 127, 127)
+        Lighting.FogEnd = OriginalLighting.FogEnd or 100000
+    end
+end
+
+-- 7. THIRD PERSON
+local function ToggleThirdPerson()
+    if Toggles.ThirdPerson then
+        Camera.CameraType = Enum.CameraType.Follow
+        Camera.CameraSubject = Character
+    else
+        Camera.CameraType = Enum.CameraType.Custom
+    end
+end
+
+-- 8. MOBİL SPEED (Dokunmatik Kontrol)
+local function SetupMobileSpeed()
+    if not Toggles.MobileSpeed or not Character or not RootPart then return end
+    
+    -- Mobil joystick oluştur
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "MobileSpeedGUI"
+    screenGui.Parent = LocalPlayer.PlayerGui
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 150, 0, 150)
+    frame.Position = UDim2.new(0, 20, 0, -75)
+    frame.AnchorPoint = Vector2.new(0, 0.5)
+    frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    frame.BackgroundTransparency = 0.5
+    frame.BorderSizePixel = 2
+    frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    frame.Parent = screenGui
+    
+    local joystick = Instance.new("Frame")
+    joystick.Size = UDim2.new(0, 50, 0, 50)
+    joystick.Position = UDim2.new(0.5, -25, 0.5, -25)
+    joystick.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    joystick.BorderSizePixel = 0
+    joystick.Parent = frame
+    
+    local isDragging = false
+    local startPos = nil
+    
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = true
+            startPos = input.Position
+        end
+    end)
+    
+    frame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = false
+            joystick.Position = UDim2.new(0.5, -25, 0.5, -25)
+        end
+    end)
+    
+    frame.InputChanged:Connect(function(input)
+        if isDragging and input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - startPos
+            local magnitude = delta.Magnitude
+            local maxRadius = 50
+            
+            if magnitude > maxRadius then
+                delta = delta.Unit * maxRadius
+            end
+            
+            joystick.Position = UDim2.new(0.5, delta.X - 25, 0.5, delta.Y - 25)
+            
+            -- Işınlanma işlemi
+            if magnitude > 10 then
+                local direction = Vector3.new(delta.X, 0, -delta.Y).Unit
+                local distance = Settings.MobileSpeedDistance * (magnitude / maxRadius)
+                RootPart.CFrame = RootPart.CFrame + direction * distance
+            end
         end
     end)
 end
 
--- ================================================================
--- BAŞLATMA
--- ================================================================
-Menu:Create()
+-- 9. DELETE FALL DAMAGE
+local function SetupFallDamage()
+    if Toggles.FallDamage and Humanoid then
+        Humanoid.FallDamage = 0
+    else
+        Humanoid.FallDamage = 100
+    end
+end
 
-print("⚡ LORD YAGIZ_ v5.1 ULTRA loaded successfully!")
-print("📱 Sol üstteki ⚡ butonuna tıkla - KAYDIRILABİLİR Menü açılır")
-print("🎯 Sınırsız mesafe Aimbot + Otomatik sıkma aktif!")
-print("👁️ Gelişmiş ESP sistemi çalışıyor!")
-print("💾 Config sistemi ile ayarlarını kaydedebilirsin!")
+-- 10. INFINITE STAMINA
+local function SetupInfiniteStamina()
+    if Toggles.InfiniteStamina and Humanoid then
+        Humanoid.Stamina.Value = Humanoid.Stamina.MaxValue
+    end
+end
 
--- ================================================================
--- TEMİZLİK
--- ================================================================
-game:BindToClose(function()
-    if Menu.Gui then Menu.Gui:Destroy() end
-    for _, obj in pairs(ESP.Objects) do
-        pcall(function() obj:Destroy() end)
+-- 11. MAKE HIM CHASE YOU
+local function MakeHimChaseYou()
+    if not Character or not RootPart or not Rake then return end
+    
+    local rakePos = Rake:FindFirstChild("HumanoidRootPart")
+    if not rakePos then return end
+    
+    local targetPos = rakePos.Position + (rakePos.Position - RootPart.Position).Unit * 20
+    RootPart.CFrame = CFrame.new(targetPos)
+end
+
+-- Ana Render Döngüsü
+RunService.Heartbeat:Connect(function()
+    if not Character then UpdateCharacter() end
+    if not Rake then Rake = GetRake() end
+    
+    AntiRakeChase()
+    AutoStickAttack()
+    SetupGodMode()
+    SetupInfiniteStamina()
+    UpdateESP()
+    
+    -- Mobil Speed aktifse joystick'i göster/gizle
+    if Toggles.MobileSpeed then
+        if not MobileJoystick then SetupMobileSpeed() end
+    else
+        if MobileJoystick then MobileJoystick:Destroy(); MobileJoystick = nil end
     end
 end)
+
+-- Rayfield UI Oluşturma
+local Window = Rayfield:CreateWindow({
+    Name = "DOLAROV HUB",
+    Icon = 0,
+    LoadingTitle = "DOLAROV HUB",
+    LoadingSubtitle = "The Rake Remastered (Mobil)",
+    Theme = "Dark",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "DolarovHub"
+    }
+})
+
+-- MAIN Sekmesi
+local MainTab = Window:CreateTab("MAIN")
+
+MainTab:CreateToggle({
+    Name = "Anti-Rake Chase",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.AntiRake = Value
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Make Him Chase You",
+    Callback = MakeHimChaseYou
+})
+
+MainTab:CreateToggle({
+    Name = "Experimental Autofarm",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.AutoFarm = Value
+        if Value then
+            AutoFarm()
+        else
+            IsFarming = false
+        end
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Auto-Stick Attack",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.AutoStick = Value
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "God Mode",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.GodMode = Value
+        if Value then
+            SetupGodMode()
+        end
+    end
+})
+
+-- MISC Sekmesi
+local MiscTab = Window:CreateTab("MISC")
+
+MiscTab:CreateToggle({
+    Name = "ESP Players",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.ESPPlayers = Value
+        if not Value then
+            for obj, data in pairs(ESPObjects) do
+                data.box:Remove()
+                data.label:Remove()
+            end
+            ESPObjects = {}
+        end
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "ESP Rake",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.ESPRake = Value
+        if not Value and ESPObjects[Rake] then
+            ESPObjects[Rake].box:Remove()
+            ESPObjects[Rake].label:Remove()
+            ESPObjects[Rake] = nil
+        end
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "ESP Flare Gun",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.ESPFlare = Value
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "Supply Box ESP",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.ESPBox = Value
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "Scrap ESP",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.ESPScrap = Value
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "Trap ESP",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.ESPTrap = Value
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "Full Brightness",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.FullBright = Value
+        ToggleFullBright()
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "Enable Third Person",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.ThirdPerson = Value
+        ToggleThirdPerson()
+    end
+})
+
+-- MOBİL SPEED (Klavye yerine dokunmatik)
+MiscTab:CreateToggle({
+    Name = "Mobile Speed (Joystick)",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.MobileSpeed = Value
+        if Value then
+            SetupMobileSpeed()
+        else
+            if MobileJoystick then 
+                MobileJoystick:Destroy() 
+                MobileJoystick = nil 
+            end
+        end
+    end
+})
+
+MiscTab:CreateSlider({
+    Name = "Mobile Speed Distance",
+    Min = 5,
+    Max = 30,
+    Default = 10,
+    Callback = function(Value)
+        Settings.MobileSpeedDistance = Value
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "Delete Fall Damage",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.FallDamage = Value
+        SetupFallDamage()
+    end
+})
+
+MiscTab:CreateToggle({
+    Name = "Infinite Stamina",
+    CurrentValue = false,
+    Callback = function(Value)
+        Toggles.InfiniteStamina = Value
+        SetupInfiniteStamina()
+    end
+})
+
+-- Başlangıç kontrolleri
+UpdateCharacter()
+Rake = GetRake()
+
+print("DOLAROV HUB - The Rake Remastered (MOBİL UYUMLU) başlatıldı!")
