@@ -1,32 +1,30 @@
 --[[
   ╔══════════════════════════════════════════════════════════════════╗
   ║        SLAYER HUB — BROOKHAVEN RP  V2  (MOBİL + PC)            ║
-  ║  Otomatik mobil/PC algılama | Dikey şerit GUI                  ║
-  ║  Fly · Speed · Fling · ESP · Car Hack · House · Anti-Fling     ║
-  ║  God Mode · Noclip · Anti-AFK · Visual FX · +45 Özellik        ║
-  ║  ⚙️ Fling Boat V2 — Tekne ile toplu fırlatma                   ║
+  ║  Otomatik mobil/PC algılama | Düz Yatay GUI                    ║
+  ║  Fly · Speed · Fling · ESP · Car Hack · BoatFling · +50 Özellik ║
   ╚══════════════════════════════════════════════════════════════════╝
 --]]
 
 -- ── Servisler ───────────────────────────────────────────────────
-local Players    = game:GetService("Players")
-local RS         = game:GetService("RunService")
-local UIS        = game:GetService("UserInputService")
-local TS         = game:GetService("TweenService")
-local Lighting   = game:GetService("Lighting")
-local Debris     = game:GetService("Debris")
+local Players = game:GetService("Players")
+local RS = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local TS = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local Debris = game:GetService("Debris")
 local Replicated = game:GetService("ReplicatedStorage")
-local lp         = Players.LocalPlayer
-local pgui       = lp.PlayerGui
-local cam        = workspace.CurrentCamera
+local lp = Players.LocalPlayer
+local pgui = lp.PlayerGui
+local cam = workspace.CurrentCamera
 
 -- Eski GUI temizle
 if pgui:FindFirstChild("SlayerHub") then pgui.SlayerHub:Destroy() end
 
 -- ── Cihaz Algılama ──────────────────────────────────────────────
 local isMobile = UIS.TouchEnabled and not UIS.KeyboardEnabled
-local vp       = cam.ViewportSize
-local SCALE    = isMobile and math.clamp(vp.X / 480, 0.7, 1.25) or 1
+local vp = cam.ViewportSize
+local SCALE = isMobile and math.clamp(vp.X / 480, 0.7, 1.25) or 1
 local function S(n) return math.floor(n * SCALE) end
 
 -- ── Bağlantı Yöneticisi ─────────────────────────────────────────
@@ -44,37 +42,37 @@ local function disc(tag)
 end
 
 -- ── Temel Yardımcılar ───────────────────────────────────────────
-local function C()   return lp.Character end
-local function R()   local c = C(); return c and c:FindFirstChild("HumanoidRootPart") end
-local function H()   local c = C(); return c and c:FindFirstChildOfClass("Humanoid") end
+local function C() return lp.Character end
+local function R() local c = C(); return c and c:FindFirstChild("HumanoidRootPart") end
+local function H() local c = C(); return c and c:FindFirstChildOfClass("Humanoid") end
 
 local FPS = 60
 conn(RS.Heartbeat, function(dt) FPS = math.clamp(1/(dt+0.001),1,144) end)
 
 -- ════════════════════════════════════════════════════════════════
---  RENK PALETİ — Slayer Hub Altın/Koyu tema
+--  RENK PALETİ — Slayer Hub
 -- ════════════════════════════════════════════════════════════════
 local COL = {
-    BG        = Color3.fromRGB(20, 20, 26),    -- #14141A
-    STRIP     = Color3.fromRGB(30, 30, 40),
-    STRIP_H   = Color3.fromRGB(50, 50, 66),
-    STRIP_ON  = Color3.fromRGB(60, 55, 45),
-    ACCENT    = Color3.fromRGB(255, 200, 80),  -- #FFC850
-    ACCENT2   = Color3.fromRGB(180, 140, 60),
-    TEXT      = Color3.fromRGB(255, 250, 240),
-    SUBTEXT   = Color3.fromRGB(150, 150, 170), -- #9696AA
-    TOG_OFF   = Color3.fromRGB(40, 40, 50),
-    TOG_ON    = Color3.fromRGB(220, 180, 70),
-    KNOB_OFF  = Color3.fromRGB(80, 80, 100),
-    KNOB_ON   = Color3.fromRGB(255, 220, 150),
-    CLOSE     = Color3.fromRGB(200, 30, 30),   -- Kırmızı
-    MIN_BTN   = Color3.fromRGB(60, 60, 80),
-    GOLD      = Color3.fromRGB(255, 200, 80),
+    BG = Color3.fromRGB(20, 20, 26),
+    STRIP = Color3.fromRGB(30, 30, 40),
+    STRIP_H = Color3.fromRGB(50, 50, 66),
+    STRIP_ON = Color3.fromRGB(60, 55, 45),
+    ACCENT = Color3.fromRGB(255, 200, 80),
+    ACCENT2 = Color3.fromRGB(180, 140, 60),
+    TEXT = Color3.fromRGB(255, 250, 240),
+    SUBTEXT = Color3.fromRGB(150, 150, 170),
+    TOG_OFF = Color3.fromRGB(40, 40, 50),
+    TOG_ON = Color3.fromRGB(220, 180, 70),
+    KNOB_OFF = Color3.fromRGB(80, 80, 100),
+    KNOB_ON = Color3.fromRGB(255, 220, 150),
+    CLOSE = Color3.fromRGB(200, 30, 30),
+    MIN_BTN = Color3.fromRGB(60, 60, 80),
+    GOLD = Color3.fromRGB(255, 200, 80),
     GOLD_DARK = Color3.fromRGB(180, 140, 50),
 }
 
 -- ════════════════════════════════════════════════════════════════
---  ANA SCREEN GUI — Slayer Hub
+--  ANA SCREEN GUI
 -- ════════════════════════════════════════════════════════════════
 local sg = Instance.new("ScreenGui", pgui)
 sg.Name = "SlayerHub"
@@ -82,7 +80,7 @@ sg.ResetOnSpawn = false
 sg.IgnoreGuiInset = true
 sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Boyutlar (600x450)
+-- Boyutlar
 local WIN_W = math.min(S(isMobile and 340 or 600), vp.X * 0.9)
 local WIN_H = math.min(S(isMobile and 380 or 450), vp.Y * 0.85)
 local STRIP_W = S(isMobile and 60 or 68)
@@ -100,15 +98,6 @@ win.Active = true
 win.Draggable = true
 Instance.new("UICorner", win).CornerRadius = UDim.new(0, S(12))
 
--- Gölge efekti (hafif glow)
-local shadow = Instance.new("Frame", win)
-shadow.Size = UDim2.new(1, S(8), 1, S(8))
-shadow.Position = UDim2.new(0, -S(4), 0, -S(4))
-shadow.BackgroundColor3 = Color3.fromRGB(255, 200, 80)
-shadow.BackgroundTransparency = 0.92
-shadow.BorderSizePixel = 0
-Instance.new("UICorner", shadow).CornerRadius = UDim.new(0, S(16))
-
 -- Kenarlık
 do local s = Instance.new("UIStroke", win)
     s.Color = COL.GOLD
@@ -117,7 +106,7 @@ do local s = Instance.new("UIStroke", win)
 end
 
 -- ════════════════════════════════════════════════════════════════
---  BAŞLIK BAR — Slayer Hub
+--  BAŞLIK BAR
 -- ════════════════════════════════════════════════════════════════
 local titleBar = Instance.new("Frame", win)
 titleBar.Size = UDim2.new(1, 0, 0, TITLE_H)
@@ -125,7 +114,6 @@ titleBar.BackgroundColor3 = Color3.fromRGB(16, 16, 22)
 titleBar.BorderSizePixel = 0
 Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, S(12))
 
--- Başlık "Slayer Hub" — Altın sarısı
 local logoTxt = Instance.new("TextLabel", titleBar)
 logoTxt.Size = UDim2.new(1, -S(120), 1, 0)
 logoTxt.Position = UDim2.new(0, S(14), 0, 0)
@@ -136,7 +124,6 @@ logoTxt.TextColor3 = COL.GOLD
 logoTxt.BackgroundTransparency = 1
 logoTxt.TextXAlignment = Enum.TextXAlignment.Left
 
--- Alt Başlık "by Slayer" — Gri
 local subTxt = Instance.new("TextLabel", titleBar)
 subTxt.Size = UDim2.new(0, S(100), 1, 0)
 subTxt.Position = UDim2.new(0, S(145), 0, 0)
@@ -164,7 +151,7 @@ conn(RS.Heartbeat, function()
         or FPS > 30 and Color3.fromRGB(255, 200, 50) or Color3.fromRGB(255, 60, 60)
 end, "fps")
 
--- Kapatma Butonu (✕ Kırmızı)
+-- Butonlar
 local function hdrBtn(txt, col, ox)
     local bSz = S(isMobile and 32 or 28)
     local b = Instance.new("TextButton", titleBar)
@@ -196,7 +183,7 @@ minB.MouseButton1Click:Connect(function()
 end)
 
 -- ════════════════════════════════════════════════════════════════
---  YATAY KAYDIRMA (ScrollingFrame)
+--  YATAY KAYDIRMA (DÜZ GUI - 90 DERECE DÖNME YOK)
 -- ════════════════════════════════════════════════════════════════
 local scrollF = Instance.new("ScrollingFrame", win)
 scrollF.Size = UDim2.new(1, 0, 1, -TITLE_H)
@@ -221,7 +208,7 @@ hPad.PaddingTop = UDim.new(0, S(6))
 hPad.PaddingBottom = UDim.new(0, S(6))
 
 -- ════════════════════════════════════════════════════════════════
---  ŞERİT (STRIP) BİLEŞENİ
+--  ŞERİT BİLEŞENİ (DÜZ METİN - DÖNME YOK)
 -- ════════════════════════════════════════════════════════════════
 local TW = TweenInfo.new(0.18, Enum.EasingStyle.Quad)
 
@@ -242,24 +229,21 @@ local function makeStrip(label, tag, toggleCb, iconChar, overrideColors)
         st.Transparency = 0.4
     end
 
-    -- Döndürülmüş metin
-    local rotF = Instance.new("Frame", f)
-    rotF.Size = UDim2.new(0, STRIP_H - S(70), 0, STRIP_W - S(10))
-    rotF.Position = UDim2.new(0.5, -(STRIP_H - S(70))/2, 0, S(5))
-    rotF.BackgroundTransparency = 1
-    rotF.Rotation = 90
-    local lbl = Instance.new("TextLabel", rotF)
-    lbl.Size = UDim2.new(1, 0, 1, 0)
+    -- NORMAL METİN (90 DERECE DÖNME YOK)
+    local lbl = Instance.new("TextLabel", f)
+    lbl.Size = UDim2.new(1, 0, 1, -S(60))
+    lbl.Position = UDim2.new(0, 0, 0, S(4))
     lbl.Text = label
-    lbl.TextSize = S(isMobile and 12 or 11)
+    lbl.TextSize = S(isMobile and 10 or 11)
     lbl.Font = Enum.Font.GothamBold
     lbl.TextColor3 = oc.text or COL.TEXT
     lbl.BackgroundTransparency = 1
     lbl.TextXAlignment = Enum.TextXAlignment.Center
-    lbl.TextWrapped = false
+    lbl.TextYAlignment = Enum.TextYAlignment.Top
+    lbl.TextWrapped = true
 
     -- Alt bölge
-    local botH = S(60)
+    local botH = S(56)
     local bot = Instance.new("Frame", f)
     bot.Size = UDim2.new(1, 0, 0, botH)
     bot.Position = UDim2.new(0, 0, 1, -botH)
@@ -289,7 +273,7 @@ local function makeStrip(label, tag, toggleCb, iconChar, overrideColors)
             ico2.Size = UDim2.new(1, 0, 0, S(22))
             ico2.Position = UDim2.new(0, 0, 0, S(2))
             ico2.Text = iconChar
-            ico2.TextSize = S(15)
+            ico2.TextSize = S(14)
             ico2.Font = Enum.Font.GothamBold
             ico2.BackgroundTransparency = 1
             ico2.TextColor3 = oc.icon or COL.SUBTEXT
@@ -298,7 +282,7 @@ local function makeStrip(label, tag, toggleCb, iconChar, overrideColors)
         local ico = Instance.new("TextLabel", bot)
         ico.Size = UDim2.new(1, 0, 1, 0)
         ico.Text = iconChar or "▶"
-        ico.TextSize = S(20)
+        ico.TextSize = S(18)
         ico.Font = Enum.Font.GothamBold
         ico.TextColor3 = oc.icon or COL.GOLD
         ico.BackgroundTransparency = 1
@@ -355,7 +339,7 @@ end
 
 local function makeDivider(label)
     local f = Instance.new("Frame", scrollF)
-    f.Size = UDim2.fromOffset(S(isMobile and 26 or 22), STRIP_H - S(12))
+    f.Size = UDim2.fromOffset(S(isMobile and 30 or 26), STRIP_H - S(12))
     f.BackgroundTransparency = 1
     f.BorderSizePixel = 0
     local line = Instance.new("Frame", f)
@@ -364,152 +348,95 @@ local function makeDivider(label)
     line.BackgroundColor3 = COL.GOLD_DARK
     line.BorderSizePixel = 0
     line.BackgroundTransparency = 0.45
-    local rF = Instance.new("Frame", f)
-    rF.Size = UDim2.new(0, S(82), 0, S(20))
-    rF.Position = UDim2.new(0.5, -S(41), 0.5, -S(10))
-    rF.BackgroundTransparency = 1
-    rF.Rotation = 90
-    local l = Instance.new("TextLabel", rF)
-    l.Size = UDim2.new(1, 0, 1, 0)
-    l.Text = label
-    l.TextSize = S(7)
-    l.Font = Enum.Font.GothamBold
-    l.TextColor3 = COL.GOLD_DARK
-    l.BackgroundTransparency = 1
+    local lbl = Instance.new("TextLabel", f)
+    lbl.Size = UDim2.new(0, S(80), 0, S(20))
+    lbl.Position = UDim2.new(0.5, -S(40), 0.5, -S(10))
+    lbl.Text = label
+    lbl.TextSize = S(8)
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextColor3 = COL.GOLD_DARK
+    lbl.BackgroundTransparency = 1
 end
 
 -- ════════════════════════════════════════════════════════════════
---  ⚙️ FLING BOAT V2 SİSTEMİ
+--  ⚙️ BOAT FLING SİSTEMİ (DÜZELTİLMİŞ)
 -- ════════════════════════════════════════════════════════════════
 
-local boatModel = nil
-local boatSeat = nil
-local boatRoot = nil
 local boatFlingActive = false
-local boatTargetPlayers = {}
-local boatTargetAll = false
+local boatFlingLoop = nil
 
--- Tekne oluşturma
-local function spawnBoat()
-    -- Var olan tekneyi temizle
-    if boatModel then
-        pcall(function() boatModel:Destroy() end)
-        boatModel = nil
-        boatSeat = nil
-        boatRoot = nil
+-- Aşırı Fizik Fling Fonksiyonu
+local function superFling(target)
+    if not target then return end
+    local char = target.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    -- Aşırı yüksek hız ve dönüş uygula
+    pcall(function()
+        -- BodyAngularVelocity - Aşırı dönüş
+        local bav = Instance.new("BodyAngularVelocity")
+        bav.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bav.AngularVelocity = Vector3.new(
+            math.random(-99999, 99999),
+            math.random(50000, 99999),
+            math.random(-99999, 99999)
+        )
+        bav.Parent = root
+        Debris:AddItem(bav, 0.15)
+        
+        -- BodyVelocity - Aşırı hız
+        local bv = Instance.new("BodyVelocity")
+        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bv.Velocity = Vector3.new(
+            math.random(-99999, 99999),
+            math.random(50000, 99999),
+            math.random(-99999, 99999)
+        )
+        bv.Parent = root
+        Debris:AddItem(bv, 0.15)
+        
+        -- Doğrudan Velocity (AssemblyLinearVelocity)
+        root.AssemblyLinearVelocity = Vector3.new(
+            math.random(-99999, 99999),
+            math.random(50000, 99999),
+            math.random(-99999, 99999)
+        )
+        
+        root.AssemblyAngularVelocity = Vector3.new(
+            math.random(-99999, 99999),
+            math.random(-99999, 99999),
+            math.random(-99999, 99999)
+        )
+    end)
+end
+
+-- Tüm oyunculara Fling
+local function flingAllPlayers()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= lp then
+            superFling(plr)
+            task.wait(0.02)
+        end
     end
+end
 
-    -- Brookhaven'daki tekne spawn remote'u (örnek)
-    local remote = ReplicatedStorage:FindFirstChild("Vehicle") or 
-                   ReplicatedStorage:FindFirstChild("SpawnVehicle") or
-                   ReplicatedStorage:FindFirstChild("VehicleSpawn")
-
-    if remote then
-        pcall(function()
-            remote:FireServer("Boat", "Jet Ski") -- veya "Speedboat"
-        end)
-    else
-        -- Alternatif: kendi tekne modelimizi oluşturalım
-        local boat = Instance.new("Model")
-        boat.Name = "SlayerBoat"
-
-        -- Ana gövde
-        local hull = Instance.new("Part")
-        hull.Size = Vector3.new(12, 3, 5)
-        hull.Position = Vector3.new(0, 0, 0)
-        hull.Shape = Enum.PartType.Cylinder
-        hull.Material = Enum.Material.Plastic
-        hull.Color = Color3.fromRGB(255, 200, 80)
-        hull.Anchored = false
-        hull.CanCollide = true
-        hull.Parent = boat
-
-        -- Koltuk
-        local seat = Instance.new("VehicleSeat")
-        seat.Size = Vector3.new(3, 1.5, 3)
-        seat.Position = Vector3.new(0, 2, 0)
-        seat.MaxSpeed = 200
-        seat.Torque = 500000
-        seat.Parent = boat
-
-        boat.Parent = workspace
-        boatModel = boat
-        boatSeat = seat
-        boatRoot = hull
-        return boat
-    end
-
-    -- Remote ile spawn yapıldıysa, tekneyi bul
-    task.wait(1)
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("VehicleSeat") and obj.Parent and obj.Parent:IsA("Model") then
-            local name = obj.Parent.Name:lower()
-            if name:find("boat") or name:find("jet") or name:find("speed") or name:find("motor") then
-                boatModel = obj.Parent
-                boatSeat = obj
-                boatRoot = obj.Parent:FindFirstChild("HumanoidRootPart") or obj
-                break
+-- Yakındaki oyuncuyu bul
+local function getNearestPlayer()
+    local r2 = R()
+    if not r2 then return nil end
+    local best, bestD = nil, math.huge
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= lp then
+            local t = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+            if t then
+                local d = (t.Position - r2.Position).Magnitude
+                if d < bestD then bestD = d; best = plr end
             end
         end
     end
-end
-
--- Tekneyi hedef oyuncuya fırlat
-local function flingBoatTarget(target)
-    if not boatModel or not boatSeat or not boatRoot then return end
-    if not target then return end
-
-    local char = target.Character
-    if not char then return end
-    local rootPart = char:FindFirstChild("HumanoidRootPart")
-    if not rootPart then return end
-
-    -- Tekneyi hedefin üzerine ışınla
-    local pos = rootPart.Position + Vector3.new(0, 3, 0)
-    boatRoot.CFrame = CFrame.new(pos) * CFrame.Angles(math.rad(math.random(-30, 30)), math.rad(math.random(0, 360)), math.rad(math.random(-30, 30)))
-
-    -- Aşırı hız ver (fizik patlaması)
-    pcall(function()
-        local bv = Instance.new("BodyVelocity", boatRoot)
-        bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-        bv.Velocity = Vector3.new(
-            math.random(-500, 500),
-            math.random(300, 800),
-            math.random(-500, 500)
-        )
-        Debris:AddItem(bv, 0.15)
-
-        local bav = Instance.new("BodyAngularVelocity", boatRoot)
-        bav.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
-        bav.AngularVelocity = Vector3.new(
-            math.random(-5000, 5000),
-            math.random(-5000, 5000),
-            math.random(-5000, 5000)
-        )
-        Debris:AddItem(bav, 0.15)
-    end)
-
-    -- Oyuncuyu da fırlat (ekstra)
-    pcall(function()
-        local bv2 = Instance.new("BodyVelocity", rootPart)
-        bv2.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-        bv2.Velocity = Vector3.new(
-            math.random(-300, 300),
-            math.random(200, 600),
-            math.random(-300, 300)
-        )
-        Debris:AddItem(bv2, 0.12)
-    end)
-end
-
--- Tüm oyunculara fling
-local function flingBoatAll()
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= lp then
-            flingBoatTarget(plr)
-            task.wait(0.05)
-        end
-    end
+    return best
 end
 
 -- ════════════════════════════════════════════════════════════════
@@ -518,7 +445,7 @@ end
 makeDivider("⚡ KARAKTER")
 
 -- Speed
-makeStrip("⚡ SPEED\nHACK", "speed", function(on)
+makeStrip("⚡ SPEED", "speed", function(on)
     if on then
         conn(RS.Heartbeat, function()
             local h = H()
@@ -532,7 +459,7 @@ makeStrip("⚡ SPEED\nHACK", "speed", function(on)
 end, "⚡")
 
 -- Süper Zıplama
-makeStrip("🦘 SÜPER\nZIPLAMA", "sjump", function(on)
+makeStrip("🦘 S.ZIPLAMA", "sjump", function(on)
     if on then
         conn(RS.Heartbeat, function()
             local h = H()
@@ -549,24 +476,10 @@ makeStrip("🦘 SÜPER\nZIPLAMA", "sjump", function(on)
     end
 end, "🦘")
 
--- Sonsuz Zıplama
-makeStrip("♾️ SONSUZ\nZIPLAMA", "infJump", function(on)
-    if on then
-        conn(UIS.JumpRequest, function()
-            local h = H()
-            if h and h.FloorMaterial == Enum.Material.Air then
-                h:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-        end, "infJump")
-    else
-        disc("infJump")
-    end
-end, "♾️")
-
 -- Uçuş
 local flyOn = false
 local fV, fG, fCon
-makeStrip("🛩️ UÇUŞ\nMODU", "fly", function(on)
+makeStrip("🛩️ UÇUŞ", "fly", function(on)
     flyOn = on
     local r2 = R()
     if on and r2 then
@@ -604,7 +517,7 @@ end, "🛩️")
 
 -- Noclip
 local ncOn = false
-makeStrip("👻 NO\nCLİP", "noclip", function(on)
+makeStrip("👻 NOCLIP", "noclip", function(on)
     ncOn = on
     if on then
         conn(RS.Stepped, function()
@@ -626,7 +539,7 @@ makeStrip("👻 NO\nCLİP", "noclip", function(on)
 end, "👻")
 
 -- God Mode
-makeStrip("🛡️ GOD\nMODE", "god", function(on)
+makeStrip("🛡️ GOD", "god", function(on)
     local h = H()
     if not h then return end
     if on then
@@ -641,332 +554,83 @@ makeStrip("🛡️ GOD\nMODE", "god", function(on)
     end
 end, "🛡️")
 
--- ════════════════════════════════════════════════════════════════
---  BÖLÜM 2 — FLING BOAT V2 (ANA ÖZELLİK)
--- ════════════════════════════════════════════════════════════════
-makeDivider("🚤 FLING BOAT V2")
+-- Anti-AFK
+makeStrip("🟢 ANTIAFK", "afk", function(on)
+    if on then
+        local vu = game:GetService("VirtualUser")
+        conn(RS.Heartbeat, function()
+            vu:Button2Down(Vector2.zero, cam.CFrame)
+            vu:Button2Up(Vector2.zero, cam.CFrame)
+        end, "afk")
+    else
+        disc("afk")
+    end
+end, "🟢")
 
--- Fling Boat renk teması (Altın/Mavi)
-local BOAT_CLR = {
-    base   = Color3.fromRGB(20, 25, 40),
-    on     = Color3.fromRGB(40, 50, 70),
-    hover  = Color3.fromRGB(60, 70, 90),
-    stroke = Color3.fromRGB(255, 200, 80),
-    text   = Color3.fromRGB(255, 250, 240),
-    icon   = Color3.fromRGB(255, 200, 80),
+-- ════════════════════════════════════════════════════════════════
+--  BÖLÜM 2 — BOAT FLING (DÜZELTİLMİŞ)
+-- ════════════════════════════════════════════════════════════════
+makeDivider("🚤 BOAT FLING")
+
+-- Boat Fling renk teması
+local FLING_CLR = {
+    base = Color3.fromRGB(40, 20, 30),
+    on = Color3.fromRGB(80, 30, 50),
+    hover = Color3.fromRGB(100, 40, 60),
+    stroke = Color3.fromRGB(255, 100, 80),
+    text = Color3.fromRGB(255, 220, 210),
+    icon = Color3.fromRGB(255, 100, 80),
 }
 
--- Tekne Hazırla
-makeBtnStrip("🚤 TEKNE\nHAZIRLA", "🚤", function()
-    spawnBoat()
-    -- Bildirim
-    local notif = Instance.new("TextLabel", sg)
-    notif.Size = UDim2.fromOffset(S(250), S(36))
-    notif.Position = UDim2.new(0.5, -S(125), 0.02, 0)
-    notif.Text = "✅ Tekne Hazır!"
-    notif.TextSize = S(12)
-    notif.Font = Enum.Font.GothamBold
-    notif.TextColor3 = COL.GOLD
-    notif.BackgroundColor3 = COL.BG
-    notif.BorderSizePixel = 0
-    Instance.new("UICorner", notif).CornerRadius = UDim.new(0, S(8))
-    do local s = Instance.new("UIStroke", notif)
-        s.Color = COL.GOLD
-        s.Thickness = 1
+-- Tekli Fling (Yakındaki oyuncuya)
+makeBtnStrip("🎯 TEK FLING", "🎯", function()
+    local target = getNearestPlayer()
+    if target then
+        superFling(target)
     end
-    task.delay(2, function()
-        TS:Create(notif, TweenInfo.new(0.4), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
-        task.delay(0.5, function() notif:Destroy() end)
-    end)
-end, BOAT_CLR)
+end, FLING_CLR)
 
--- Hedef Seç (Dropdown) — Tüm Oyuncular veya Seçili
-local targetMode = "All" -- "All" veya "Selected"
-local selectedTarget = nil
-
--- Hedef seçim şeridi
-do
-    local f = Instance.new("Frame", scrollF)
-    f.Size = UDim2.fromOffset(STRIP_W * 1.8, STRIP_H - S(12))
-    f.BackgroundColor3 = BOAT_CLR.base
-    f.BorderSizePixel = 0
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, S(8))
-    do local st = Instance.new("UIStroke", f)
-        st.Color = BOAT_CLR.stroke
-        st.Thickness = 0.8
-        st.Transparency = 0.4
-    end
-
-    local titleL = Instance.new("TextLabel", f)
-    titleL.Size = UDim2.new(1, 0, 0, S(26))
-    titleL.Position = UDim2.new(0, 0, 0, S(4))
-    titleL.Text = "🎯 FLING HEDEFİ"
-    titleL.TextSize = S(11)
-    titleL.Font = Enum.Font.GothamBold
-    titleL.TextColor3 = BOAT_CLR.icon
-    titleL.BackgroundTransparency = 1
-
-    local selLbl = Instance.new("TextLabel", f)
-    selLbl.Size = UDim2.new(1, 0, 0, S(20))
-    selLbl.Position = UDim2.new(0, 0, 0, S(28))
-    selLbl.Text = "Hedef: Tüm Oyuncular"
-    selLbl.TextSize = S(9)
-    selLbl.Font = Enum.Font.GothamSemibold
-    selLbl.TextColor3 = COL.SUBTEXT
-    selLbl.BackgroundTransparency = 1
-
-    -- Butonlar: All / Seçili
-    local function smallBtn(txt, col, x, w, cb)
-        local b = Instance.new("TextButton", f)
-        b.Size = UDim2.fromOffset(w, S(22))
-        b.Position = UDim2.fromOffset(x, S(52))
-        b.Text = txt
-        b.TextSize = S(9)
-        b.Font = Enum.Font.GothamBold
-        b.TextColor3 = Color3.new(1, 1, 1)
-        b.BackgroundColor3 = col
-        b.BorderSizePixel = 0
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0, S(4))
-        b.MouseButton1Click:Connect(cb)
-        return b
-    end
-
-    local btnW = math.floor((STRIP_W * 1.8 - S(8)) / 2)
-    smallBtn("🌍 Tüm Oyuncular", Color3.fromRGB(40, 50, 70), S(4), btnW, function()
-        targetMode = "All"
-        selectedTarget = nil
-        selLbl.Text = "Hedef: Tüm Oyuncular"
-        selLbl.TextColor3 = COL.GOLD
-    end)
-
-    smallBtn("🎯 Seçili", Color3.fromRGB(70, 40, 60), S(4) + btnW + S(2), btnW, function()
-        targetMode = "Selected"
-        -- Yakındaki oyuncuyu otomatik seç
-        local r2 = R()
-        if r2 then
-            local best, bestD = nil, math.huge
-            for _, plr in pairs(Players:GetPlayers()) do
-                if plr ~= lp then
-                    local t = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-                    if t then
-                        local d = (t.Position - r2.Position).Magnitude
-                        if d < bestD then bestD = d; best = plr end
-                    end
-                end
-            end
-            selectedTarget = best
-            if best then
-                selLbl.Text = "Hedef: " .. best.Name
-                selLbl.TextColor3 = COL.GOLD
-            else
-                selLbl.Text = "Hedef: Yok (oyuncu bulunamadı)"
-                selLbl.TextColor3 = Color3.fromRGB(255, 80, 80)
-            end
-        end
-    end)
-
-    -- Oyuncu listesi (ScrollingFrame)
-    local listSF = Instance.new("ScrollingFrame", f)
-    listSF.Size = UDim2.new(1, -S(6), 1, -S(108))
-    listSF.Position = UDim2.new(0, S(3), 0, S(78))
-    listSF.BackgroundTransparency = 1
-    listSF.BorderSizePixel = 0
-    listSF.ScrollBarThickness = S(3)
-    listSF.ScrollBarImageColor3 = COL.GOLD
-    listSF.CanvasSize = UDim2.new(0, 0, 0, 0)
-    listSF.AutomaticCanvasSize = Enum.AutomaticSize.Y
-
-    local ll = Instance.new("UIListLayout", listSF)
-    ll.Padding = UDim.new(0, S(3))
-    ll.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-    local pBtns = {}
-    local function refreshPlayerList()
-        for _, b in pairs(pBtns) do pcall(function() b:Destroy() end) end
-        pBtns = {}
-        local plrs = {}
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= lp then table.insert(plrs, p) end
-        end
-        if #plrs == 0 then
-            local nl = Instance.new("TextLabel", listSF)
-            nl.Size = UDim2.new(1, 0, 0, S(24))
-            nl.Text = "Başka oyuncu yok"
-            nl.TextSize = S(9)
-            nl.Font = Enum.Font.Gotham
-            nl.TextColor3 = COL.SUBTEXT
-            nl.BackgroundTransparency = 1
-            table.insert(pBtns, nl)
-            return
-        end
-        for _, plr in pairs(plrs) do
-            local b = Instance.new("TextButton", listSF)
-            b.Size = UDim2.new(1, 0, 0, S(26))
-            b.Text = "👤 " .. plr.Name
-            b.TextSize = S(9)
-            b.Font = Enum.Font.GothamSemibold
-            b.TextXAlignment = Enum.TextXAlignment.Left
-            b.TextColor3 = COL.TEXT
-            b.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
-            b.BorderSizePixel = 0
-            Instance.new("UICorner", b).CornerRadius = UDim.new(0, S(4))
-            local pl2 = plr
-            b.MouseButton1Click:Connect(function()
-                selectedTarget = pl2
-                targetMode = "Selected"
-                selLbl.Text = "Hedef: " .. pl2.Name
-                selLbl.TextColor3 = COL.GOLD
-                for _, x in pairs(pBtns) do
-                    if x:IsA("TextButton") then
-                        x.BackgroundColor3 = Color3.fromRGB(30, 30, 42)
-                    end
-                end
-                b.BackgroundColor3 = COL.GOLD_DARK
-            end)
-            table.insert(pBtns, b)
-        end
-    end
-    refreshPlayerList()
-
-    Players.PlayerAdded:Connect(function() task.wait(0.5); refreshPlayerList() end)
-    Players.PlayerRemoving:Connect(function() task.wait(0.1); refreshPlayerList() end)
-end
-
--- Fling Boat Aktifleştir (Toggle)
-makeStrip("🔥 FLING\nBOAT", "flingBoat", function(on)
-    boatFlingActive = on
-    if on then
-        -- Önce tekne yoksa oluştur
-        if not boatModel then spawnBoat() end
-        if not boatModel then return end
-
-        conn(RS.Heartbeat, function()
-            if not boatFlingActive then return end
-            if not boatModel or not boatRoot then return end
-
-            if targetMode == "All" then
-                -- Tüm oyunculara sırayla fling
-                for _, plr in pairs(Players:GetPlayers()) do
-                    if plr ~= lp then
-                        flingBoatTarget(plr)
-                        task.wait(0.03)
-                    end
-                end
-            else
-                -- Seçili oyuncu
-                if selectedTarget then
-                    flingBoatTarget(selectedTarget)
-                else
-                    -- Yakındaki oyuncuyu bul
-                    local r2 = R()
-                    if r2 then
-                        local best, bestD = nil, math.huge
-                        for _, plr in pairs(Players:GetPlayers()) do
-                            if plr ~= lp then
-                                local t = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-                                if t then
-                                    local d = (t.Position - r2.Position).Magnitude
-                                    if d < bestD then bestD = d; best = plr end
-                                end
-                            end
-                        end
-                        if best then
-                            selectedTarget = best
-                            flingBoatTarget(best)
-                        end
-                    end
-                end
-            end
-        end, "flingBoatLoop")
-    else
-        disc("flingBoatLoop")
-    end
-end, "🔥", BOAT_CLR)
-
--- Tek Fling (Tek seferlik)
-makeBtnStrip("💥 TEK\nFLİNG", "💥", function()
-    if not boatModel then spawnBoat() end
-    if not boatModel then return end
-
-    if targetMode == "All" then
-        flingBoatAll()
-    elseif selectedTarget then
-        flingBoatTarget(selectedTarget)
-    else
-        -- Yakındaki oyuncu
-        local r2 = R()
-        if r2 then
-            local best, bestD = nil, math.huge
-            for _, plr in pairs(Players:GetPlayers()) do
-                if plr ~= lp then
-                    local t = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-                    if t then
-                        local d = (t.Position - r2.Position).Magnitude
-                        if d < bestD then bestD = d; best = plr end
-                    end
-                end
-            end
-            if best then flingBoatTarget(best) end
-        end
-    end
-end, BOAT_CLR)
+-- Tüm Oyunculara Fling
+makeBtnStrip("💥 HERKES FLING", "💥", function()
+    flingAllPlayers()
+end, FLING_CLR)
 
 -- Süper Fling (Aşırı güç)
-makeBtnStrip("☄️ SÜPER\nFLİNG", "☄️", function()
-    if not boatModel then spawnBoat() end
-    if not boatModel then return end
-
-    -- Aşırı güç versiyonu
-    local function superFling(target)
-        if not target then return end
-        local char = target.Character
-        if not char then return end
-        local rootPart = char:FindFirstChild("HumanoidRootPart")
-        if not rootPart then return end
-
-        -- Tekneyi hedefe ışınla
-        local pos = rootPart.Position + Vector3.new(0, 5, 0)
-        boatRoot.CFrame = CFrame.new(pos)
-
-        -- Çok yüksek hız
-        pcall(function()
-            local bv = Instance.new("BodyVelocity", boatRoot)
-            bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-            bv.Velocity = Vector3.new(
-                math.random(-1000, 1000),
-                math.random(800, 1500),
-                math.random(-1000, 1000)
-            )
-            Debris:AddItem(bv, 0.2)
-        end)
-
-        -- Oyuncuyu da fırlat
-        pcall(function()
-            local bv2 = Instance.new("BodyVelocity", rootPart)
-            bv2.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-            bv2.Velocity = Vector3.new(
-                math.random(-600, 600),
-                math.random(500, 1000),
-                math.random(-600, 600)
-            )
-            Debris:AddItem(bv2, 0.15)
-        end)
-    end
-
-    if targetMode == "All" then
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= lp then
-                superFling(plr)
-                task.wait(0.05)
-            end
+makeBtnStrip("☄️ SÜPER FLING", "☄️", function()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= lp then
+            superFling(plr)
+            task.wait(0.01)
         end
-    elseif selectedTarget then
-        superFling(selectedTarget)
     end
-end, BOAT_CLR)
+end, FLING_CLR)
+
+-- OTOMATİK FLİNG (Toggle)
+makeStrip("🔄 OTOMATİK", "autoFling", function(on)
+    if on then
+        boatFlingActive = true
+        conn(RS.Heartbeat, function()
+            if not boatFlingActive then return end
+            local r2 = R()
+            if not r2 then return end
+            for _, plr in pairs(Players:GetPlayers()) do
+                if plr ~= lp then
+                    local t = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if t and (t.Position - r2.Position).Magnitude < 50 then
+                        superFling(plr)
+                        task.wait(0.05)
+                    end
+                end
+            end
+        end, "autoFling")
+    else
+        boatFlingActive = false
+        disc("autoFling")
+    end
+end, "🔄", FLING_CLR)
 
 -- ════════════════════════════════════════════════════════════════
---  BÖLÜM 3 — GÖRSEL EFEKTLER
+--  BÖLÜM 3 — GÖRSEL
 -- ════════════════════════════════════════════════════════════════
 makeDivider("🎨 GÖRSEL")
 
@@ -976,7 +640,7 @@ local oB = Lighting.Brightness
 local oGS = Lighting.GlobalShadows
 local oCT = Lighting.ClockTime
 
-makeStrip("💡 FULL\nBRIGHT", "fb", function(on)
+makeStrip("💡 FULLBRIGHT", "fb", function(on)
     if on then
         Lighting.Brightness = 10
         Lighting.ClockTime = 14
@@ -994,7 +658,7 @@ makeStrip("💡 FULL\nBRIGHT", "fb", function(on)
     end
 end, "💡")
 
-makeStrip("🌙 GECE\nMODU", "night", function(on)
+makeStrip("🌙 GECE", "night", function(on)
     if on then
         Lighting.ClockTime = 0
         Lighting.Ambient = Color3.fromRGB(20, 20, 60)
@@ -1071,7 +735,7 @@ local function buildESP()
     end
 end
 
-makeStrip("👁️ OYUNCU\nESP", "esp", function(on)
+makeStrip("👁️ ESP", "esp", function(on)
     if on then
         buildESP()
         conn(RS.Heartbeat, function()
@@ -1090,60 +754,28 @@ makeStrip("👁️ OYUNCU\nESP", "esp", function(on)
 end, "👁️")
 
 -- ════════════════════════════════════════════════════════════════
---  BÖLÜM 5 — ARAÇ
--- ════════════════════════════════════════════════════════════════
-makeDivider("🚗 ARAÇ")
-
-local boostedCars = {}
-makeStrip("🚗 ARAÇ\nHIZI", "carhack", function(on)
-    if on then
-        conn(RS.Heartbeat, function()
-            local r2 = R()
-            if not r2 then return end
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj:IsA("VehicleSeat") and not boostedCars[obj] then
-                    if (obj.Position - r2.Position).Magnitude < 22 then
-                        pcall(function()
-                            obj.MaxSpeed = 200
-                            obj.Torque = 250000
-                        end)
-                        boostedCars[obj] = true
-                    end
-                end
-            end
-        end, "carhack")
-    else
-        disc("carhack")
-        for s, _ in pairs(boostedCars) do
-            pcall(function() s.MaxSpeed = 60; s.Torque = 10000 end)
-        end
-        boostedCars = {}
-    end
-end, "🚗")
-
--- ════════════════════════════════════════════════════════════════
---  BÖLÜM 6 — DÜNYA
+--  BÖLÜM 5 — DÜNYA
 -- ════════════════════════════════════════════════════════════════
 makeDivider("🌍 DÜNYA")
 
-makeBtnStrip("⭐ SPAWN'A\nISINLAN", "⭐", function()
+makeBtnStrip("⭐ SPAWN", "⭐", function()
     local r2 = R()
     if not r2 then return end
     local sp = workspace:FindFirstChild("SpawnLocation") or workspace:FindFirstChildWhichIsA("SpawnLocation", true)
     if sp then r2.CFrame = sp.CFrame + Vector3.new(0, 5, 0) end
 end)
 
-makeBtnStrip("☁️ HAVAYA\nZIPLA", "☁️", function()
+makeBtnStrip("☁️ HAVAYA", "☁️", function()
     local r2 = R()
     if r2 then r2.CFrame = r2.CFrame + Vector3.new(0, 80, 0) end
 end)
 
-makeBtnStrip("🔄 HIZLI\nRESPAWN", "🔄", function()
+makeBtnStrip("🔄 RESPAWN", "🔄", function()
     lp:LoadCharacter()
 end)
 
 -- ════════════════════════════════════════════════════════════════
---  MOBİL HIZLI BUTONLAR (Sağ taraf)
+--  MOBİL HIZLI BUTONLAR
 -- ════════════════════════════════════════════════════════════════
 local quickBar = Instance.new("Frame", sg)
 local qSz = S(isMobile and 54 or 42)
@@ -1204,7 +836,7 @@ local function qBtn(icon, col, idx, tip, fn)
     return b
 end
 
-qBtn("🏠", Color3.fromRGB(60, 50, 30), 0, "Menü Aç/Kapat", function()
+qBtn("🏠", Color3.fromRGB(60, 50, 30), 0, "Menü", function()
     win.Visible = not win.Visible
 end)
 
@@ -1250,18 +882,13 @@ qBtn("🛩️", Color3.fromRGB(50, 40, 60), 2, "Uçuş", function()
     end
 end)
 
-qBtn("🚤", Color3.fromRGB(30, 50, 80), 3, "Fling Boat", function()
-    if not boatModel then spawnBoat() end
-    if targetMode == "All" then
-        flingBoatAll()
-    elseif selectedTarget then
-        flingBoatTarget(selectedTarget)
-    end
+qBtn("💥", Color3.fromRGB(80, 30, 30), 3, "Herkes Fling", function()
+    flingAllPlayers()
 end)
 
-qBtn("💥", Color3.fromRGB(80, 30, 30), 4, "Herkesi Fling", function()
-    if not boatModel then spawnBoat() end
-    flingBoatAll()
+qBtn("🎯", Color3.fromRGB(60, 30, 50), 4, "Tek Fling", function()
+    local target = getNearestPlayer()
+    if target then superFling(target) end
 end)
 
 qBtn("🛡️", Color3.fromRGB(50, 30, 60), 5, "God Mode", function()
@@ -1295,12 +922,10 @@ UIS.InputBegan:Connect(function(i, gp)
             fG = nil
         end
     elseif i.KeyCode == Enum.KeyCode.F7 then
-        if not boatModel then spawnBoat() end
-        if targetMode == "All" then
-            flingBoatAll()
-        elseif selectedTarget then
-            flingBoatTarget(selectedTarget)
-        end
+        flingAllPlayers()
+    elseif i.KeyCode == Enum.KeyCode.F8 then
+        local target = getNearestPlayer()
+        if target then superFling(target) end
     end
 end)
 
@@ -1310,11 +935,13 @@ end)
 lp.CharacterAdded:Connect(function(char)
     task.wait(0.8)
     flyOn = false
+    boatFlingActive = false
     if fCon then fCon:Disconnect(); fCon = nil end
     pcall(function() if fV then fV:Destroy() end end)
     fV = nil
     pcall(function() if fG then fG:Destroy() end end)
     fG = nil
+    disc("autoFling")
     if ncOn then
         conn(RS.Stepped, function()
             for _, p in pairs(char:GetDescendants()) do
@@ -1328,8 +955,8 @@ end)
 --  BAŞLANGIÇ BİLDİRİMİ
 -- ════════════════════════════════════════════════════════════════
 local notifF = Instance.new("Frame", sg)
-notifF.Size = UDim2.fromOffset(S(340), S(58))
-notifF.Position = UDim2.new(0.5, -S(170), 1, S(10))
+notifF.Size = UDim2.fromOffset(S(320), S(56))
+notifF.Position = UDim2.new(0.5, -S(160), 1, S(10))
 notifF.BackgroundColor3 = COL.BG
 notifF.BorderSizePixel = 0
 Instance.new("UICorner", notifF).CornerRadius = UDim.new(0, S(10))
@@ -1346,13 +973,13 @@ nl.TextColor3 = COL.TEXT
 nl.BackgroundTransparency = 1
 nl.TextWrapped = true
 nl.Text = "⚡ SLAYER HUB V2 — Brookhaven RP\n✅ Hazır!  " .. (isMobile and "📱 Mobil" or "💻 PC") ..
-         "  |  RightShift=Menü  F7=FlingBoat"
+         "  |  F7=Tüm Fling  F8=Tek Fling"
 
-TS:Create(notifF, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {Position = UDim2.new(0.5, -S(170), 1, -S(72))}):Play()
+TS:Create(notifF, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {Position = UDim2.new(0.5, -S(160), 1, -S(70))}):Play()
 task.delay(5, function()
-    TS:Create(notifF, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {Position = UDim2.new(0.5, -S(170), 1, S(10))}):Play()
+    TS:Create(notifF, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {Position = UDim2.new(0.5, -S(160), 1, S(10))}):Play()
     task.delay(0.6, function() notifF:Destroy() end)
 end)
 
 print("⚡ SLAYER HUB V2 — Brookhaven RP | Hazır!")
-print("Klavye: RightShift=Menü | F5=Speed | F6=Uçuş | F7=FlingBoat")
+print("Klavye: RightShift=Menü | F5=Speed | F6=Uçuş | F7=Tüm Fling | F8=Tek Fling")
